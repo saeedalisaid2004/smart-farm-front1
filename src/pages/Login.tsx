@@ -1,0 +1,139 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, Leaf } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!role) {
+      toast({ variant: "destructive", title: "Error", description: "Please select your role" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        let msg = "Login failed. Please try again.";
+        if (error.message.includes("Invalid login")) msg = "Invalid email or password.";
+        if (error.message.includes("Email not confirmed")) msg = "Please confirm your email first.";
+        toast({ variant: "destructive", title: "Error", description: msg });
+      } else {
+        if (role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-4">
+            <Leaf className="w-9 h-9 text-primary-foreground" />
+          </div>
+          <h1 className="text-xl font-semibold text-foreground">Smart Farm AI</h1>
+          <p className="text-muted-foreground text-sm mt-1">Sign in to manage your smart farm</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email */}
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-11 rounded-full bg-secondary border-0 px-4"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-11 rounded-full bg-secondary border-0 px-4 pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Role */}
+          <div className="space-y-2">
+            <Label className="text-foreground font-medium">Role</Label>
+            <Select value={role} onValueChange={setRole}>
+              <SelectTrigger className="h-11 rounded-full bg-secondary border-0 px-4">
+                <SelectValue placeholder="Select your role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="farmer">Farmer</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 rounded-full text-base font-semibold mt-2"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-primary font-medium hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
