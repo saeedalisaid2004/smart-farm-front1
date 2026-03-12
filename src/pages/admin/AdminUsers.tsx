@@ -17,6 +17,9 @@ const mockUsers = [
   { id: 3, name: "Mike Johnson", email: "mike.johnson@example.com", role: "Admin", status: "Active", joined: "Jan 10, 2024" },
   { id: 4, name: "Emma Wilson", email: "emma.wilson@example.com", role: "Farmer", status: "Active", joined: "Mar 5, 2024" },
   { id: 5, name: "David Brown", email: "david.brown@example.com", role: "Farmer", status: "Inactive", joined: "Feb 12, 2024" },
+  { id: 6, name: "Lisa Anderson", email: "lisa.anderson@example.com", role: "Farmer", status: "Active", joined: "Mar 18, 2024" },
+  { id: 7, name: "Tom Harris", email: "tom.harris@example.com", role: "Farmer", status: "Active", joined: "Jan 25, 2024" },
+  { id: 8, name: "Rachel Green", email: "rachel.green@example.com", role: "Admin", status: "Active", joined: "Feb 8, 2024" },
 ];
 
 const AdminUsers = () => {
