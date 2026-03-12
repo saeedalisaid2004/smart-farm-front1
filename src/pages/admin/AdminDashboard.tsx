@@ -66,20 +66,22 @@ const AdminDashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statsCards.map((card) => (
-            <div key={card.label} className="bg-card border border-border rounded-xl p-5 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <card.icon className="w-6 h-6 text-primary" />
+            <div key={card.label} className="bg-card border border-border rounded-xl p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <card.icon className="w-5 h-5 text-primary" />
+                </div>
+                {card.change && (
+                  <span className={`text-xs font-semibold ${card.changeColor}`}>{card.change}</span>
+                )}
+                {card.badge && (
+                  <span className={`text-xs font-semibold ${card.badgeColor}`}>{card.badge}</span>
+                )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold text-foreground">{card.value}</p>
-                <p className="text-sm text-muted-foreground">{card.sub}</p>
+              <div>
+                <p className="text-sm font-medium text-foreground">{card.label}</p>
+                <p className="text-sm text-muted-foreground">{card.value} {card.sub}</p>
               </div>
-              {card.change && (
-                <span className={`text-xs font-semibold ${card.changeColor}`}>{card.change}</span>
-              )}
-              {card.badge && (
-                <span className={`text-xs font-semibold ${card.badgeColor}`}>{card.badge}</span>
-              )}
             </div>
           ))}
         </div>
