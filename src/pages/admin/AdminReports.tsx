@@ -19,6 +19,21 @@ const usageData = [
   { service: "Chatbot", value: 310 },
 ];
 
+const dailyData = [
+  { day: "Jun 1", activity: 240 },
+  { day: "Jun 2", activity: 265 },
+  { day: "Jun 3", activity: 250 },
+  { day: "Jun 4", activity: 300 },
+  { day: "Jun 5", activity: 270 },
+  { day: "Jun 6", activity: 210 },
+  { day: "Jun 7", activity: 180 },
+];
+
+const generatedReports = [
+  { name: "Monthly Usage Report", date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB" },
+  { name: "User Activity Analysis", date: "Jun 1, 2024", tag: "Users", size: "1.8 MB" },
+];
+
 const growthData = [
   { month: "Jan", users: 120 },
   { month: "Feb", users: 180 },
