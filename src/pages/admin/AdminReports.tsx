@@ -32,6 +32,9 @@ const dailyData = [
 const generatedReports = [
   { name: "Monthly Usage Report", date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB" },
   { name: "User Activity Analysis", date: "Jun 1, 2024", tag: "Users", size: "1.8 MB" },
+  { name: "AI Model Performance", date: "May 25, 2024", tag: "Performance", size: "3.2 MB" },
+  { name: "System Health Report", date: "May 20, 2024", tag: "System", size: "1.5 MB" },
+  { name: "Revenue Analytics", date: "May 15, 2024", tag: "Finance", size: "2.1 MB" },
 ];
 
 const growthData = [
