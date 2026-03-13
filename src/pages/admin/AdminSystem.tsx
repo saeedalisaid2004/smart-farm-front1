@@ -15,10 +15,18 @@ const services = [
 const models = [
   { name: "Plant-CNN-v2.3", version: "2.3.0", type: "CNN", accuracy: "94.2%", status: "Active" },
   { name: "Animal-YOLO-v4", version: "4.1.0", type: "YOLO", accuracy: "91.8%", status: "Active" },
-  { name: "Crop-RF-v3", version: "3.0.2", type: "Random Forest", accuracy: "89.5%", status: "Active" },
-  { name: "Soil-SVM-v2", version: "2.1.0", type: "SVM", accuracy: "93.1%", status: "Active" },
-  { name: "Fruit-ResNet-v1", version: "1.5.0", type: "ResNet", accuracy: "92.7%", status: "Active" },
-  { name: "Chat-LLM-v2", version: "2.0.1", type: "LLM", accuracy: "95.2%", status: "Active" },
+  { name: "Crop-ML-v3.1", version: "3.1.0", type: "Machine Learning", accuracy: "89.5%", status: "Active" },
+  { name: "Soil-DL-v2.0", version: "2.0.1", type: "Deep Learning", accuracy: "92.3%", status: "Active" },
+  { name: "Fruit-CV-v1.5", version: "1.5.4", type: "Computer Vision", accuracy: "90.7%", status: "Active" },
+  { name: "Chat-NLP-v2.7", version: "2.7.0", type: "NLP", accuracy: "96.1%", status: "Active" },
+];
+
+const systemSettings = [
+  { name: "Auto-backup Database", desc: "Automatically backup database daily", defaultOn: true },
+  { name: "Email Notifications", desc: "Send system alerts via email", defaultOn: true },
+  { name: "API Rate Limiting", desc: "Limit API requests per user", defaultOn: true },
+  { name: "Maintenance Mode", desc: "Enable system maintenance mode", defaultOn: false },
+  { name: "Debug Logging", desc: "Enable detailed system logs", defaultOn: false },
 ];
 
 const AdminSystem = () => {
