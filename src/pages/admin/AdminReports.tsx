@@ -208,6 +208,7 @@ const AdminReports = () => {
           </div>
         </div>
       </div>
+    </AdminLayout>
   );
 };
 
