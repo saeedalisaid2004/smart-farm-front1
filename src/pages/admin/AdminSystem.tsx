@@ -1,6 +1,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Monitor, Database, Brain, Power, CheckCircle, Globe } from "lucide-react";
+import { Monitor, Database, Brain, Power, CheckCircle, Globe, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 const services = [
   { name: "Plant Disease Detection", uptime: "99.9%" },
@@ -14,10 +15,18 @@ const services = [
 const models = [
   { name: "Plant-CNN-v2.3", version: "2.3.0", type: "CNN", accuracy: "94.2%", status: "Active" },
   { name: "Animal-YOLO-v4", version: "4.1.0", type: "YOLO", accuracy: "91.8%", status: "Active" },
-  { name: "Crop-RF-v3", version: "3.0.2", type: "Random Forest", accuracy: "89.5%", status: "Active" },
-  { name: "Soil-SVM-v2", version: "2.1.0", type: "SVM", accuracy: "93.1%", status: "Active" },
-  { name: "Fruit-ResNet-v1", version: "1.5.0", type: "ResNet", accuracy: "92.7%", status: "Active" },
-  { name: "Chat-LLM-v2", version: "2.0.1", type: "LLM", accuracy: "95.2%", status: "Active" },
+  { name: "Crop-ML-v3.1", version: "3.1.0", type: "Machine Learning", accuracy: "89.5%", status: "Active" },
+  { name: "Soil-DL-v2.0", version: "2.0.1", type: "Deep Learning", accuracy: "92.3%", status: "Active" },
+  { name: "Fruit-CV-v1.5", version: "1.5.4", type: "Computer Vision", accuracy: "90.7%", status: "Active" },
+  { name: "Chat-NLP-v2.7", version: "2.7.0", type: "NLP", accuracy: "96.1%", status: "Active" },
+];
+
+const systemSettings = [
+  { name: "Auto-backup Database", desc: "Automatically backup database daily", defaultOn: true },
+  { name: "Email Notifications", desc: "Send system alerts via email", defaultOn: true },
+  { name: "API Rate Limiting", desc: "Limit API requests per user", defaultOn: true },
+  { name: "Maintenance Mode", desc: "Enable system maintenance mode", defaultOn: false },
+  { name: "Debug Logging", desc: "Enable detailed system logs", defaultOn: false },
 ];
 
 const AdminSystem = () => {
@@ -161,6 +170,31 @@ const AdminSystem = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* General System Settings */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
+              <Settings className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-foreground">General System Settings</p>
+              <p className="text-sm text-muted-foreground">Configure system-wide preferences</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            {systemSettings.map((setting) => (
+              <div key={setting.name} className="flex items-center justify-between bg-secondary/20 border border-border rounded-lg px-5 py-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{setting.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{setting.desc}</p>
+                </div>
+                <Switch defaultChecked={setting.defaultOn} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
