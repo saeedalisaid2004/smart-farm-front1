@@ -1,5 +1,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { TrendingUp, Users, Globe, Activity, Filter } from "lucide-react";
+import { TrendingUp, Users, Globe, Activity, Filter, FileText, Calendar, Download } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line,
