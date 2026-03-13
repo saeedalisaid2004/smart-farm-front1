@@ -2,57 +2,73 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Settings, User, Palette } from "lucide-react";
 
 const AdminSettings = () => {
   const { toast } = useToast();
 
   const handleSave = () => {
-    toast({ title: "Settings saved", description: "System settings have been updated." });
+    toast({ title: "Settings saved", description: "Your profile has been updated." });
   };
 
   return (
     <AdminLayout title="Settings">
       <div className="space-y-6 max-w-2xl">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">System Settings</h1>
-          <p className="text-muted-foreground mt-1">Configure platform-wide settings</p>
-        </div>
-
-        {/* General */}
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-          <h3 className="font-semibold text-foreground">General</h3>
-          <div className="space-y-2">
-            <Label>Platform Name</Label>
-            <Input defaultValue="Smart Farm AI" className="h-10" />
-          </div>
-          <div className="space-y-2">
-            <Label>Support Email</Label>
-            <Input defaultValue="support@smartfarm.ai" className="h-10" />
+        <div className="flex items-center gap-2">
+          <Settings className="w-5 h-5 text-primary" />
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+            <p className="text-muted-foreground">Manage your account and application preferences</p>
           </div>
         </div>
 
-        {/* Notifications */}
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-          <h3 className="font-semibold text-foreground">Notifications</h3>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">Email alerts for new users</p>
-              <p className="text-xs text-muted-foreground">Get notified when new users register</p>
+        {/* Profile Settings */}
+        <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center">
+              <User className="w-4 h-4 text-green-600" />
             </div>
-            <Switch defaultChecked />
+            <h3 className="font-semibold text-foreground">Profile Settings</h3>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">System health alerts</p>
-              <p className="text-xs text-muted-foreground">Get notified about system issues</p>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-foreground">Full Name</Label>
+              <Input defaultValue="Farm Owner" className="h-11 rounded-lg" />
             </div>
-            <Switch defaultChecked />
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-foreground">Email</Label>
+              <Input defaultValue="owner@smartfarm.com" className="h-11 rounded-lg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-foreground">Phone Number</Label>
+              <Input defaultValue="+1234567890" className="h-11 rounded-lg" />
+            </div>
+            <Button onClick={handleSave} className="w-full h-11 rounded-lg text-sm font-medium">
+              Save Profile
+            </Button>
           </div>
         </div>
 
-        <Button onClick={handleSave} className="rounded-lg">Save Settings</Button>
+        {/* Theme Preference */}
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center">
+              <Palette className="w-4 h-4 text-green-600" />
+            </div>
+            <h3 className="font-semibold text-foreground">Theme Preference</h3>
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
+              <input type="radio" name="theme" value="light" defaultChecked className="w-4 h-4 accent-primary" />
+              <span className="text-sm font-medium text-foreground">Light Mode</span>
+            </label>
+            <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
+              <input type="radio" name="theme" value="dark" className="w-4 h-4 accent-primary" />
+              <span className="text-sm font-medium text-foreground">Dark Mode</span>
+            </label>
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );
