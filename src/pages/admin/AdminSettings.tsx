@@ -82,11 +82,11 @@ const AdminSettings = () => {
           </div>
           <div className="space-y-2">
             <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
-              <input type="radio" name="theme" value="light" defaultChecked className="w-4 h-4 accent-primary" />
+              <input type="radio" name="theme" value="light" checked={theme === "light"} onChange={() => setTheme("light")} className="w-4 h-4 accent-primary" />
               <span className="text-sm font-medium text-foreground">Light Mode</span>
             </label>
             <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
-              <input type="radio" name="theme" value="dark" className="w-4 h-4 accent-primary" />
+              <input type="radio" name="theme" value="dark" checked={theme === "dark"} onChange={() => setTheme("dark")} className="w-4 h-4 accent-primary" />
               <span className="text-sm font-medium text-foreground">Dark Mode</span>
             </label>
           </div>
