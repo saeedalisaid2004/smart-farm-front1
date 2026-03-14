@@ -1,15 +1,16 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Monitor, Database, Brain, Power, CheckCircle, Globe, Settings } from "lucide-react";
+import { Monitor, Database, Brain, Power, CheckCircle, AlertCircle, Globe, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 
-const services = [
-  { name: "Plant Disease Detection", uptime: "99.9%" },
-  { name: "Animal Weight Estimation", uptime: "99.7%" },
-  { name: "Crop Recommendation", uptime: "99.8%" },
-  { name: "Soil Type Analysis", uptime: "99.6%" },
-  { name: "Fruit Quality Analysis", uptime: "99.5%" },
-  { name: "Smart Farm Chatbot", uptime: "99.9%" },
+const initialServices = [
+  { name: "Plant Disease Detection", uptime: "99.9%", online: true },
+  { name: "Animal Weight Estimation", uptime: "99.7%", online: true },
+  { name: "Crop Recommendation", uptime: "99.8%", online: true },
+  { name: "Soil Type Analysis", uptime: "99.6%", online: true },
+  { name: "Fruit Quality Analysis", uptime: "99.5%", online: true },
+  { name: "Smart Farm Chatbot", uptime: "99.9%", online: true },
 ];
 
 const models = [
@@ -30,6 +31,12 @@ const systemSettings = [
 ];
 
 const AdminSystem = () => {
+  const [services, setServices] = useState(initialServices);
+
+  const toggleService = (index: number) => {
+    setServices(prev => prev.map((svc, i) => i === index ? { ...svc, online: !svc.online } : svc));
+  };
+
   return (
     <AdminLayout title="System Management">
       <div className="space-y-6">
@@ -114,16 +121,28 @@ const AdminSystem = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {services.map((svc) => (
-              <div key={svc.name} className="flex items-center justify-between bg-secondary/30 border border-border rounded-lg px-4 py-3">
+            {services.map((svc, index) => (
+              <div
+                key={svc.name}
+                className="flex items-center justify-between bg-secondary/30 border border-border rounded-lg px-4 py-3 cursor-pointer"
+                onClick={() => toggleService(index)}
+              >
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  {svc.online ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-destructive" />
+                  )}
                   <div>
                     <p className="text-sm font-medium text-foreground">{svc.name}</p>
                     <p className="text-xs text-muted-foreground">Uptime: {svc.uptime}</p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">online</Badge>
+                {svc.online ? (
+                  <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">online</Badge>
+                ) : (
+                  <Badge className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100 text-xs">offline</Badge>
+                )}
               </div>
             ))}
           </div>
