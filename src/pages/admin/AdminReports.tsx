@@ -30,11 +30,16 @@ const dailyData = [
 ];
 
 const generatedReports = [
-  { name: "Monthly Usage Report", date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB" },
-  { name: "User Activity Analysis", date: "Jun 1, 2024", tag: "Users", size: "1.8 MB" },
-  { name: "AI Model Performance", date: "May 25, 2024", tag: "Performance", size: "3.2 MB" },
-  { name: "System Health Report", date: "May 20, 2024", tag: "System", size: "1.5 MB" },
-  { name: "Revenue Analytics", date: "May 15, 2024", tag: "Finance", size: "2.1 MB" },
+  { name: "Monthly Usage Report", date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB",
+    content: () => `Monthly Usage Report - June 2024\n\nTotal Analyses: 8,456\nActive Users: 1,247\n\nService Breakdown:\n- Plant Disease Detection: 340 analyses\n- Animal Weight Estimation: 250 analyses\n- Crop Recommendation: 190 analyses\n- Soil Analysis: 160 analyses\n- Fruit Quality: 140 analyses\n- Smart Chatbot: 310 sessions\n\nPeak Usage: June 4 (300 requests)\nAvg Response Time: 145ms\nUptime: 99.8%` },
+  { name: "User Activity Analysis", date: "Jun 1, 2024", tag: "Users", size: "1.8 MB",
+    content: () => `User Activity Analysis - June 2024\n\nTotal Registered Users: 1,247\nNew Users This Month: 40\nDaily Active Users (avg): 312\n\nUser Growth:\nJan: 120 | Feb: 180 | Mar: 240\nApr: 300 | May: 380 | Jun: 420\n\nMost Active Service: Plant Disease Detection\nAvg Session Duration: 8.5 minutes` },
+  { name: "AI Model Performance", date: "May 25, 2024", tag: "Performance", size: "3.2 MB",
+    content: () => `AI Model Performance Report - May 2024\n\nPlant Disease Model:\n- Accuracy: 94.2%\n- Avg Inference: 120ms\n\nAnimal Weight Model:\n- Accuracy: 91.8%\n- Avg Inference: 200ms\n\nCrop Recommendation:\n- Accuracy: 89.5%\n- Avg Inference: 95ms\n\nFruit Quality Model:\n- Accuracy: 92.1%\n- Avg Inference: 150ms` },
+  { name: "System Health Report", date: "May 20, 2024", tag: "System", size: "1.5 MB",
+    content: () => `System Health Report - May 2024\n\nUptime: 99.8%\nTotal Downtime: 1.4 hours\nAvg Response Time: 145ms\nPeak Load: 450 req/min\n\nServer Status: All Healthy\nDatabase: Operational\nStorage: 67% utilized\nCDN: Active` },
+  { name: "Revenue Analytics", date: "May 15, 2024", tag: "Finance", size: "2.1 MB",
+    content: () => `Revenue Analytics - May 2024\n\nTotal Revenue: $12,450\nSubscriptions: $9,200\nPay-per-use: $3,250\n\nGrowth: +18% vs April\nChurn Rate: 2.1%\nARPU: $9.98\n\nTop Plan: Professional (45%)\nFree Tier Users: 320` },
 ];
 
 const growthData = [
