@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Settings, User, Palette, Globe, Bell } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -15,6 +16,19 @@ import {
 
 const AdminSettings = () => {
   const { toast } = useToast();
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const handleSave = () => {
     toast({ title: "Settings saved", description: "Your profile has been updated." });
@@ -68,11 +82,11 @@ const AdminSettings = () => {
           </div>
           <div className="space-y-2">
             <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
-              <input type="radio" name="theme" value="light" defaultChecked className="w-4 h-4 accent-primary" />
+              <input type="radio" name="theme" value="light" checked={theme === "light"} onChange={() => setTheme("light")} className="w-4 h-4 accent-primary" />
               <span className="text-sm font-medium text-foreground">Light Mode</span>
             </label>
             <label className="flex items-center gap-3 border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
-              <input type="radio" name="theme" value="dark" className="w-4 h-4 accent-primary" />
+              <input type="radio" name="theme" value="dark" checked={theme === "dark"} onChange={() => setTheme("dark")} className="w-4 h-4 accent-primary" />
               <span className="text-sm font-medium text-foreground">Dark Mode</span>
             </label>
           </div>
