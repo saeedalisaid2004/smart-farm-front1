@@ -31,8 +31,13 @@ const systemSettings = [
 ];
 
 const AdminSystem = () => {
+  const [services, setServices] = useState(initialServices);
+
+  const toggleService = (index: number) => {
+    setServices(prev => prev.map((svc, i) => i === index ? { ...svc, online: !svc.online } : svc));
+  };
+
   return (
-    <AdminLayout title="System Management">
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">System Management</h1>
