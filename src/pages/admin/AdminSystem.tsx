@@ -1,15 +1,16 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Monitor, Database, Brain, Power, CheckCircle, Globe, Settings } from "lucide-react";
+import { Monitor, Database, Brain, Power, CheckCircle, AlertCircle, Globe, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 
-const services = [
-  { name: "Plant Disease Detection", uptime: "99.9%" },
-  { name: "Animal Weight Estimation", uptime: "99.7%" },
-  { name: "Crop Recommendation", uptime: "99.8%" },
-  { name: "Soil Type Analysis", uptime: "99.6%" },
-  { name: "Fruit Quality Analysis", uptime: "99.5%" },
-  { name: "Smart Farm Chatbot", uptime: "99.9%" },
+const initialServices = [
+  { name: "Plant Disease Detection", uptime: "99.9%", online: true },
+  { name: "Animal Weight Estimation", uptime: "99.7%", online: true },
+  { name: "Crop Recommendation", uptime: "99.8%", online: true },
+  { name: "Soil Type Analysis", uptime: "99.6%", online: true },
+  { name: "Fruit Quality Analysis", uptime: "99.5%", online: true },
+  { name: "Smart Farm Chatbot", uptime: "99.9%", online: true },
 ];
 
 const models = [
