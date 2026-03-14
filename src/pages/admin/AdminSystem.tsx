@@ -121,16 +121,28 @@ const AdminSystem = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {services.map((svc) => (
-              <div key={svc.name} className="flex items-center justify-between bg-secondary/30 border border-border rounded-lg px-4 py-3">
+            {services.map((svc, index) => (
+              <div
+                key={svc.name}
+                className="flex items-center justify-between bg-secondary/30 border border-border rounded-lg px-4 py-3 cursor-pointer"
+                onClick={() => toggleService(index)}
+              >
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  {svc.online ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-destructive" />
+                  )}
                   <div>
                     <p className="text-sm font-medium text-foreground">{svc.name}</p>
                     <p className="text-xs text-muted-foreground">Uptime: {svc.uptime}</p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">online</Badge>
+                {svc.online ? (
+                  <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">online</Badge>
+                ) : (
+                  <Badge className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100 text-xs">offline</Badge>
+                )}
               </div>
             ))}
           </div>
