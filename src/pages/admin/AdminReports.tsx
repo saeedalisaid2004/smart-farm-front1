@@ -208,7 +208,18 @@ const AdminReports = () => {
                     </div>
                   </div>
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 bg-secondary/50 hover:bg-secondary text-sm text-muted-foreground py-2.5 rounded-lg transition-colors">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([report.content()], { type: "text/plain" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${report.name.replace(/\s+/g, "_")}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-secondary/50 hover:bg-secondary text-sm text-muted-foreground py-2.5 rounded-lg transition-colors"
+                >
                   <Download className="w-4 h-4" /> Download
                 </button>
               </div>
