@@ -2,25 +2,27 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-
-const features = [
-  { icon: Leaf, title: "Plant Disease Detection", desc: "Detect plant diseases early using AI image analysis.", path: "/dashboard/plant-disease" },
-  { icon: Eye, title: "Animal Weight Estimation", desc: "Estimate animal weight accurately without physical scales.", path: "/dashboard/animal-weight" },
-  { icon: Sprout, title: "Crop Recommendation", desc: "Get the best crop suggestions based on soil and climate data.", path: "/dashboard/crop-recommendation" },
-  { icon: FlaskConical, title: "Soil Type Analysis", desc: "Analyze soil fertility and type using AI.", path: "/dashboard/soil-analysis" },
-  { icon: Apple, title: "Fruit Quality Analysis", desc: "Classify fruit quality and detect defects.", path: "/dashboard/fruit-quality" },
-  { icon: MessageCircle, title: "Smart Farm Chatbot", desc: "Ask questions and get instant farming advice.", path: "/dashboard/chatbot" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const userName = user?.user_metadata?.full_name || "John Farmer";
 
+  const features = [
+    { icon: Leaf, title: t("dashboard.plantDisease"), desc: t("dashboard.plantDiseaseDesc"), path: "/dashboard/plant-disease" },
+    { icon: Eye, title: t("dashboard.animalWeight"), desc: t("dashboard.animalWeightDesc"), path: "/dashboard/animal-weight" },
+    { icon: Sprout, title: t("dashboard.cropRecommendation"), desc: t("dashboard.cropRecommendationDesc"), path: "/dashboard/crop-recommendation" },
+    { icon: FlaskConical, title: t("dashboard.soilAnalysis"), desc: t("dashboard.soilAnalysisDesc"), path: "/dashboard/soil-analysis" },
+    { icon: Apple, title: t("dashboard.fruitQuality"), desc: t("dashboard.fruitQualityDesc"), path: "/dashboard/fruit-quality" },
+    { icon: MessageCircle, title: t("dashboard.chatbot"), desc: t("dashboard.chatbotDesc"), path: "/dashboard/chatbot" },
+  ];
+
   return (
-    <DashboardLayout title="Welcome">
+    <DashboardLayout title={t("dashboard.welcome")}>
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-semibold text-foreground mb-1">Welcome, {userName}</h1>
-        <p className="text-muted-foreground mb-8">Use AI to improve your farming decisions</p>
+        <h1 className="text-2xl font-semibold text-foreground mb-1">{t("dashboard.welcomeUser")}, {userName}</h1>
+        <p className="text-muted-foreground mb-8">{t("dashboard.useAI")}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f) => (

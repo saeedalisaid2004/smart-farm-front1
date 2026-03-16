@@ -6,12 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Leaf } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
 const Login = () => {
@@ -22,6 +19,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,82 +52,48 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm">
-        {/* Logo */}
         <div className="flex flex-col items-center mb-6">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-4">
             <Leaf className="w-9 h-9 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold text-foreground">Smart Farm AI</h1>
-          <p className="text-muted-foreground text-sm mt-1">Sign in to manage your smart farm</p>
+          <h1 className="text-xl font-semibold text-foreground">{t("login.title")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("login.subtitle")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-11 rounded-full bg-secondary border-0 px-4"
-            />
+            <Label htmlFor="email" className="text-foreground font-medium">{t("login.email")}</Label>
+            <Input id="email" type="email" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full bg-secondary border-0 px-4" />
           </div>
-
-          {/* Password */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
+            <Label htmlFor="password" className="text-foreground font-medium">{t("login.password")}</Label>
             <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11 rounded-full bg-secondary border-0 px-4 pr-11"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
+              <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("login.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 rounded-full bg-secondary border-0 px-4 pr-11" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
-
-          {/* Role */}
           <div className="space-y-2">
-            <Label className="text-foreground font-medium">Role</Label>
+            <Label className="text-foreground font-medium">{t("login.role")}</Label>
             <Select value={role} onValueChange={setRole}>
               <SelectTrigger className="h-11 rounded-full bg-secondary border-0 px-4">
-                <SelectValue placeholder="Select your role" />
+                <SelectValue placeholder={t("login.selectRole")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="farmer">Farmer</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="farmer">{t("common.farmer")}</SelectItem>
+                <SelectItem value="admin">{t("common.admin")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full h-12 rounded-full text-base font-semibold mt-2"
-          >
-            {loading ? "Signing in..." : "Sign In"}
+          <Button type="submit" disabled={loading} className="w-full h-12 rounded-full text-base font-semibold mt-2">
+            {loading ? t("login.signingIn") : t("login.signIn")}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">
-            Sign up
-          </Link>
+          {t("login.noAccount")}{" "}
+          <Link to="/register" className="text-primary font-medium hover:underline">{t("login.signUp")}</Link>
         </p>
       </div>
     </div>

@@ -2,10 +2,12 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Upload, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FruitQuality = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -14,7 +16,7 @@ const FruitQuality = () => {
   };
 
   return (
-    <DashboardLayout title="Fruit Quality Analysis">
+    <DashboardLayout title={t("fruitQuality.title")}>
       <div className="max-w-2xl mx-auto">
         <div className="bg-card border border-border rounded-2xl p-8">
           <div className="flex justify-center mb-6">
@@ -22,7 +24,6 @@ const FruitQuality = () => {
               <Apple className="w-7 h-7 text-destructive" />
             </div>
           </div>
-
           <div
             className="border-2 border-dashed border-border rounded-xl p-12 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-primary/40 transition-colors"
             onClick={() => fileRef.current?.click()}
@@ -32,23 +33,17 @@ const FruitQuality = () => {
             ) : (
               <>
                 <Upload className="w-10 h-10 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground text-sm">Click below to upload an image</p>
+                <p className="text-muted-foreground text-sm">{t("common.uploadHint")}</p>
               </>
             )}
           </div>
-
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-
           <div className="flex gap-4">
-            <Button
-              variant="outline"
-              className="flex-1 rounded-full py-6 text-base font-medium"
-              onClick={() => fileRef.current?.click()}
-            >
-              Choose Image
+            <Button variant="outline" className="flex-1 rounded-full py-6 text-base font-medium" onClick={() => fileRef.current?.click()}>
+              {t("common.chooseImage")}
             </Button>
             <Button className="flex-1 rounded-full py-6 text-base font-medium">
-              Analyze Image
+              {t("common.analyzeImage")}
             </Button>
           </div>
         </div>
