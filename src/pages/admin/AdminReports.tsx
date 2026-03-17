@@ -9,6 +9,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const usageData = [
   { service: "Plant Disease", value: 340 },
@@ -29,19 +30,6 @@ const dailyData = [
   { day: "Jun 7", activity: 180 },
 ];
 
-const generatedReports = [
-  { name: "Monthly Usage Report", date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB",
-    content: () => `Monthly Usage Report - June 2024\n\nTotal Analyses: 8,456\nActive Users: 1,247\n\nService Breakdown:\n- Plant Disease Detection: 340 analyses\n- Animal Weight Estimation: 250 analyses\n- Crop Recommendation: 190 analyses\n- Soil Analysis: 160 analyses\n- Fruit Quality: 140 analyses\n- Smart Chatbot: 310 sessions\n\nPeak Usage: June 4 (300 requests)\nAvg Response Time: 145ms\nUptime: 99.8%` },
-  { name: "User Activity Analysis", date: "Jun 1, 2024", tag: "Users", size: "1.8 MB",
-    content: () => `User Activity Analysis - June 2024\n\nTotal Registered Users: 1,247\nNew Users This Month: 40\nDaily Active Users (avg): 312\n\nUser Growth:\nJan: 120 | Feb: 180 | Mar: 240\nApr: 300 | May: 380 | Jun: 420\n\nMost Active Service: Plant Disease Detection\nAvg Session Duration: 8.5 minutes` },
-  { name: "AI Model Performance", date: "May 25, 2024", tag: "Performance", size: "3.2 MB",
-    content: () => `AI Model Performance Report - May 2024\n\nPlant Disease Model:\n- Accuracy: 94.2%\n- Avg Inference: 120ms\n\nAnimal Weight Model:\n- Accuracy: 91.8%\n- Avg Inference: 200ms\n\nCrop Recommendation:\n- Accuracy: 89.5%\n- Avg Inference: 95ms\n\nFruit Quality Model:\n- Accuracy: 92.1%\n- Avg Inference: 150ms` },
-  { name: "System Health Report", date: "May 20, 2024", tag: "System", size: "1.5 MB",
-    content: () => `System Health Report - May 2024\n\nUptime: 99.8%\nTotal Downtime: 1.4 hours\nAvg Response Time: 145ms\nPeak Load: 450 req/min\n\nServer Status: All Healthy\nDatabase: Operational\nStorage: 67% utilized\nCDN: Active` },
-  { name: "Revenue Analytics", date: "May 15, 2024", tag: "Finance", size: "2.1 MB",
-    content: () => `Revenue Analytics - May 2024\n\nTotal Revenue: $12,450\nSubscriptions: $9,200\nPay-per-use: $3,250\n\nGrowth: +18% vs April\nChurn Rate: 2.1%\nARPU: $9.98\n\nTop Plan: Professional (45%)\nFree Tier Users: 320` },
-];
-
 const growthData = [
   { month: "Jan", users: 120 },
   { month: "Feb", users: 180 },
@@ -51,45 +39,58 @@ const growthData = [
   { month: "Jun", users: 420 },
 ];
 
-const statsCards = [
-  { icon: TrendingUp, label: "Total Analyses", value: "8,456", change: "+23% from last month", color: "text-green-600", bg: "bg-green-50" },
-  { icon: Users, label: "Active Users", value: "1,247", change: "+12% from last month", color: "text-blue-600", bg: "bg-blue-50" },
-  { icon: Globe, label: "AI Services", value: "6 Active", change: "99.8% uptime", color: "text-green-600", bg: "bg-green-50" },
-  { icon: Activity, label: "Avg Response", value: "145ms", change: "-8% from last month", color: "text-green-600", bg: "bg-orange-50" },
-];
-
 const AdminReports = () => {
+  const { t } = useLanguage();
+
+  const generatedReports = [
+    { name: t("adminReports.monthlyUsage"), date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB",
+      content: () => `Monthly Usage Report - June 2024\n\nTotal Analyses: 8,456\nActive Users: 1,247\n\nService Breakdown:\n- Plant Disease Detection: 340\n- Animal Weight Estimation: 250\n- Crop Recommendation: 190\n- Soil Analysis: 160\n- Fruit Quality: 140\n- Smart Chatbot: 310` },
+    { name: t("adminReports.userActivity"), date: "Jun 1, 2024", tag: "Users", size: "1.8 MB",
+      content: () => `User Activity Analysis - June 2024\n\nTotal Users: 1,247\nNew Users: 40\nDaily Active Users: 312` },
+    { name: t("adminReports.modelPerformance"), date: "May 25, 2024", tag: "Performance", size: "3.2 MB",
+      content: () => `AI Model Performance Report - May 2024\n\nPlant Disease: 94.2%\nAnimal Weight: 91.8%\nCrop Recommendation: 89.5%\nFruit Quality: 92.1%` },
+    { name: t("adminReports.systemHealth"), date: "May 20, 2024", tag: "System", size: "1.5 MB",
+      content: () => `System Health Report - May 2024\n\nUptime: 99.8%\nAvg Response: 145ms\nPeak Load: 450 req/min` },
+    { name: t("adminReports.revenue"), date: "May 15, 2024", tag: "Finance", size: "2.1 MB",
+      content: () => `Revenue Analytics - May 2024\n\nTotal Revenue: $12,450\nGrowth: +18%\nChurn: 2.1%` },
+  ];
+
+  const statsCards = [
+    { icon: TrendingUp, label: t("adminReports.totalAnalyses"), value: "8,456", change: `+23% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-green-50" },
+    { icon: Users, label: t("adminReports.activeUsers"), value: "1,247", change: `+12% ${t("adminReports.fromLastMonth")}`, color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: Globe, label: t("adminReports.aiServices"), value: "6 Active", change: t("adminReports.uptimePercent"), color: "text-green-600", bg: "bg-green-50" },
+    { icon: Activity, label: t("adminReports.avgResponse"), value: "145ms", change: `-8% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-orange-50" },
+  ];
+
   return (
-    <AdminLayout title="System Reports">
+    <AdminLayout title={t("adminReports.title")}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">System Reports</h1>
-          <p className="text-muted-foreground mt-1">Comprehensive analytics and reporting for the Smart Farm AI platform</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("adminReports.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("adminReports.subtitle")}</p>
         </div>
 
-        {/* Report Filters */}
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-foreground">Report Filters</h3>
+            <h3 className="font-semibold text-foreground">{t("adminReports.filters")}</h3>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground mb-1.5">Date Range</p>
+            <p className="text-sm text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
             <Select defaultValue="30">
               <SelectTrigger className="w-64 h-10">
-                <SelectValue placeholder="Select range" />
+                <SelectValue placeholder={t("adminReports.dateRange")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="7">Last 7 Days</SelectItem>
-                <SelectItem value="30">Last 30 Days</SelectItem>
-                <SelectItem value="90">Last 90 Days</SelectItem>
-                <SelectItem value="365">Last Year</SelectItem>
+                <SelectItem value="7">{t("adminReports.last7")}</SelectItem>
+                <SelectItem value="30">{t("adminReports.last30")}</SelectItem>
+                <SelectItem value="90">{t("adminReports.last90")}</SelectItem>
+                <SelectItem value="365">{t("adminReports.lastYear")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statsCards.map((stat) => (
             <div key={stat.label} className="bg-card border border-border rounded-xl p-5">
@@ -105,17 +106,15 @@ const AdminReports = () => {
           ))}
         </div>
 
-        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Usage by Service */}
           <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex items-center gap-2 mb-1">
               <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">Usage by Service</h3>
-                <p className="text-sm text-muted-foreground">Total analyses per service</p>
+                <h3 className="font-semibold text-foreground">{t("adminReports.usageByService")}</h3>
+                <p className="text-sm text-muted-foreground">{t("adminReports.totalPerService")}</p>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -129,15 +128,14 @@ const AdminReports = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* User Growth */}
           <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex items-center gap-2 mb-1">
               <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
                 <Users className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">User Growth</h3>
-                <p className="text-sm text-muted-foreground">New user registrations</p>
+                <h3 className="font-semibold text-foreground">{t("adminReports.userGrowth")}</h3>
+                <p className="text-sm text-muted-foreground">{t("adminReports.newRegistrations")}</p>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -152,15 +150,14 @@ const AdminReports = () => {
           </div>
         </div>
 
-        {/* Daily Activity */}
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-green-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Daily Activity</h3>
-              <p className="text-sm text-muted-foreground">Platform activity over the past week</p>
+              <h3 className="font-semibold text-foreground">{t("adminReports.dailyActivity")}</h3>
+              <p className="text-sm text-muted-foreground">{t("adminReports.platformActivity")}</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -174,7 +171,6 @@ const AdminReports = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Generated Reports */}
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
@@ -182,12 +178,12 @@ const AdminReports = () => {
                 <FileText className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">Generated Reports</h3>
-                <p className="text-sm text-muted-foreground">Download historical reports</p>
+                <h3 className="font-semibold text-foreground">{t("adminReports.generatedReports")}</h3>
+                <p className="text-sm text-muted-foreground">{t("adminReports.downloadHistorical")}</p>
               </div>
             </div>
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5">
-              Generate New Report
+              {t("adminReports.generateNew")}
             </Button>
           </div>
 
@@ -220,7 +216,7 @@ const AdminReports = () => {
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-secondary/50 hover:bg-secondary text-sm text-muted-foreground py-2.5 rounded-lg transition-colors"
                 >
-                  <Download className="w-4 h-4" /> Download
+                  <Download className="w-4 h-4" /> {t("adminReports.download")}
                 </button>
               </div>
             ))}

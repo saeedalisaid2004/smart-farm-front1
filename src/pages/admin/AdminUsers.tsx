@@ -5,13 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
-
-const statsCards = [
-  { icon: Users, label: "Total Users", value: "1,247", iconColor: "text-primary", iconBg: "bg-primary/10" },
-  { icon: UserCheck, label: "Active Users", value: "1,156", iconColor: "text-primary", iconBg: "bg-primary/10" },
-  { icon: UserX, label: "Inactive Users", value: "91", iconColor: "text-destructive", iconBg: "bg-destructive/10" },
-  { icon: Shield, label: "Admins", value: "12", iconColor: "text-primary", iconBg: "bg-primary/10" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const mockUsers = [
   { id: 1, name: "John Farmer", email: "john.farmer@example.com", role: "Farmer", status: "Active", joined: "Jan 15, 2024" },
@@ -25,15 +19,23 @@ const mockUsers = [
 ];
 
 const AdminUsers = () => {
+  const { t } = useLanguage();
+
+  const statsCards = [
+    { icon: Users, label: t("adminUsers.totalUsers"), value: "1,247", iconColor: "text-primary", iconBg: "bg-primary/10" },
+    { icon: UserCheck, label: t("adminUsers.activeUsers"), value: "1,156", iconColor: "text-primary", iconBg: "bg-primary/10" },
+    { icon: UserX, label: t("adminUsers.inactiveUsers"), value: "91", iconColor: "text-destructive", iconBg: "bg-destructive/10" },
+    { icon: Shield, label: t("adminUsers.admins"), value: "12", iconColor: "text-primary", iconBg: "bg-primary/10" },
+  ];
+
   return (
-    <AdminLayout title="User Management">
+    <AdminLayout title={t("adminUsers.title")}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">User Management</h1>
-          <p className="text-muted-foreground mt-1">Manage users, roles, and permissions across the Smart Farm AI platform</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("adminUsers.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("adminUsers.subtitle")}</p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statsCards.map((card) => (
             <div key={card.label} className="bg-card border border-border rounded-xl p-5">
@@ -48,25 +50,23 @@ const AdminUsers = () => {
           ))}
         </div>
 
-        {/* Search */}
         <div className="bg-card border border-border rounded-xl p-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input placeholder="Search by name or email..." className="pl-12 h-12 rounded-lg border-0 bg-secondary" />
+            <Input placeholder={t("adminUsers.searchPlaceholder")} className="pl-12 h-12 rounded-lg border-0 bg-secondary" />
           </div>
         </div>
 
-        {/* Users Table */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">User</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Email</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Role</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Status</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Joined</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Actions</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.user")}</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.email")}</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.role")}</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.status")}</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.joined")}</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">{t("adminUsers.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -124,25 +124,25 @@ const AdminUsers = () => {
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-48 p-1">
                         <button
-                          onClick={() => toast({ title: "View Profile", description: `Viewing ${user.name}'s profile` })}
+                          onClick={() => toast({ title: t("adminUsers.viewProfile"), description: `${t("adminUsers.viewing")} ${user.name}` })}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
                         >
                           <Eye className="w-4 h-4 text-muted-foreground" />
-                          View Profile
+                          {t("adminUsers.viewProfile")}
                         </button>
                         <button
-                          onClick={() => toast({ title: "Deactivate", description: `${user.name} has been deactivated` })}
+                          onClick={() => toast({ title: t("adminUsers.deactivate"), description: `${user.name} ${t("adminUsers.deactivated")}` })}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
                         >
                           <UserMinus className="w-4 h-4 text-muted-foreground" />
-                          Deactivate
+                          {t("adminUsers.deactivate")}
                         </button>
                         <button
-                          onClick={() => toast({ title: "Delete User", description: `${user.name} has been deleted`, variant: "destructive" })}
+                          onClick={() => toast({ title: t("adminUsers.deleteUser"), description: `${user.name} ${t("adminUsers.deleted")}`, variant: "destructive" })}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive rounded-md hover:bg-destructive/10 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
-                          Delete User
+                          {t("adminUsers.deleteUser")}
                         </button>
                       </PopoverContent>
                     </Popover>
