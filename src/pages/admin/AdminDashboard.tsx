@@ -1,13 +1,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Users, Activity, Cpu, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-
-const statsCards = [
-  { icon: Users, label: "Total Users", value: "1,247", sub: "registered", change: "+12%", changeColor: "text-primary" },
-  { icon: Activity, label: "Total Analyses", value: "8,456", sub: "this month", change: "+23%", changeColor: "text-primary" },
-  { icon: Cpu, label: "AI Services", value: "6 of 6", sub: "active", badge: "All Online", badgeColor: "text-primary" },
-  { icon: TrendingUp, label: "Most Used", value: "Plant Disease", sub: "Detection", badge: "Top", badgeColor: "text-primary" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const usageData = [
   { month: "Jan", value: 150 },
@@ -16,15 +10,6 @@ const usageData = [
   { month: "Apr", value: 280 },
   { month: "May", value: 350 },
   { month: "Jun", value: 400 },
-];
-
-const serviceData = [
-  { name: "Plant Disease", value: 25 },
-  { name: "Chatbot", value: 21 },
-  { name: "Animal Weight", value: 18 },
-  { name: "Recommendation", value: 14 },
-  { name: "Soil Analysis", value: 12 },
-  { name: "Fruit Quality", value: 10 },
 ];
 
 const COLORS = [
@@ -47,20 +32,38 @@ const activeUsersData = [
 ];
 
 const recentActivity = [
-  { name: "John Farmer", action: "Used Plant Disease Detection", time: "2 minutes ago" },
-  { name: "Sarah Miller", action: "Completed Soil Analysis", time: "15 minutes ago" },
-  { name: "Mike Johnson", action: "Requested Crop Recommendation", time: "1 hour ago" },
-  { name: "Emma Wilson", action: "Used Animal Weight Estimation", time: "2 hours ago" },
-  { name: "David Brown", action: "Analyzed Fruit Quality", time: "3 hours ago" },
+  { nameKey: "John Farmer", action: "Used Plant Disease Detection", time: "2 minutes ago" },
+  { nameKey: "Sarah Miller", action: "Completed Soil Analysis", time: "15 minutes ago" },
+  { nameKey: "Mike Johnson", action: "Requested Crop Recommendation", time: "1 hour ago" },
+  { nameKey: "Emma Wilson", action: "Used Animal Weight Estimation", time: "2 hours ago" },
+  { nameKey: "David Brown", action: "Analyzed Fruit Quality", time: "3 hours ago" },
 ];
 
 const AdminDashboard = () => {
+  const { t } = useLanguage();
+
+  const serviceData = [
+    { name: t("adminDash.plantDisease"), value: 25 },
+    { name: t("adminDash.chatbot"), value: 21 },
+    { name: t("adminDash.animalWeight"), value: 18 },
+    { name: t("adminDash.recommendation"), value: 14 },
+    { name: t("adminDash.soilAnalysis"), value: 12 },
+    { name: t("adminDash.fruitQuality"), value: 10 },
+  ];
+
+  const statsCards = [
+    { icon: Users, label: t("adminDash.totalUsers"), value: "1,247", sub: t("adminDash.registered"), change: "+12%", changeColor: "text-primary" },
+    { icon: Activity, label: t("adminDash.totalAnalyses"), value: "8,456", sub: t("adminDash.thisMonth"), change: "+23%", changeColor: "text-primary" },
+    { icon: Cpu, label: t("adminDash.aiServices"), value: "6 of 6", sub: t("adminDash.active"), badge: t("adminDash.allOnline"), badgeColor: "text-primary" },
+    { icon: TrendingUp, label: t("adminDash.mostUsed"), value: t("adminDash.plantDisease"), sub: t("adminDash.detection"), badge: t("adminDash.top"), badgeColor: "text-primary" },
+  ];
+
   return (
-    <AdminLayout title="Admin Dashboard">
+    <AdminLayout title={t("adminDash.title")}>
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">System-wide overview and analytics for Smart Farm AI platform</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("adminDash.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("adminDash.subtitle")}</p>
         </div>
 
         {/* Stats Cards */}
@@ -94,8 +97,8 @@ const AdminDashboard = () => {
                 <Activity className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">Usage Over Time</h3>
-                <p className="text-sm text-muted-foreground">Monthly AI analyses trend</p>
+                <h3 className="font-semibold text-foreground">{t("adminDash.usageOverTime")}</h3>
+                <p className="text-sm text-muted-foreground">{t("adminDash.monthlyTrend")}</p>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={250}>
@@ -115,8 +118,8 @@ const AdminDashboard = () => {
                 <Cpu className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">Service Distribution</h3>
-                <p className="text-sm text-muted-foreground">Usage by AI service</p>
+                <h3 className="font-semibold text-foreground">{t("adminDash.serviceDistribution")}</h3>
+                <p className="text-sm text-muted-foreground">{t("adminDash.usageByService")}</p>
               </div>
             </div>
             <div className="flex items-center justify-center">
@@ -141,8 +144,8 @@ const AdminDashboard = () => {
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Active Users</h3>
-              <p className="text-sm text-muted-foreground">Daily active users this week</p>
+              <h3 className="font-semibold text-foreground">{t("adminDash.activeUsers")}</h3>
+              <p className="text-sm text-muted-foreground">{t("adminDash.dailyActive")}</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={250}>
@@ -158,7 +161,7 @@ const AdminDashboard = () => {
 
         {/* Recent System Activity */}
         <div className="bg-card border border-border rounded-xl p-6">
-          <h3 className="font-semibold text-foreground mb-4">Recent System Activity</h3>
+          <h3 className="font-semibold text-foreground mb-4">{t("adminDash.recentActivity")}</h3>
           <div className="divide-y divide-border">
             {recentActivity.map((activity, i) => (
               <div key={i} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
@@ -166,7 +169,7 @@ const AdminDashboard = () => {
                   <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{activity.name}</p>
+                  <p className="text-sm font-medium text-foreground">{activity.nameKey}</p>
                   <p className="text-xs text-muted-foreground">{activity.action}</p>
                 </div>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">{activity.time}</span>
