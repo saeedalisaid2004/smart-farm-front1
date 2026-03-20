@@ -47,7 +47,7 @@ const AdminProfile = () => {
     const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
     const url = `${publicUrl}?t=${Date.now()}`;
 
-    await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+    await supabase.from("profiles").upsert({ id: user.id, avatar_url: url, email: user.email, full_name: user.user_metadata?.full_name });
     setAvatarUrl(url);
     window.dispatchEvent(new CustomEvent("avatar-updated", { detail: url }));
     toast({ title: t("profile.photoUpdated") });
