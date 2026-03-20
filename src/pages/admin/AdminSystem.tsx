@@ -28,8 +28,8 @@ const AdminSystem = () => {
 
   const systemSettings = [
     { name: t("adminSys.autoBackup"), desc: t("adminSys.autoBackupDesc"), defaultOn: true },
+    { name: t("adminSys.emailNotif"), desc: t("adminSys.emailNotifDesc"), defaultOn: true },
     { name: t("adminSys.maintenance"), desc: t("adminSys.maintenanceDesc"), defaultOn: false },
-    { name: t("adminSys.debugLog"), desc: t("adminSys.debugLogDesc"), defaultOn: false },
   ];
 
   const [services, setServices] = useState(initialServices);
