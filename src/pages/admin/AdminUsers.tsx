@@ -1,11 +1,14 @@
+import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2 } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const mockUsers = [
   { id: 1, name: "John Farmer", email: "john.farmer@example.com", role: "Farmer", status: "Active", joined: "Jan 15, 2024" },
@@ -20,6 +23,9 @@ const mockUsers = [
 
 const AdminUsers = () => {
   const { t } = useLanguage();
+  const [showAddAdmin, setShowAddAdmin] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const statsCards = [
     { icon: Users, label: t("adminUsers.totalUsers"), value: "1,247", iconColor: "text-primary", iconBg: "bg-primary/10" },
@@ -28,12 +34,54 @@ const AdminUsers = () => {
     { icon: Shield, label: t("adminUsers.admins"), value: "12", iconColor: "text-primary", iconBg: "bg-primary/10" },
   ];
 
+  const handleAddAdmin = async () => {
+    if (!adminEmail.trim()) {
+      toast({ title: t("adminUsers.enterEmail"), variant: "destructive" });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.rpc("promote_to_admin", { _email: adminEmail.trim() });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; message: string; user_name?: string };
+
+      if (result.success) {
+        toast({
+          title: t("adminUsers.addNewAdmin"),
+          description: `${result.user_name || adminEmail} ${t("adminUsers.promotedSuccess")}`,
+        });
+        setShowAddAdmin(false);
+        setAdminEmail("");
+      } else {
+        const msg = result.message === "User not found"
+          ? t("adminUsers.userNotFound")
+          : result.message === "User is already an admin"
+            ? t("adminUsers.alreadyAdmin")
+            : result.message;
+        toast({ title: msg, variant: "destructive" });
+      }
+    } catch (err) {
+      toast({ title: t("adminUsers.userNotFound"), variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AdminLayout title={t("adminUsers.title")}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{t("adminUsers.title")}</h1>
-          <p className="text-muted-foreground mt-1">{t("adminUsers.subtitle")}</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{t("adminUsers.title")}</h1>
+            <p className="text-muted-foreground mt-1">{t("adminUsers.subtitle")}</p>
+          </div>
+          <Button onClick={() => setShowAddAdmin(true)} className="gap-2">
+            <UserPlus className="w-4 h-4" />
+            {t("adminUsers.addUser")}
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -153,6 +201,53 @@ const AdminUsers = () => {
           </table>
         </div>
       </div>
+
+      {/* Add New Admin Dialog */}
+      <Dialog open={showAddAdmin} onOpenChange={setShowAddAdmin}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <UserPlus className="w-5 h-5 text-primary" />
+              </div>
+              <DialogTitle>{t("adminUsers.addNewAdmin")}</DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">{t("adminUsers.emailAddress")}</label>
+              <Input
+                type="email"
+                placeholder={t("adminUsers.emailPlaceholder")}
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                className="h-12 bg-secondary/50 border-border"
+                onKeyDown={(e) => e.key === "Enter" && handleAddAdmin()}
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => { setShowAddAdmin(false); setAdminEmail(""); }}
+              >
+                {t("adminUsers.cancel")}
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleAddAdmin}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  t("adminUsers.addAdmin")
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
