@@ -130,6 +130,10 @@ const translations = {
     "profile.location": "Location",
     "profile.locationValue": "Smart Farm Region",
     "profile.role": "Role",
+    "profile.changePhoto": "Change Photo",
+    "profile.uploading": "Uploading...",
+    "profile.photoUpdated": "Profile photo updated",
+    "profile.photoError": "Failed to upload photo",
     // Login
     "login.title": "Smart Farm AI",
     "login.subtitle": "Sign in to manage your smart farm",
@@ -435,6 +439,10 @@ const translations = {
     "profile.location": "الموقع",
     "profile.locationValue": "منطقة المزرعة الذكية",
     "profile.role": "الدور",
+    "profile.changePhoto": "تغيير الصورة",
+    "profile.uploading": "جاري الرفع...",
+    "profile.photoUpdated": "تم تحديث صورة الملف الشخصي",
+    "profile.photoError": "فشل رفع الصورة",
     // Login
     "login.title": "المزرعة الذكية",
     "login.subtitle": "سجل دخولك لإدارة مزرعتك الذكية",

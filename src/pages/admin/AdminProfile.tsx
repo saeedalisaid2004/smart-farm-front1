@@ -1,17 +1,57 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { User, Mail, Phone, MapPin, Calendar, Edit2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useRef, useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminProfile = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const userName = user?.user_metadata?.full_name || "Admin User";
   const userEmail = user?.email || "admin@smartfarm.com";
   const createdAt = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
     : "January 1, 2024";
+
+  useEffect(() => {
+    if (user?.id) {
+      supabase.from("profiles").select("avatar_url").eq("id", user.id).single().then(({ data }) => {
+        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+      });
+    }
+  }, [user?.id]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast({ title: t("profile.photoError"), variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+    const url = `${publicUrl}?t=${Date.now()}`;
+
+    await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+    setAvatarUrl(url);
+    toast({ title: t("profile.photoUpdated") });
+    setUploading(false);
+  };
 
   return (
     <AdminLayout title={t("profile.title")}>
@@ -21,8 +61,22 @@ const AdminProfile = () => {
           <div className="px-8 pb-6 -mt-12">
             <div className="flex items-end justify-between">
               <div className="flex items-end gap-4">
-                <div className="w-24 h-24 rounded-full bg-card border-4 border-card flex items-center justify-center shadow-lg">
-                  <span className="text-primary text-3xl font-bold">{userName.charAt(0).toUpperCase()}</span>
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-full bg-card border-4 border-card flex items-center justify-center shadow-lg overflow-hidden">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-primary text-3xl font-bold">{userName.charAt(0).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                    className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                  >
+                    <Camera className="w-6 h-6 text-white" />
+                  </button>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                 </div>
                 <div className="mb-1">
                   <h1 className="text-2xl font-bold text-foreground">{userName}</h1>
