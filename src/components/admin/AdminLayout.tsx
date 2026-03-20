@@ -141,7 +141,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate("/admin/profile")} className="cursor-pointer">
                   <User className="w-4 h-4 mr-2" /> {t("header.profile")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/admin/settings")} className="cursor-pointer">

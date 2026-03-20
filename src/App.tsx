@@ -24,6 +24,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSystem from "./pages/admin/AdminSystem";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProfile from "./pages/admin/AdminProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/system" element={<ProtectedRoute><AdminSystem /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
+            <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
