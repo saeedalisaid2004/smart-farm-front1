@@ -44,6 +44,29 @@ const DashboardReports = () => {
           </Button>
         </div>
 
+        {/* Report Filters */}
+        <div className="bg-card border border-border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Filter className="w-4 h-4 text-primary" />
+            </div>
+            <p className="text-sm font-semibold text-foreground">{t("adminReports.filters")}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-full sm:w-56 bg-secondary/50 border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="last7">{t("adminReports.last7")}</SelectItem>
+                <SelectItem value="last30">{t("adminReports.last30")}</SelectItem>
+                <SelectItem value="last90">{t("adminReports.last90")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
