@@ -1,6 +1,8 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { FileText, Download, Calendar, TrendingUp } from "lucide-react";
+import { FileText, Download, Calendar, TrendingUp, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const DashboardReports = () => {
