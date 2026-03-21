@@ -14,9 +14,17 @@ const COLORS = [
   "hsl(142, 71%, 85%)",
 ];
 
+const parseApiTime = (timeStr: string): Date => {
+  // API returns Egypt time (UTC+2), e.g. "2026-03-21 18:44"
+  // Append timezone offset to parse correctly
+  const isoStr = timeStr.replace(" ", "T") + "+02:00";
+  return new Date(isoStr);
+};
+
 const getTimeAgo = (date: Date) => {
   const now = new Date();
   const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 0) return "just now";
   if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
