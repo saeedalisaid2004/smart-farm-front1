@@ -20,7 +20,7 @@ const DashboardSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
-  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || "Farm Owner");
+  const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState("+1234567890");
   const [theme, setTheme] = useState<"light" | "dark">("light");

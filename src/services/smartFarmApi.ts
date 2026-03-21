@@ -59,8 +59,8 @@ export const apiLogin = async (email: string, password: string) => {
     body: toUrlEncoded({ email, password }),
   });
   const data = await res.json();
-  if (data.user_id) {
-    setExternalUserId(data.user_id);
+  if (data.user?.id) {
+    setExternalUserId(data.user.id);
   }
   return data;
 };

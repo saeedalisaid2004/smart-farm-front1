@@ -1,52 +1,61 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+
+interface AppUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  avatar_url?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AppUser | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  setUser: (user: AppUser | null) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
   loading: true,
-  signOut: async () => {},
+  setUser: () => {},
+  signOut: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUserState] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    const stored = localStorage.getItem("app_user");
+    if (stored) {
+      try {
+        setUserState(JSON.parse(stored));
+      } catch {
+        localStorage.removeItem("app_user");
       }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    setLoading(false);
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const setUser = (u: AppUser | null) => {
+    setUserState(u);
+    if (u) {
+      localStorage.setItem("app_user", JSON.stringify(u));
+    } else {
+      localStorage.removeItem("app_user");
+    }
+  };
+
+  const signOut = () => {
+    setUser(null);
+    localStorage.removeItem("external_user_id");
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, loading, setUser, signOut }}>
       {children}
     </AuthContext.Provider>
   );

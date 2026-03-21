@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { supabase } from "@/integrations/supabase/client";
+
 
 const adminMenuItems = [
   { icon: LayoutDashboard, labelKey: "admin.dashboard" as const, path: "/admin/dashboard" },
@@ -46,16 +46,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
     navigate("/login");
   };
 
-  const userName = user?.user_metadata?.full_name || "Admin User";
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const userName = user?.name || "Admin User";
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || null);
 
   useEffect(() => {
-    if (user?.id) {
-      supabase.from("profiles").select("avatar_url").eq("id", user.id).maybeSingle().then(({ data }) => {
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
-      });
-    }
-  }, [user?.id]);
+    if (user?.avatar_url) setAvatarUrl(user.avatar_url);
+  }, [user?.avatar_url]);
 
   useEffect(() => {
     const handler = (e: Event) => {

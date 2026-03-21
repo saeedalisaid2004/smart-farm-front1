@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiRegister } from "@/services/smartFarmApi";
@@ -22,23 +21,16 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Register with Supabase
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
-    });
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      // Also register with external API
-      try {
-        await apiRegister(name, email, password);
-      } catch {
-        // External API registration is optional
+    try {
+      const data = await apiRegister(name, email, password);
+      if (data.detail) {
+        toast({ title: "Error", description: data.detail, variant: "destructive" });
+      } else {
+        toast({ title: "✅", description: "تم إنشاء الحساب بنجاح! سجل دخولك الآن." });
+        navigate("/login");
       }
-      toast({ title: "✅", description: "Account created! Check your email to verify." });
-      navigate("/login");
+    } catch {
+      toast({ title: "Error", description: "حدث خطأ غير متوقع", variant: "destructive" });
     }
     setLoading(false);
   };
@@ -74,7 +66,7 @@ const Register = () => {
               <Label htmlFor="password" className="text-foreground font-medium">{t("register.password")}</Label>
               <div className="relative">
                 <Lock className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground`} />
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} required minLength={6} />
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} required />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className={`absolute ${isRTL ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors`}>
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>

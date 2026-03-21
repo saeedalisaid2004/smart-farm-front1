@@ -4,54 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Leaf } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiLogin } from "@/services/smartFarmApi";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Login with Supabase
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        let msg = "Login failed. Please try again.";
-        if (error.message.includes("Invalid login")) msg = "Invalid email or password.";
-        if (error.message.includes("Email not confirmed")) msg = "Please confirm your email first.";
-        toast({ variant: "destructive", title: "Error", description: msg });
-      } else {
-        // Also login with external API to get user_id
-        try {
-          await apiLogin(email, password);
-        } catch {
-          // External API login is optional, continue anyway
-        }
-        // Check user role from database
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "")
-          .maybeSingle();
-        
-        if (roleData?.role === "admin") {
+      const data = await apiLogin(email, password);
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+        });
+        if (data.user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/dashboard");
         }
+      } else {
+        toast({ variant: "destructive", title: "Error", description: data.detail || "بيانات الدخول غير صحيحة" });
       }
     } catch {
-      toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
+      toast({ variant: "destructive", title: "Error", description: "حدث خطأ غير متوقع" });
     } finally {
       setLoading(false);
     }
