@@ -90,74 +90,48 @@ const CropRecommendation = () => {
         </div>
 
         {result && (() => {
-          const primary = result.recommendations?.primary || result.recommended_crop;
-          const alternatives = result.recommendations?.alternatives || [];
-          const description = result.description || "";
-          const confidence = result.confidence;
-          const inputData = result.input_data;
+          if (result.detail) {
+            return (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6">
+                <p className="text-destructive font-medium">{result.detail}</p>
+              </div>
+            );
+          }
+
+          const crop = result.recommendations?.primary || result.recommended_crop || result.prediction || result.predicted_class;
+          const yieldLevel = result.expected_yield || result.yield_level;
+          const description = result.description || result.recommendation || result.summary;
 
           return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
-              {primary ? (
-                <>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Recommended Crop</p>
-                    <p className="text-3xl font-bold text-primary capitalize">{primary}</p>
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Recommendation Result</h3>
+
+              {crop && (
+                <div className="bg-primary/10 border-2 border-primary/30 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sprout className="w-5 h-5 text-primary" />
+                    <span className="text-sm text-muted-foreground">Recommended Crop</span>
                   </div>
+                  <p className="text-2xl font-bold text-foreground capitalize">{crop}</p>
+                </div>
+              )}
 
-                  {alternatives.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">Alternatives</p>
-                      <div className="flex flex-wrap gap-2">
-                        {alternatives.map((alt: string, i: number) => (
-                          <span key={i} className="px-4 py-1.5 bg-secondary text-foreground rounded-full text-sm font-medium capitalize">
-                            {alt}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {yieldLevel && (
+                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
+                  <span className="font-semibold text-foreground">Expected Yield Level: </span>
+                  <span className={`font-semibold ${yieldLevel.toLowerCase() === 'high' ? 'text-primary' : yieldLevel.toLowerCase() === 'medium' ? 'text-yellow-500' : 'text-orange-500'}`}>
+                    {yieldLevel}
+                  </span>
+                </div>
+              )}
 
-                  {confidence && (
-                    <p className="text-sm text-muted-foreground">
-                      Confidence: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
-                    </p>
-                  )}
+              {description && (
+                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
+                  <p className="text-sm text-muted-foreground">{description}</p>
+                </div>
+              )}
 
-                  {description && (
-                    <p className="text-sm text-muted-foreground">{description}</p>
-                  )}
-
-                  {inputData && (
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-                      {inputData.temperature && (
-                        <div className="p-3 bg-secondary/50 rounded-xl">
-                          <p className="text-xs text-muted-foreground">{t("crop.temperature")}</p>
-                          <p className="text-sm font-medium text-foreground">{inputData.temperature}</p>
-                        </div>
-                      )}
-                      {inputData.humidity && (
-                        <div className="p-3 bg-secondary/50 rounded-xl">
-                          <p className="text-xs text-muted-foreground">{t("crop.humidity")}</p>
-                          <p className="text-sm font-medium text-foreground">{inputData.humidity}</p>
-                        </div>
-                      )}
-                      {inputData.rainfall && (
-                        <div className="p-3 bg-secondary/50 rounded-xl">
-                          <p className="text-xs text-muted-foreground">{t("crop.rainfall")}</p>
-                          <p className="text-sm font-medium text-foreground">{inputData.rainfall}</p>
-                        </div>
-                      )}
-                      {inputData.soil_type && (
-                        <div className="p-3 bg-secondary/50 rounded-xl">
-                          <p className="text-xs text-muted-foreground">{t("crop.soilType")}</p>
-                          <p className="text-sm font-medium text-foreground">{inputData.soil_type}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              ) : (
+              {!crop && (
                 <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
                   {JSON.stringify(result, null, 2)}
                 </pre>
