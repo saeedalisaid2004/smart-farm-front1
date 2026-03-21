@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2 } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ const AdminUsers = () => {
   const [stats, setStats] = useState<any>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewUser, setViewUser] = useState<any>(null);
 
   const loadData = () => {
     setLoadingData(true);
@@ -219,7 +220,7 @@ const AdminUsers = () => {
                         </PopoverTrigger>
                         <PopoverContent align="end" className="w-48 p-1">
                           <button
-                            onClick={() => toast({ title: t("adminUsers.viewProfile"), description: `Viewing ${user.name || user.email}` })}
+                            onClick={() => setViewUser(user)}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
                           >
                             <Eye className="w-4 h-4 text-muted-foreground" />
@@ -289,6 +290,58 @@ const AdminUsers = () => {
               <Button className="flex-1" onClick={handleAddAdmin} disabled={isLoading}>
                 {isLoading ? <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> : t("adminUsers.addAdmin")}
               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Profile Dialog */}
+      <Dialog open={!!viewUser} onOpenChange={(open) => !open && setViewUser(null)}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+          <div className="h-24 bg-gradient-to-r from-primary to-primary/70" />
+          <div className="-mt-12 px-6 pb-6">
+            <div className="w-20 h-20 rounded-2xl bg-card border-4 border-background flex items-center justify-center mb-3 shadow-md">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <DialogHeader className="text-left mb-4">
+              <DialogTitle className="text-xl">{viewUser?.name || viewUser?.full_name || "User"}</DialogTitle>
+              <p className="text-sm text-muted-foreground">{viewUser?.role || "Farmer"}</p>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Email</p>
+                  <p className="text-sm font-medium text-foreground">{viewUser?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Role</p>
+                  <p className="text-sm font-medium text-foreground">{viewUser?.role || "Farmer"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <UserCheck className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <Badge variant="outline" className={`text-xs mt-0.5 ${
+                    (viewUser?.status === "Active" || viewUser?.status === "active") ? "border-primary/30 text-primary bg-primary/5" : "border-destructive/30 text-destructive bg-destructive/5"
+                  }`}>
+                    {viewUser?.status || "Active"}
+                  </Badge>
+                </div>
+              </div>
+              {viewUser?.joined && (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Joined</p>
+                    <p className="text-sm font-medium text-foreground">{viewUser.joined}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
