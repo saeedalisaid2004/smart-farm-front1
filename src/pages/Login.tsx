@@ -7,6 +7,7 @@ import { Eye, EyeOff, Leaf } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { apiLogin } from "@/services/smartFarmApi";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -29,6 +30,7 @@ const Login = () => {
     }
     setLoading(true);
     try {
+      // Login with Supabase
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         let msg = "Login failed. Please try again.";
@@ -36,6 +38,12 @@ const Login = () => {
         if (error.message.includes("Email not confirmed")) msg = "Please confirm your email first.";
         toast({ variant: "destructive", title: "Error", description: msg });
       } else {
+        // Also login with external API to get user_id
+        try {
+          await apiLogin(email, password);
+        } catch {
+          // External API login is optional, continue anyway
+        }
         if (role === "admin") {
           navigate("/admin/dashboard");
         } else {

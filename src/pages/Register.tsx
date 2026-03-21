@@ -7,6 +7,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { apiRegister } from "@/services/smartFarmApi";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +22,8 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Register with Supabase
     const { error } = await supabase.auth.signUp({
       email, password,
       options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
@@ -28,6 +31,12 @@ const Register = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      // Also register with external API
+      try {
+        await apiRegister(name, email, password);
+      } catch {
+        // External API registration is optional
+      }
       toast({ title: "✅", description: "Account created! Check your email to verify." });
       navigate("/login");
     }

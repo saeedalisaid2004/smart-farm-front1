@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { TrendingUp, Users, Globe, Activity, Filter, FileText, Calendar, Download } from "lucide-react";
+import { TrendingUp, Users, Globe, Activity, Filter, FileText, Calendar, Download, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,57 +11,90 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-const usageData = [
-  { service: "Plant Disease", value: 340 },
-  { service: "Animal Weight", value: 250 },
-  { service: "Crop Rec.", value: 190 },
-  { service: "Soil Analysis", value: 160 },
-  { service: "Fruit Quality", value: 140 },
-  { service: "Chatbot", value: 310 },
-];
-
-const dailyData = [
-  { day: "Jun 1", activity: 240 },
-  { day: "Jun 2", activity: 265 },
-  { day: "Jun 3", activity: 250 },
-  { day: "Jun 4", activity: 300 },
-  { day: "Jun 5", activity: 270 },
-  { day: "Jun 6", activity: 210 },
-  { day: "Jun 7", activity: 180 },
-];
-
-const growthData = [
-  { month: "Jan", users: 120 },
-  { month: "Feb", users: 180 },
-  { month: "Mar", users: 240 },
-  { month: "Apr", users: 300 },
-  { month: "May", users: 380 },
-  { month: "Jun", users: 420 },
-];
+import { getAdminReportStats, generatePremiumReport } from "@/services/smartFarmApi";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminReports = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  const generatedReports = [
-    { name: t("adminReports.monthlyUsage"), date: "Jun 1, 2024", tag: "Usage", size: "2.4 MB",
-      content: () => `Monthly Usage Report - June 2024\n\nTotal Analyses: 8,456\nActive Users: 1,247\n\nService Breakdown:\n- Plant Disease Detection: 340\n- Animal Weight Estimation: 250\n- Crop Recommendation: 190\n- Soil Analysis: 160\n- Fruit Quality: 140\n- Smart Chatbot: 310` },
-    { name: t("adminReports.userActivity"), date: "Jun 1, 2024", tag: "Users", size: "1.8 MB",
-      content: () => `User Activity Analysis - June 2024\n\nTotal Users: 1,247\nNew Users: 40\nDaily Active Users: 312` },
-    { name: t("adminReports.modelPerformance"), date: "May 25, 2024", tag: "Performance", size: "3.2 MB",
-      content: () => `AI Model Performance Report - May 2024\n\nPlant Disease: 94.2%\nAnimal Weight: 91.8%\nCrop Recommendation: 89.5%\nFruit Quality: 92.1%` },
-    { name: t("adminReports.systemHealth"), date: "May 20, 2024", tag: "System", size: "1.5 MB",
-      content: () => `System Health Report - May 2024\n\nUptime: 99.8%\nAvg Response: 145ms\nPeak Load: 450 req/min` },
-    { name: t("adminReports.revenue"), date: "May 15, 2024", tag: "Finance", size: "2.1 MB",
-      content: () => `Revenue Analytics - May 2024\n\nTotal Revenue: $12,450\nGrowth: +18%\nChurn: 2.1%` },
-  ];
+  useEffect(() => {
+    getAdminReportStats()
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleGenerateReport = async () => {
+    setGeneratingPdf(true);
+    try {
+      const result = await generatePremiumReport();
+      if (result.file_url) {
+        window.open(result.file_url, "_blank");
+        toast({ title: "Report generated successfully" });
+      } else {
+        toast({ title: result.message || "Report generated" });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Failed to generate report" });
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
+  const usageData = data?.charts?.usage_by_service
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service, value }))
+    : [
+        { service: "Plant Disease", value: 340 },
+        { service: "Animal Weight", value: 250 },
+        { service: "Crop Rec.", value: 190 },
+        { service: "Soil Analysis", value: 160 },
+        { service: "Fruit Quality", value: 140 },
+        { service: "Chatbot", value: 310 },
+      ];
+
+  const growthData = data?.charts?.user_growth
+    ? Object.entries(data.charts.user_growth).map(([month, users]) => ({ month, users }))
+    : [
+        { month: "Jan", users: 120 },
+        { month: "Feb", users: 180 },
+        { month: "Mar", users: 240 },
+        { month: "Apr", users: 300 },
+        { month: "May", users: 380 },
+        { month: "Jun", users: 420 },
+      ];
+
+  const dailyData = data?.charts?.daily_activity
+    ? Object.entries(data.charts.daily_activity).map(([day, activity]) => ({ day, activity }))
+    : [
+        { day: "Jun 1", activity: 240 },
+        { day: "Jun 2", activity: 265 },
+        { day: "Jun 3", activity: 250 },
+        { day: "Jun 4", activity: 300 },
+        { day: "Jun 5", activity: 270 },
+        { day: "Jun 6", activity: 210 },
+        { day: "Jun 7", activity: 180 },
+      ];
 
   const statsCards = [
-    { icon: TrendingUp, label: t("adminReports.totalAnalyses"), value: "8,456", change: `+23% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-green-50" },
-    { icon: Users, label: t("adminReports.activeUsers"), value: "1,247", change: `+12% ${t("adminReports.fromLastMonth")}`, color: "text-blue-600", bg: "bg-blue-50" },
-    { icon: Globe, label: t("adminReports.aiServices"), value: "6 Active", change: t("adminReports.uptimePercent"), color: "text-green-600", bg: "bg-green-50" },
-    { icon: Activity, label: t("adminReports.avgResponse"), value: "145ms", change: `-8% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-orange-50" },
+    { icon: TrendingUp, label: t("adminReports.totalAnalyses"), value: data?.total_analyses ?? "8,456", change: `+23% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-green-50" },
+    { icon: Users, label: t("adminReports.activeUsers"), value: data?.active_users ?? "1,247", change: `+12% ${t("adminReports.fromLastMonth")}`, color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: Globe, label: t("adminReports.aiServices"), value: data?.ai_services_count ?? "6 Active", change: t("adminReports.uptimePercent"), color: "text-green-600", bg: "bg-green-50" },
+    { icon: Activity, label: t("adminReports.avgResponse"), value: data?.avg_response_time ?? "145ms", change: `-8% ${t("adminReports.fromLastMonth")}`, color: "text-green-600", bg: "bg-orange-50" },
   ];
+
+  if (loading) {
+    return (
+      <AdminLayout title={t("adminReports.title")}>
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title={t("adminReports.title")}>
@@ -182,44 +216,10 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.downloadHistorical")}</p>
               </div>
             </div>
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5">
+            <Button onClick={handleGenerateReport} disabled={generatingPdf} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5">
+              {generatingPdf ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {t("adminReports.generateNew")}
             </Button>
-          </div>
-
-          <div className="space-y-3">
-            {generatedReports.map((report) => (
-              <div key={report.name} className="border border-border rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{report.name}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                      <Calendar className="w-3 h-3" />
-                      <span>{report.date}</span>
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0">{report.tag}</Badge>
-                      <span>{report.size}</span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    const blob = new Blob([report.content()], { type: "text/plain" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${report.name.replace(/\s+/g, "_")}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 bg-secondary/50 hover:bg-secondary text-sm text-muted-foreground py-2.5 rounded-lg transition-colors"
-                >
-                  <Download className="w-4 h-4" /> {t("adminReports.download")}
-                </button>
-              </div>
-            ))}
           </div>
         </div>
       </div>

@@ -1,27 +1,68 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { askFarmBot, getChatHistory, getExternalUserId } from "@/services/smartFarmApi";
 
 const SmartFarmChatbot = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [messages, setMessages] = useState<{ role: string; content: string; time: string }[]>([
     { role: "assistant", content: t("chatbot.greeting"), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
   ]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Load chat history on mount
+  useEffect(() => {
+    const userId = getExternalUserId();
+    if (userId) {
+      getChatHistory(userId).then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const history = data.map((item: any) => ({
+            role: item.role || (item.is_bot ? "assistant" : "user"),
+            content: item.content || item.message || item.text || "",
+            time: item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
+          }));
+          setMessages(history);
+        }
+      }).catch(() => {});
+    }
+  }, []);
+
+  const handleSend = async () => {
     if (!input.trim()) return;
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setMessages(prev => [...prev, { role: "user", content: input, time: now }]);
+    const userMsg = input;
+    setMessages(prev => [...prev, { role: "user", content: userMsg, time: now }]);
     setInput("");
-    setTimeout(() => {
+
+    const userId = getExternalUserId();
+    if (!userId) {
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(prev => [...prev, { role: "assistant", content: t("chatbot.demoResponse"), time }]);
-    }, 1000);
+      setMessages(prev => [...prev, { role: "assistant", content: "Please login first to use the chatbot.", time }]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await askFarmBot(userId, userMsg, language === "ar" ? "ar" : "en");
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const reply = data.answer || data.response || data.reply || JSON.stringify(data);
+      setMessages(prev => [...prev, { role: "assistant", content: reply, time }]);
+    } catch {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong. Please try again.", time }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,7 +94,7 @@ const SmartFarmChatbot = () => {
                 )}
                 <div>
                   <div className={cn(
-                    "max-w-md px-4 py-3 rounded-2xl text-sm",
+                    "max-w-md px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap",
                     msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
                   )}>
                     {msg.content}
@@ -62,16 +103,28 @@ const SmartFarmChatbot = () => {
                 </div>
               </div>
             ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-1 shrink-0">
+                  <MessageCircle className="w-4 h-4 text-primary" />
+                </div>
+                <div className="bg-secondary px-4 py-3 rounded-2xl">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
           <div className="p-4 border-t border-border flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              onKeyDown={(e) => e.key === "Enter" && !loading && handleSend()}
               placeholder={t("chatbot.placeholder")}
               className="rounded-full h-11 bg-secondary border-0 px-4"
+              disabled={loading}
             />
-            <Button onClick={handleSend} size="icon" className="rounded-full h-11 w-11 shrink-0">
+            <Button onClick={handleSend} size="icon" className="rounded-full h-11 w-11 shrink-0" disabled={loading}>
               <Send className="w-4 h-4" />
             </Button>
           </div>

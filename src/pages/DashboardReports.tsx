@@ -1,33 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { FileText, Download, Calendar, TrendingUp, Filter } from "lucide-react";
+import { FileText, Download, Calendar, TrendingUp, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getFarmerStats, generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
+import { useToast } from "@/hooks/use-toast";
 
 const DashboardReports = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [dateRange, setDateRange] = useState("last30");
+  const [stats, setStats] = useState<any>(null);
+  const [reports, setReports] = useState<any[]>([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  const reports = [
-    { id: 1, name: t("reports.plantReport"), desc: t("reports.plantReportDesc"), date: "December 10, 2024", tags: ["AI Analysis", "Completed"],
-      content: () => `Plant Disease Analysis Report\n================================\nDate: December 10, 2024\nTotal Images Analyzed: 45\nDiseases Detected: 3\nHealthy Plants: 42 (93.3%)\n\nDetected Diseases:\n1. Tomato Early Blight - Confidence: 96.5%\n2. Apple Scab - Confidence: 92.1%\n3. Grape Black Rot - Detected in 1 sample` },
-    { id: 2, name: t("reports.livestockReport"), desc: t("reports.livestockReportDesc"), date: "December 8, 2024", tags: ["Computer Vision", "Completed"],
-      content: () => `Livestock Weight Monitoring Report\n===================================\nDate: December 8, 2024\nTotal Animals Tracked: 156\nAverage Weight: 425 kg\nWeight Range: 310 kg - 580 kg` },
-    { id: 3, name: t("reports.cropReport"), desc: t("reports.cropReportDesc"), date: "December 5, 2024", tags: ["ML Prediction", "Completed"],
-      content: () => `Crop Yield Forecast Report\n===========================\nDate: December 5, 2024\nCrop Varieties Analyzed: 12\nConfidence Level: 88.5%` },
-    { id: 4, name: t("reports.soilReport"), desc: t("reports.soilReportDesc"), date: "December 1, 2024", tags: ["Soil Analysis", "Completed"],
-      content: () => `Soil Quality Assessment Report\n==============================\nDate: December 1, 2024\nFields Analyzed: 8\nSoil Health Score: 78/100` },
-  ];
+  useEffect(() => {
+    const userId = getExternalUserId();
+    if (!userId) return;
 
-  const handleDownload = (report: typeof reports[0]) => {
-    const blob = new Blob([report.content()], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${report.name.replace(/\s+/g, "_")}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    setLoadingStats(true);
+    Promise.all([
+      getFarmerStats(userId).catch(() => null),
+      listFarmerReports(userId).catch(() => []),
+    ]).then(([statsData, reportsData]) => {
+      if (statsData) setStats(statsData);
+      if (Array.isArray(reportsData)) setReports(reportsData);
+    }).finally(() => setLoadingStats(false));
+  }, []);
+
+  const handleGeneratePdf = async () => {
+    const userId = getExternalUserId();
+    if (!userId) return;
+    setGeneratingPdf(true);
+    try {
+      const data = await generateFarmerPdf(userId);
+      if (data.file_url) {
+        window.open(data.file_url, "_blank");
+        toast({ title: "Report generated successfully" });
+      } else {
+        toast({ title: data.message || "Report generated" });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Failed to generate report" });
+    } finally {
+      setGeneratingPdf(false);
+    }
   };
 
   return (
@@ -38,8 +57,8 @@ const DashboardReports = () => {
             <h1 className="text-2xl font-semibold text-foreground">{t("reports.title")}</h1>
             <p className="text-muted-foreground text-sm">{t("reports.subtitle")}</p>
           </div>
-          <Button className="rounded-full gap-2">
-            <Download className="w-4 h-4" />
+          <Button className="rounded-full gap-2" onClick={handleGeneratePdf} disabled={generatingPdf}>
+            {generatingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             {t("reports.exportAll")}
           </Button>
         </div>
@@ -67,68 +86,83 @@ const DashboardReports = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">24</p>
-              <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
-            </div>
+        {loadingStats ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-          <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">6</p>
-              <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">+25%</p>
-              <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {reports.map((report) => (
-            <div key={report.id} className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="p-5">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <FileText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-foreground">{report.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">{report.desc}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {report.date}
-                      </span>
-                      {report.tags.map((tag) => (
-                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{stats?.total_reports || stats?.total_analyses || 0}</p>
+                  <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
                 </div>
               </div>
-              <button
-                onClick={() => handleDownload(report)}
-                className="w-full py-3 border-t border-border text-sm text-muted-foreground hover:bg-secondary transition-colors flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                {t("reports.download")}
-              </button>
+              <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{stats?.this_month || 0}</p>
+                  <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
+                </div>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{stats?.growth || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+
+            {reports.length > 0 ? (
+              <div className="space-y-4">
+                {reports.map((report: any, idx: number) => (
+                  <div key={idx} className="bg-card border border-border rounded-2xl overflow-hidden">
+                    <div className="p-5">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                          <FileText className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-foreground">{report.name || report.title || `Report #${idx + 1}`}</h3>
+                          <p className="text-sm text-muted-foreground mt-0.5">{report.description || ""}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="w-3 h-3" /> {report.date || report.created_at || ""}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {report.file_url && (
+                      <a
+                        href={report.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 border-t border-border text-sm text-muted-foreground hover:bg-secondary transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        {t("reports.download")}
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                No reports available yet
+              </div>
+            )}
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
