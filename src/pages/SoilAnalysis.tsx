@@ -84,52 +84,68 @@ const SoilAnalysis = () => {
         </div>
 
         {result && (() => {
-          // Handle API error/detail message
-          if (result.detail) {
+          if (result.detail || result.status === "Rejected") {
+            const msg = result.detail || result.message || "Request rejected";
             return (
               <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
                 <FlaskConical className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive font-medium">{result.detail}</p>
+                <p className="text-sm text-destructive font-medium">{msg}</p>
               </div>
             );
           }
 
           const soilType = result.soil_type || result.predicted_class || result.prediction;
+          const fertility = result.fertility_level || result.fertility;
           const recommendation = result.recommendation || result.description;
-          const confidence = result.confidence;
-          const inputData = result.input_data;
+
+          const getFertilityColor = (level: string) => {
+            const l = level.toLowerCase();
+            if (l === 'high') return 'bg-primary/10 border-primary/40 text-primary';
+            if (l === 'medium') return 'bg-yellow-50 border-yellow-400 text-yellow-600';
+            return 'bg-destructive/10 border-destructive/40 text-destructive';
+          };
 
           return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
-              {soilType ? (
-                <>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">{t("soil.title")}</p>
-                    <p className="text-3xl font-bold text-primary capitalize">{soilType}</p>
-                  </div>
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
 
-                  {confidence && (
-                    <p className="text-sm text-muted-foreground">
-                      Confidence: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
-                    </p>
-                  )}
-
-                  {recommendation && (
-                    <p className="text-sm text-muted-foreground">{recommendation}</p>
-                  )}
-
-                  {inputData && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-border">
-                      {Object.entries(inputData).map(([key, val]) => (
-                        <div key={key} className="p-3 bg-secondary/50 rounded-xl">
-                          <p className="text-xs text-muted-foreground uppercase">{key}</p>
-                          <p className="text-sm font-medium text-foreground">{String(val)}</p>
-                        </div>
-                      ))}
+              <div className="grid grid-cols-2 gap-4">
+                {soilType && (
+                  <div className="bg-secondary/30 border border-border rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <FlaskConical className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground">Soil Type</span>
                     </div>
-                  )}
-                </>
-              ) : (
+                    <div className="bg-primary/10 border-2 border-primary/30 rounded-xl py-2 px-4 text-center">
+                      <span className="font-semibold text-foreground capitalize">{soilType}</span>
+                    </div>
+                  </div>
+                )}
+
+                {fertility && (
+                  <div className="bg-secondary/30 border border-border rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <FlaskConical className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground">Fertility Level</span>
+                    </div>
+                    <div className={`border-2 rounded-xl py-2 px-4 text-center ${getFertilityColor(fertility)}`}>
+                      <span className="font-semibold capitalize">{fertility}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {recommendation && (
+                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
+                  <p className="text-sm text-muted-foreground">{recommendation}</p>
+                </div>
+              )}
+
+              {!soilType && !fertility && (
                 <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
                   {JSON.stringify(result, null, 2)}
                 </pre>
