@@ -96,10 +96,20 @@ const AdminSystem = () => {
     localStorage.setItem("serviceOverrides", JSON.stringify(savedOverrides));
   };
 
-  const handleToggleSetting = async (settingName: string) => {
+  const handleToggleSetting = async (settingKey: string) => {
     try {
-      await apiToggleSystemSetting(settingName);
+      await apiToggleSystemSetting(settingKey);
     } catch {}
+    // Toggle in state
+    setSettings(prev => prev.map(s => {
+      const key = s.key || s.setting_name || s.name;
+      return key === settingKey ? { ...s, enabled: !s.enabled } : s;
+    }));
+    // Save to localStorage
+    const savedOverrides = JSON.parse(localStorage.getItem("settingOverrides") || "{}");
+    const current = settings.find(s => (s.key || s.setting_name || s.name) === settingKey);
+    savedOverrides[settingKey] = !(current?.enabled);
+    localStorage.setItem("settingOverrides", JSON.stringify(savedOverrides));
   };
 
   const defaultSettings = [
