@@ -179,6 +179,8 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          <h2 className="text-lg font-medium text-foreground flex-1 text-center">{title}</h2>
+          <div className="flex-1" />
         </header>
 
         <main className="flex-1 p-8">{children}</main>
