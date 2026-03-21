@@ -96,7 +96,7 @@ const AnimalWeight = () => {
               {/* Animal Name */}
               {animalName && (
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold text-foreground">Animal Name</p>
+                  <p className="text-sm font-semibold text-foreground">{t("animalWeight.animalName")}</p>
                   <p className="text-3xl font-bold text-primary">{animalName}</p>
                 </div>
               )}
