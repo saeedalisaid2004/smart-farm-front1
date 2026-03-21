@@ -150,7 +150,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 cursor-pointer">
+                <button className={cn("flex items-center gap-2 cursor-pointer", isRTL && "flex-row-reverse")}>
                   <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center relative overflow-hidden">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
