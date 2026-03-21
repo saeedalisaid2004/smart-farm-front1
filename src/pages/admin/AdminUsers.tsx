@@ -99,6 +99,16 @@ const AdminUsers = () => {
     }
   };
 
+  const handleActivateUser = async (user: any) => {
+    try {
+      await apiActivateUser(user.id || user.user_id);
+      toast({ title: `${user.name} activated` });
+      loadData();
+    } catch {
+      toast({ title: "Failed", variant: "destructive" });
+    }
+  };
+
   return (
     <AdminLayout title={t("adminUsers.title")}>
       <div className="space-y-6">
