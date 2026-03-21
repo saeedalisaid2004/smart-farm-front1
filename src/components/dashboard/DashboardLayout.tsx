@@ -109,6 +109,41 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
       <div className="flex-1 flex flex-col">
         <header className="h-16 bg-card border-b border-border flex items-center px-6 sticky top-0 z-10">
           <div className={cn("flex items-center gap-4", isRTL ? "order-first" : "order-last")}>
+            <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition-colors">
+              <Moon className="w-5 h-5 dark:hidden" />
+              <Sun className="w-5 h-5 hidden dark:block" />
+            </button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-96 p-0" align={isRTL ? "start" : "end"}>
+                <div className="flex items-center justify-between p-4 border-b border-border">
+                  <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
+                  <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">3 new</span>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer">
+                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", n.bg)}>
+                        <n.icon className={cn("w-5 h-5", n.color)} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{n.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{n.time}</p>
+                      </div>
+                      {n.unread && <div className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0 mt-1.5" />}
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 cursor-pointer">
@@ -141,41 +176,6 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96 p-0" align={isRTL ? "start" : "end"}>
-                <div className="flex items-center justify-between p-4 border-b border-border">
-                  <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
-                  <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">3 new</span>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer">
-                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", n.bg)}>
-                        <n.icon className={cn("w-5 h-5", n.color)} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{n.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{n.time}</p>
-                      </div>
-                      {n.unread && <div className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0 mt-1.5" />}
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition-colors">
-              <Moon className="w-5 h-5 dark:hidden" />
-              <Sun className="w-5 h-5 hidden dark:block" />
-            </button>
           </div>
           <h2 className="text-lg font-medium text-foreground flex-1 text-center">{title}</h2>
         </header>
