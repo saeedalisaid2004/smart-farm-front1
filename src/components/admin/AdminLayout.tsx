@@ -64,7 +64,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className={cn("h-screen w-64 bg-card border-border flex flex-col sticky top-0", isRTL ? "border-l" : "border-r")}>
+      <aside className={cn("h-screen w-64 bg-card border-border flex flex-col sticky top-0 order-first", isRTL ? "border-l order-last" : "border-r")}>
         <div className={cn("p-5 flex items-center gap-3", isRTL && "flex-row-reverse")}>
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
             <Leaf className="w-5 h-5 text-primary-foreground" />
