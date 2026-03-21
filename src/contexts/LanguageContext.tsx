@@ -545,6 +545,7 @@ const translations = {
     "adminUsers.viewProfile": "عرض الملف",
     "adminUsers.viewing": "عرض",
     "adminUsers.deactivate": "تعطيل",
+    "adminUsers.activate": "تفعيل",
     "adminUsers.deactivated": "تم تعطيله",
     "adminUsers.deleteUser": "حذف المستخدم",
     "adminUsers.deleted": "تم حذفه",
