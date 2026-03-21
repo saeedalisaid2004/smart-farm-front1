@@ -53,16 +53,12 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
     navigate("/login");
   };
 
-  const userName = user?.user_metadata?.full_name || "John Farmer";
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const userName = user?.name || "John Farmer";
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || null);
 
   useEffect(() => {
-    if (user?.id) {
-      supabase.from("profiles").select("avatar_url").eq("id", user.id).maybeSingle().then(({ data }) => {
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
-      });
-    }
-  }, [user?.id]);
+    if (user?.avatar_url) setAvatarUrl(user.avatar_url);
+  }, [user?.avatar_url]);
 
   useEffect(() => {
     const handler = (e: Event) => {

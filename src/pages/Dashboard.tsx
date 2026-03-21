@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const userName = user?.user_metadata?.full_name || "John Farmer";
+  const userName = user?.name || "John Farmer";
 
   const features = [
     { icon: Leaf, title: t("dashboard.plantDisease"), desc: t("dashboard.plantDiseaseDesc"), path: "/dashboard/plant-disease" },
