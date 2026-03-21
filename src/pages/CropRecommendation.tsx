@@ -101,7 +101,7 @@ const CropRecommendation = () => {
               {primary ? (
                 <>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">{t("crop.recommendedCrop")}</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Recommended Crop</p>
                     <p className="text-3xl font-bold text-primary capitalize">{primary}</p>
                   </div>
 
