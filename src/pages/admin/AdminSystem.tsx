@@ -70,12 +70,17 @@ const AdminSystem = () => {
 
   const handleToggleService = async (index: number) => {
     const svc = services[index];
+    const newOnline = !svc.online;
     try {
       await apiToggleService(svc.module || svc.name);
-      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: !s.online } : s));
+      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     } catch {
-      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: !s.online } : s));
+      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     }
+    // Save override to localStorage so it persists after refresh
+    const savedOverrides = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
+    savedOverrides[svc.module] = newOnline;
+    localStorage.setItem("serviceOverrides", JSON.stringify(savedOverrides));
   };
 
   const handleToggleSetting = async (settingName: string) => {
