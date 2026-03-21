@@ -24,9 +24,22 @@ const AdminSystem = () => {
       getModelsTable().catch(() => []),
     ]).then(([status, settingsData, modelsData]) => {
       if (status) setSystemStatus(status);
+      
+      // Load saved setting overrides
+      const savedSettingOverrides: Record<string, boolean> = JSON.parse(localStorage.getItem("settingOverrides") || "{}");
+      
       if (settingsData) {
-        if (Array.isArray(settingsData)) setSettings(settingsData);
-        else if (settingsData.settings) setSettings(settingsData.settings);
+        let settingsArr: any[] = [];
+        if (Array.isArray(settingsData)) settingsArr = settingsData;
+        else if (settingsData.settings) settingsArr = settingsData.settings;
+        
+        // Map API status and apply localStorage overrides
+        setSettings(settingsArr.map((s: any) => ({
+          ...s,
+          enabled: (s.key in savedSettingOverrides) 
+            ? savedSettingOverrides[s.key] 
+            : (s.status === "online" || s.enabled === true),
+        })));
       }
       if (Array.isArray(modelsData)) setModels(modelsData);
       else if (modelsData?.models) setModels(modelsData.models);
@@ -83,10 +96,20 @@ const AdminSystem = () => {
     localStorage.setItem("serviceOverrides", JSON.stringify(savedOverrides));
   };
 
-  const handleToggleSetting = async (settingName: string) => {
+  const handleToggleSetting = async (settingKey: string) => {
     try {
-      await apiToggleSystemSetting(settingName);
+      await apiToggleSystemSetting(settingKey);
     } catch {}
+    // Toggle in state
+    setSettings(prev => prev.map(s => {
+      const key = s.key || s.setting_name || s.name;
+      return key === settingKey ? { ...s, enabled: !s.enabled } : s;
+    }));
+    // Save to localStorage
+    const savedOverrides = JSON.parse(localStorage.getItem("settingOverrides") || "{}");
+    const current = settings.find(s => (s.key || s.setting_name || s.name) === settingKey);
+    savedOverrides[settingKey] = !(current?.enabled);
+    localStorage.setItem("settingOverrides", JSON.stringify(savedOverrides));
   };
 
   const defaultSettings = [
@@ -276,7 +299,7 @@ const AdminSystem = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{setting.desc || setting.description}</p>
                 </div>
                 <Switch
-                  defaultChecked={setting.defaultOn ?? setting.enabled ?? setting.is_enabled}
+                  checked={setting.enabled ?? setting.defaultOn ?? false}
                   onCheckedChange={() => handleToggleSetting(setting.key || setting.setting_name || setting.name)}
                 />
               </div>
