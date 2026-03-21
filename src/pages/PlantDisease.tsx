@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Upload, Leaf, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Upload, Leaf, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
