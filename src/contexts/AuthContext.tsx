@@ -48,9 +48,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const setUser = (u: AppUser | null) => {
     setUserState(u);
     if (u) {
-      localStorage.setItem("app_user", JSON.stringify(u));
+      // Don't store base64 avatar in app_user to avoid localStorage size issues
+      const { avatar_url, ...rest } = u;
+      localStorage.setItem("app_user", JSON.stringify(rest));
     } else {
       localStorage.removeItem("app_user");
+      localStorage.removeItem("avatar_base64");
     }
   };
 
