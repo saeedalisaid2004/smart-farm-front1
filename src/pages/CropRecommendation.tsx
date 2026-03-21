@@ -80,6 +80,8 @@ const CropRecommendation = () => {
                   <SelectItem value="Clay">{t("crop.clay")}</SelectItem>
                   <SelectItem value="Sandy">{t("crop.sandy")}</SelectItem>
                   <SelectItem value="Loamy">{t("crop.loamy")}</SelectItem>
+                  <SelectItem value="Silt">{t("crop.silt") || "Silt"}</SelectItem>
+                  <SelectItem value="Peaty">{t("crop.peaty") || "Peaty"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
