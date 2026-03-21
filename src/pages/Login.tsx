@@ -82,18 +82,6 @@ const Login = () => {
               </button>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-foreground font-medium">{t("login.role")}</Label>
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="h-11 rounded-full bg-secondary border-0 px-4">
-                <SelectValue placeholder={t("login.selectRole")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="farmer">{t("common.farmer")}</SelectItem>
-                <SelectItem value="admin">{t("common.admin")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <Button type="submit" disabled={loading} className="w-full h-12 rounded-full text-base font-semibold mt-2">
             {loading ? t("login.signingIn") : t("login.signIn")}
           </Button>
