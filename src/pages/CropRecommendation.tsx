@@ -107,7 +107,7 @@ const CropRecommendation = () => {
 
                   {alternatives.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">{t("crop.alternatives")}</p>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Alternatives</p>
                       <div className="flex flex-wrap gap-2">
                         {alternatives.map((alt: string, i: number) => (
                           <span key={i} className="px-4 py-1.5 bg-secondary text-foreground rounded-full text-sm font-medium capitalize">
