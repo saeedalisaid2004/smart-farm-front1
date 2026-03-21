@@ -25,31 +25,21 @@ const AdminSystem = () => {
     ]).then(([status, settingsData, modelsData]) => {
       if (status) setSystemStatus(status);
       
-      // Load saved setting overrides
-      const savedSettingOverrides: Record<string, boolean> = JSON.parse(localStorage.getItem("settingOverrides") || "{}");
-      
       if (settingsData) {
         let settingsArr: any[] = [];
         if (Array.isArray(settingsData)) settingsArr = settingsData;
         else if (settingsData.settings) settingsArr = settingsData.settings;
         
-        // Map API status, localStorage overrides only apply if they exist
-        setSettings(settingsArr.map((s: any) => {
-          const apiEnabled = s.status === "online" || s.enabled === true;
-          const hasOverride = s.key && (s.key in savedSettingOverrides);
-          return {
-            ...s,
-            enabled: hasOverride ? savedSettingOverrides[s.key] : apiEnabled,
-          };
-        }));
+        // Map API status directly - the API is the source of truth
+        setSettings(settingsArr.map((s: any) => ({
+          ...s,
+          enabled: s.status === "online" || s.enabled === true,
+        })));
       }
       if (Array.isArray(modelsData)) setModels(modelsData);
       else if (modelsData?.models) setModels(modelsData.models);
 
-      // Build services from status or use defaults, cross-reference with models table
-      // Also check localStorage for any manual overrides
-      const savedOverrides: Record<string, boolean> = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
-      
+      // Build services from models table - API is the source of truth
       if (status?.services) {
         setServices(status.services);
       } else {
@@ -66,18 +56,13 @@ const AdminSystem = () => {
           if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
         });
         
-        const getStatus = (module: string) => {
-          if (module in savedOverrides) return savedOverrides[module];
-          return modelStatusMap[module] ?? true;
-        };
-        
         setServices([
-          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: getStatus("plant_disease") },
-          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: getStatus("animal_weight") },
-          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: getStatus("crop_recommendation") },
-          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: getStatus("soil_analysis") },
-          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: getStatus("fruit_quality") },
-          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: getStatus("chatbot") },
+          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
+          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
+          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: modelStatusMap["crop_recommendation"] ?? true },
+          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
+          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
+          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
         ]);
       }
     }).finally(() => setLoading(false));
@@ -92,10 +77,6 @@ const AdminSystem = () => {
     } catch {
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     }
-    // Save override to localStorage so it persists after refresh
-    const savedOverrides = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
-    savedOverrides[svc.module] = newOnline;
-    localStorage.setItem("serviceOverrides", JSON.stringify(savedOverrides));
   };
 
   const handleToggleSetting = async (settingKey: string) => {
