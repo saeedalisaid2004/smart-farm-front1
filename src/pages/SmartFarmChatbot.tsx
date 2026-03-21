@@ -27,9 +27,9 @@ const SmartFarmChatbot = () => {
       getChatHistory(userId).then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           const history = data.map((item: any) => ({
-            role: item.role || (item.is_bot ? "assistant" : "user"),
+            role: item.role || (item.sender === "bot" || item.is_bot ? "assistant" : "user"),
             content: item.content || item.message || item.text || "",
-            time: item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
+            time: item.time || (item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""),
           }));
           setMessages(history);
         }
