@@ -79,11 +79,17 @@ const AnimalWeight = () => {
         </div>
 
         {result && (() => {
-          if (result.detail) {
+          if (result.detail || result.status === "Rejected") {
+            const msg = result.detail || result.message || "Request rejected";
             return (
               <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
                 <Eye className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive font-medium">{result.detail}</p>
+                <div>
+                  <p className="text-sm text-destructive font-medium">{msg}</p>
+                  {result.detected_object && (
+                    <p className="text-xs text-muted-foreground mt-1">Detected: {result.detected_object}</p>
+                  )}
+                </div>
               </div>
             );
           }
