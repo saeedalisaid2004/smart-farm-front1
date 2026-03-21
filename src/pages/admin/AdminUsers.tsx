@@ -23,6 +23,7 @@ const AdminUsers = () => {
   const [stats, setStats] = useState<any>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewUser, setViewUser] = useState<any>(null);
 
   const loadData = () => {
     setLoadingData(true);
