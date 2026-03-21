@@ -108,16 +108,16 @@ const AdminSystem = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{t("adminSys.systemStatus")}</p>
-                <p className="text-xs text-green-500 font-medium">{t("adminSys.allOperational")}</p>
+                <p className="text-xs text-green-500 font-medium">{systemStatus?.system?.status || t("adminSys.allOperational")}</p>
               </div>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t("adminSys.uptime")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.uptime || "99.8%"}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.system?.uptime || "—"}</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="text-muted-foreground">{t("adminSys.responseTime")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.avg_response_time || "145ms"}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.system?.response_time || "—"}</span>
             </div>
           </div>
 
@@ -128,16 +128,16 @@ const AdminSystem = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{t("adminSys.database")}</p>
-                <p className="text-xs text-green-500 font-medium">{t("adminSys.healthy")}</p>
+                <p className="text-xs text-green-500 font-medium">{systemStatus?.database?.status || t("adminSys.healthy")}</p>
               </div>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t("adminSys.storageUsed")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.storage_used || "234 GB"}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.database?.storage_used || "—"}</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="text-muted-foreground">{t("adminSys.connections")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.connections || "156"} {t("adminSys.connectionsActive")}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.database?.connections || "—"} {t("adminSys.connectionsActive")}</span>
             </div>
           </div>
 
@@ -148,16 +148,16 @@ const AdminSystem = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{t("adminSys.aiModels")}</p>
-                <p className="text-xs text-green-500 font-medium">{t("adminSys.activeModels")}</p>
+                <p className="text-xs text-green-500 font-medium">{systemStatus?.ai_models_summary?.active || "—"} {t("adminSys.activeModels")}</p>
               </div>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t("adminSys.avgAccuracy")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.avg_accuracy || "92.4%"}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.ai_models_summary?.avg_accuracy || "—"}</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="text-muted-foreground">{t("adminSys.totalRequests")}</span>
-              <span className="font-semibold text-foreground">{systemStatus?.total_requests || "8,456"}</span>
+              <span className="font-semibold text-foreground">{systemStatus?.ai_models_summary?.total_requests || "—"}</span>
             </div>
           </div>
         </div>
