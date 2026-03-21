@@ -109,6 +109,39 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
       <div className="flex-1 flex flex-col">
         <header className="h-16 bg-card border-b border-border flex items-center px-6 sticky top-0 z-10">
           <div className={cn("flex items-center gap-4", isRTL ? "order-first" : "order-last")}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center relative overflow-hidden">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-primary text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
+                    )}
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
+                  </div>
+                  <div className={cn("text-right", isRTL && "text-left")}>
+                    <p className="text-sm font-medium text-foreground leading-tight">{userName}</p>
+                    <p className="text-xs text-muted-foreground leading-tight">{t("common.farmer")}</p>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48">
+                <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/dashboard/profile")} className="cursor-pointer">
+                  <User className="w-4 h-4 mr-2" /> {t("header.profile")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" /> {t("dashboard.settings")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Popover>
               <PopoverTrigger asChild>
                 <button className="relative text-muted-foreground hover:text-foreground transition-colors">
@@ -143,39 +176,6 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
               <Moon className="w-5 h-5 dark:hidden" />
               <Sun className="w-5 h-5 hidden dark:block" />
             </button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center relative overflow-hidden">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-primary text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
-                    )}
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-foreground leading-tight">{userName}</p>
-                    <p className="text-xs text-muted-foreground leading-tight">{t("common.farmer")}</p>
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48">
-                <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard/profile")} className="cursor-pointer">
-                  <User className="w-4 h-4 mr-2" /> {t("header.profile")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer">
-                  <Settings className="w-4 h-4 mr-2" /> {t("dashboard.settings")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <h2 className="text-lg font-medium text-foreground flex-1 text-center">{title}</h2>
         </header>
