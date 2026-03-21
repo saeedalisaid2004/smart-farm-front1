@@ -220,7 +220,7 @@ const AdminUsers = () => {
                         </PopoverTrigger>
                         <PopoverContent align="end" className="w-48 p-1">
                           <button
-                            onClick={() => toast({ title: t("adminUsers.viewProfile"), description: `Viewing ${user.name || user.email}` })}
+                            onClick={() => setViewUser(user)}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
                           >
                             <Eye className="w-4 h-4 text-muted-foreground" />
