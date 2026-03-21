@@ -8,9 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiLogin } from "@/services/smartFarmApi";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
