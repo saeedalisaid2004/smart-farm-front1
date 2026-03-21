@@ -232,6 +232,7 @@ const translations = {
     "adminUsers.viewProfile": "View Profile",
     "adminUsers.viewing": "Viewing",
     "adminUsers.deactivate": "Deactivate",
+    "adminUsers.activate": "Activate",
     "adminUsers.deactivated": "has been deactivated",
     "adminUsers.deleteUser": "Delete User",
     "adminUsers.deleted": "has been deleted",
