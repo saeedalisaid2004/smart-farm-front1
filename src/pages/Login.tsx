@@ -37,7 +37,14 @@ const Login = () => {
         } catch {
           // External API login is optional, continue anyway
         }
-        if (role === "admin") {
+        // Check user role from database
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "")
+          .maybeSingle();
+        
+        if (roleData?.role === "admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/dashboard");
