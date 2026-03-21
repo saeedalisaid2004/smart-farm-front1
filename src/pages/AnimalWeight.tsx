@@ -79,7 +79,7 @@ const AnimalWeight = () => {
 
         {result && (
           <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-            <h3 className="text-lg font-semibold text-foreground">{t("animalWeight.result") || "Estimation Result"}</h3>
+            <h3 className="text-lg font-semibold text-foreground">Estimation Result</h3>
             {(result.estimated_weight || result.weight) && (
               <div className="flex items-baseline gap-3 flex-wrap">
                 <p className="text-3xl font-bold text-primary">
