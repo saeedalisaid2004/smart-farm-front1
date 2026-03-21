@@ -4,10 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
@@ -16,26 +17,113 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const SETTINGS_STORAGE_KEY = "dashboard_settings";
+
+type NotificationSettings = {
+  emailNotifications: boolean;
+  analysisAlerts: boolean;
+  weeklyReport: boolean;
+};
+
+const defaultNotifications: NotificationSettings = {
+  emailNotifications: false,
+  analysisAlerts: true,
+  weeklyReport: true,
+};
+
+const getStoredSettings = () => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+
+    return {
+      phone: parsed.phone || "+1234567890",
+      notifications: {
+        ...defaultNotifications,
+        ...(parsed.notifications || {}),
+      },
+    };
+  } catch {
+    return {
+      phone: "+1234567890",
+      notifications: defaultNotifications,
+    };
+  }
+};
+
+const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings();
+
+  localStorage.setItem(
+    SETTINGS_STORAGE_KEY,
+    JSON.stringify({
+      ...current,
+      ...updates,
+      notifications: {
+        ...current.notifications,
+        ...(updates.notifications || {}),
+      },
+    }),
+  );
+};
+
 const DashboardSettings = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState("+1234567890");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [phone, setPhone] = useState(() => getStoredSettings().phone);
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    localStorage.getItem("theme") === "dark" ? "dark" : "light",
+  );
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings().notifications);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFullName(user.name || "Farm Owner");
+    setEmail(user.email || "owner@smartfarm.com");
+  }, [user]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    persistSettings({ notifications });
+  }, [notifications]);
 
   const handleThemeChange = (value: "light" | "dark") => {
     setTheme(value);
-    if (value === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
   };
 
-  const handleSave = () => {
-    toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+  const handleSave = async () => {
+    const userId = getExternalUserId();
+
+    setSaving(true);
+    try {
+      if (userId) {
+        await apiSaveSettings(userId, {
+          full_name: fullName,
+          email,
+          phone,
+        });
+      }
+
+      if (user) {
+        setUser({ ...user, name: fullName, email });
+      }
+
+      persistSettings({ phone });
+      toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+    } catch {
+      toast({ title: "Failed to update profile", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -91,10 +179,11 @@ const DashboardSettings = () => {
               </div>
             </div>
 
-            <Button
-              onClick={handleSave}
-              className="w-full rounded-xl py-6 text-base font-medium mt-8"
-            >
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="w-full rounded-xl py-6 text-base font-medium mt-8"
+              >
               {t("settings.saveProfile")}
             </Button>
           </div>
@@ -159,15 +248,30 @@ const DashboardSettings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">{t("settings.emailNotifications")}</Label>
-                <Switch />
+                <Switch
+                  checked={notifications.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    setNotifications((prev) => ({ ...prev, emailNotifications: checked }))
+                  }
+                />
               </div>
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">{t("settings.analysisAlerts")}</Label>
-                <Switch defaultChecked />
+                <Switch
+                  checked={notifications.analysisAlerts}
+                  onCheckedChange={(checked) =>
+                    setNotifications((prev) => ({ ...prev, analysisAlerts: checked }))
+                  }
+                />
               </div>
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">{t("settings.weeklyReport")}</Label>
-                <Switch defaultChecked />
+                <Switch
+                  checked={notifications.weeklyReport}
+                  onCheckedChange={(checked) =>
+                    setNotifications((prev) => ({ ...prev, weeklyReport: checked }))
+                  }
+                />
               </div>
             </div>
           </div>
