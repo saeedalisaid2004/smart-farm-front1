@@ -32,7 +32,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const stored = localStorage.getItem("app_user");
     if (stored) {
       try {
-        setUserState(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        const savedAvatar = localStorage.getItem("avatar_base64");
+        if (savedAvatar) {
+          parsed.avatar_url = savedAvatar;
+        }
+        setUserState(parsed);
       } catch {
         localStorage.removeItem("app_user");
       }
