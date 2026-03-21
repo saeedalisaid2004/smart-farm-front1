@@ -182,7 +182,7 @@ export const getUserManagementData = async () => {
 };
 
 export const searchUsers = async (query: string) => {
-  const res = await fetch(`${API_BASE}/admin/users/search?q=${encodeURIComponent(query)}`);
+  const res = await fetch(`${API_BASE}/admin/users/search?query=${encodeURIComponent(query)}`);
   return res.json();
 };
 
