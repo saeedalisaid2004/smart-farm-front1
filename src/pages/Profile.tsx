@@ -5,16 +5,46 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+
+const SETTINGS_STORAGE_KEY = "dashboard_settings";
+const AVATAR_STORAGE_KEY = "avatar_base64";
+
+const getStoredPhone = () => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+    return parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "";
+  } catch {
+    return "";
+  }
+};
+
+const persistPhone = (phone: string) => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+
+    localStorage.setItem(
+      SETTINGS_STORAGE_KEY,
+      JSON.stringify({
+        ...parsed,
+        phone,
+      }),
+    );
+  } catch {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ phone }));
+  }
+};
 
 const Profile = () => {
   const { user, setUser } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -24,17 +54,15 @@ const Profile = () => {
 
   const [editName, setEditName] = useState(userName);
   const [editEmail, setEditEmail] = useState(userEmail);
-  const getStoredPhone = () => {
-    try {
-      const stored = localStorage.getItem("dashboard_settings");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.phone && parsed.phone !== "+1234567890") return parsed.phone;
-      }
-    } catch {}
-    return "";
-  };
   const [editPhone, setEditPhone] = useState(getStoredPhone());
+
+  useEffect(() => {
+    setAvatarUrl(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
+  }, [user?.avatar_url]);
+
+  useEffect(() => {
+    setEditPhone(getStoredPhone());
+  }, []);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,7 +73,7 @@ const Profile = () => {
     reader.onload = () => {
       const base64 = reader.result as string;
       setAvatarUrl(base64);
-      localStorage.setItem("avatar_base64", base64);
+      localStorage.setItem(AVATAR_STORAGE_KEY, base64);
       setUser({ ...user, avatar_url: base64 });
       window.dispatchEvent(new CustomEvent("avatar-updated", { detail: base64 }));
       toast({ title: t("profile.photoUpdated") });
@@ -65,7 +93,14 @@ const Profile = () => {
         email: editEmail,
         phone: editPhone,
       });
-      setUser({ ...user, name: editName, email: editEmail });
+
+      persistPhone(editPhone);
+      setUser({
+        ...user,
+        name: editName,
+        email: editEmail,
+        avatar_url: avatarUrl || user.avatar_url,
+      });
       setEditing(false);
       toast({ title: "Profile updated successfully" });
     } catch {
