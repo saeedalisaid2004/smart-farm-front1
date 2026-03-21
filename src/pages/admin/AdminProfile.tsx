@@ -31,14 +31,17 @@ const AdminProfile = () => {
     if (!file || !user) return;
 
     setUploading(true);
-    const url = URL.createObjectURL(file);
-    setAvatarUrl(url);
-    if (user) {
-      setUser({ ...user, avatar_url: url });
-    }
-    window.dispatchEvent(new CustomEvent("avatar-updated", { detail: url }));
-    toast({ title: t("profile.photoUpdated") });
-    setUploading(false);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setAvatarUrl(base64);
+      localStorage.setItem("avatar_base64", base64);
+      setUser({ ...user, avatar_url: base64 });
+      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: base64 }));
+      toast({ title: t("profile.photoUpdated") });
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
