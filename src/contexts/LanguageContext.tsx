@@ -67,6 +67,9 @@ const translations = {
     "plantDisease.title": "Plant Disease Detection (CNN)",
     // Animal Weight
     "animalWeight.title": "Animal Weight Estimation",
+    "animalWeight.estimationResult": "Estimation Result",
+    "animalWeight.animalName": "Animal Name",
+    "animalWeight.confidence": "Confidence",
     // Fruit Quality
     "fruitQuality.title": "Fruit Quality Analysis",
     // Crop Recommendation
@@ -376,6 +379,9 @@ const translations = {
     "plantDisease.title": "كشف أمراض النبات (CNN)",
     // Animal Weight
     "animalWeight.title": "تقدير وزن الحيوان",
+    "animalWeight.estimationResult": "نتيجة التقدير",
+    "animalWeight.animalName": "اسم الحيوان",
+    "animalWeight.confidence": "نسبة الثقة",
     // Fruit Quality
     "fruitQuality.title": "تحليل جودة الفاكهة",
     // Crop Recommendation

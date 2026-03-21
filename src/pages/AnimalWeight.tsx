@@ -87,7 +87,7 @@ const AnimalWeight = () => {
             <div className="bg-card border border-border rounded-2xl p-6 grid grid-cols-2 gap-6">
               {/* Estimation Result */}
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Estimation Result</p>
+                <p className="text-sm font-semibold text-foreground">{t("animalWeight.estimationResult")}</p>
                 <p className="text-3xl font-bold text-primary">
                   {weightValue ? `${String(weightValue).replace(/\s*kg\s*/gi, "")} kg` : "—"}
                 </p>
@@ -96,7 +96,7 @@ const AnimalWeight = () => {
               {/* Animal Name */}
               {animalName && (
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold text-foreground">Animal Name</p>
+                  <p className="text-sm font-semibold text-foreground">{t("animalWeight.animalName")}</p>
                   <p className="text-3xl font-bold text-primary">{animalName}</p>
                 </div>
               )}
@@ -104,7 +104,7 @@ const AnimalWeight = () => {
               {/* Confidence - full width */}
               {result.confidence && (
                 <div className="col-span-2">
-                  <p className="text-sm text-muted-foreground">Confidence: <span className="font-medium text-foreground">{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : result.confidence}</span></p>
+                  <p className="text-sm text-muted-foreground">{t("animalWeight.confidence")}: <span className="font-medium text-foreground">{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : result.confidence}</span></p>
                 </div>
               )}
 
