@@ -1,10 +1,13 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Camera } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Camera, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
 
 const AdminProfile = () => {
   const { user, setUser } = useAuth();
@@ -13,9 +16,15 @@ const AdminProfile = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || null);
   const [uploading, setUploading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const userName = user?.name || "Admin User";
   const userEmail = user?.email || "admin@smartfarm.com";
+
+  const [editName, setEditName] = useState(userName);
+  const [editEmail, setEditEmail] = useState(userEmail);
+  const [editPhone, setEditPhone] = useState("+1234567890");
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -30,6 +39,27 @@ const AdminProfile = () => {
     window.dispatchEvent(new CustomEvent("avatar-updated", { detail: url }));
     toast({ title: t("profile.photoUpdated") });
     setUploading(false);
+  };
+
+  const handleSave = async () => {
+    const userId = getExternalUserId();
+    if (!userId || !user) return;
+
+    setSaving(true);
+    try {
+      await apiSaveSettings(userId, {
+        full_name: editName,
+        email: editEmail,
+        phone: editPhone,
+      });
+      setUser({ ...user, name: editName, email: editEmail });
+      setEditing(false);
+      toast({ title: "Profile updated successfully" });
+    } catch {
+      toast({ title: "Failed to update profile", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -61,25 +91,57 @@ const AdminProfile = () => {
                 <p className="text-muted-foreground">{t("common.admin")}</p>
               </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
-                <Mail className="w-5 h-5 text-primary" />
-                <div><p className="text-xs text-muted-foreground">{t("profile.email")}</p><p className="text-sm font-medium text-foreground">{userEmail}</p></div>
+
+            {editing ? (
+              <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">{t("profile.fullName")}</Label>
+                    <Input id="name" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">{t("profile.email")}</Label>
+                    <Input id="email" type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">{t("profile.phone")}</Label>
+                    <Input id="phone" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={handleSave} disabled={saving} className="rounded-xl">
+                    <Save className="w-4 h-4 mr-2" />{saving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditing(false)} className="rounded-xl">
+                    <X className="w-4 h-4 mr-2" />Cancel
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
-                <Phone className="w-5 h-5 text-primary" />
-                <div><p className="text-xs text-muted-foreground">{t("profile.phone")}</p><p className="text-sm font-medium text-foreground">+1234567890</p></div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
-                <MapPin className="w-5 h-5 text-primary" />
-                <div><p className="text-xs text-muted-foreground">{t("profile.location")}</p><p className="text-sm font-medium text-foreground">Smart Farm Valley</p></div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
-                <Calendar className="w-5 h-5 text-primary" />
-                <div><p className="text-xs text-muted-foreground">{t("profile.location")}</p><p className="text-sm font-medium text-foreground">2024</p></div>
-              </div>
-            </div>
-            <Button className="mt-6 rounded-xl"><Edit2 className="w-4 h-4 mr-2" />{t("profile.editProfile")}</Button>
+            ) : (
+              <>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
+                    <Mail className="w-5 h-5 text-primary" />
+                    <div><p className="text-xs text-muted-foreground">{t("profile.email")}</p><p className="text-sm font-medium text-foreground">{userEmail}</p></div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
+                    <Phone className="w-5 h-5 text-primary" />
+                    <div><p className="text-xs text-muted-foreground">{t("profile.phone")}</p><p className="text-sm font-medium text-foreground">+1234567890</p></div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <div><p className="text-xs text-muted-foreground">{t("profile.location")}</p><p className="text-sm font-medium text-foreground">Smart Farm Valley</p></div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
+                    <Calendar className="w-5 h-5 text-primary" />
+                    <div><p className="text-xs text-muted-foreground">{t("profile.memberSince")}</p><p className="text-sm font-medium text-foreground">2024</p></div>
+                  </div>
+                </div>
+                <Button className="mt-6 rounded-xl" onClick={() => setEditing(true)}>
+                  <Edit2 className="w-4 h-4 mr-2" />{t("profile.editProfile")}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
