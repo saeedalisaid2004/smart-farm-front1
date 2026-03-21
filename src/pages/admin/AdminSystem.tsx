@@ -33,13 +33,15 @@ const AdminSystem = () => {
         if (Array.isArray(settingsData)) settingsArr = settingsData;
         else if (settingsData.settings) settingsArr = settingsData.settings;
         
-        // Map API status and apply localStorage overrides
-        setSettings(settingsArr.map((s: any) => ({
-          ...s,
-          enabled: (s.key in savedSettingOverrides) 
-            ? savedSettingOverrides[s.key] 
-            : (s.status === "online" || s.enabled === true),
-        })));
+        // Map API status, localStorage overrides only apply if they exist
+        setSettings(settingsArr.map((s: any) => {
+          const apiEnabled = s.status === "online" || s.enabled === true;
+          const hasOverride = s.key && (s.key in savedSettingOverrides);
+          return {
+            ...s,
+            enabled: hasOverride ? savedSettingOverrides[s.key] : apiEnabled,
+          };
+        }));
       }
       if (Array.isArray(modelsData)) setModels(modelsData);
       else if (modelsData?.models) setModels(modelsData.models);
