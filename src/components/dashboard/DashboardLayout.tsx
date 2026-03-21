@@ -69,7 +69,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
     return () => window.removeEventListener("avatar-updated", handler);
   }, []);
   return (
-    <div className={cn("min-h-screen bg-background flex", isRTL && "flex-row-reverse")}>
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className={cn("h-screen w-64 bg-card border-border flex flex-col sticky top-0", isRTL ? "border-l" : "border-r")}>
         <div className={cn("p-5 flex items-center gap-3", isRTL && "flex-row-reverse")}>
