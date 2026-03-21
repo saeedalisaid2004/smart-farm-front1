@@ -294,6 +294,58 @@ const AdminUsers = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* View Profile Dialog */}
+      <Dialog open={!!viewUser} onOpenChange={(open) => !open && setViewUser(null)}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+          <div className="h-24 bg-gradient-to-r from-primary to-primary/70" />
+          <div className="-mt-12 px-6 pb-6">
+            <div className="w-20 h-20 rounded-2xl bg-card border-4 border-background flex items-center justify-center mb-3 shadow-md">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <DialogHeader className="text-left mb-4">
+              <DialogTitle className="text-xl">{viewUser?.name || viewUser?.full_name || "User"}</DialogTitle>
+              <p className="text-sm text-muted-foreground">{viewUser?.role || "Farmer"}</p>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Email</p>
+                  <p className="text-sm font-medium text-foreground">{viewUser?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Role</p>
+                  <p className="text-sm font-medium text-foreground">{viewUser?.role || "Farmer"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                <UserCheck className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <Badge variant="outline" className={`text-xs mt-0.5 ${
+                    (viewUser?.status === "Active" || viewUser?.status === "active") ? "border-primary/30 text-primary bg-primary/5" : "border-destructive/30 text-destructive bg-destructive/5"
+                  }`}>
+                    {viewUser?.status || "Active"}
+                  </Badge>
+                </div>
+              </div>
+              {viewUser?.joined && (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Joined</p>
+                    <p className="text-sm font-medium text-foreground">{viewUser.joined}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
