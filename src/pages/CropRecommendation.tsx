@@ -120,7 +120,7 @@ const CropRecommendation = () => {
 
                   {confidence && (
                     <p className="text-sm text-muted-foreground">
-                      {t("crop.confidence")}: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
+                      Confidence: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
                     </p>
                   )}
 
