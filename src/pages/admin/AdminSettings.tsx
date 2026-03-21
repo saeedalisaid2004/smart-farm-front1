@@ -7,6 +7,8 @@ import { Settings, User, Palette, Globe, Bell } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
@@ -15,25 +17,108 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const SETTINGS_STORAGE_KEY = "admin_settings";
+
+type NotificationSettings = {
+  pushNotifications: boolean;
+  emailAlerts: boolean;
+};
+
+const defaultNotifications: NotificationSettings = {
+  pushNotifications: true,
+  emailAlerts: true,
+};
+
+const getStoredSettings = () => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+
+    return {
+      phone: parsed.phone || "+1234567890",
+      notifications: {
+        ...defaultNotifications,
+        ...(parsed.notifications || {}),
+      },
+    };
+  } catch {
+    return {
+      phone: "+1234567890",
+      notifications: defaultNotifications,
+    };
+  }
+};
+
+const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings();
+
+  localStorage.setItem(
+    SETTINGS_STORAGE_KEY,
+    JSON.stringify({
+      ...current,
+      ...updates,
+      notifications: {
+        ...current.notifications,
+        ...(updates.notifications || {}),
+      },
+    }),
+  );
+};
+
 const AdminSettings = () => {
+  const { user, setUser } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
+  const [fullName, setFullName] = useState(user?.name || "Farm Owner");
+  const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
+  const [phone, setPhone] = useState(() => getStoredSettings().phone);
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    localStorage.getItem("theme") === "dark" ? "dark" : "light",
+  );
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings().notifications);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFullName(user.name || "Farm Owner");
+    setEmail(user.email || "owner@smartfarm.com");
+  }, [user]);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    root.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const handleSave = () => {
-    toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
+  useEffect(() => {
+    persistSettings({ notifications });
+  }, [notifications]);
+
+  const handleSave = async () => {
+    const userId = getExternalUserId();
+
+    setSaving(true);
+    try {
+      if (userId) {
+        await apiSaveSettings(userId, {
+          full_name: fullName,
+          email,
+          phone,
+        });
+      }
+
+      if (user) {
+        setUser({ ...user, name: fullName, email });
+      }
+
+      persistSettings({ phone });
+      toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
+    } catch {
+      toast({ title: "Failed to update profile", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -58,17 +143,17 @@ const AdminSettings = () => {
           <div className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">{t("settings.fullName")}</Label>
-              <Input defaultValue="Farm Owner" className="h-11 rounded-lg" />
+              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="h-11 rounded-lg" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">{t("settings.email")}</Label>
-              <Input defaultValue="owner@smartfarm.com" className="h-11 rounded-lg" />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 rounded-lg" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">{t("settings.phone")}</Label>
-              <Input defaultValue="+1234567890" className="h-11 rounded-lg" />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11 rounded-lg" />
             </div>
-            <Button onClick={handleSave} className="w-full h-11 rounded-lg text-sm font-medium">
+            <Button onClick={handleSave} disabled={saving} className="w-full h-11 rounded-lg text-sm font-medium">
               {t("settings.saveProfile")}
             </Button>
           </div>
@@ -124,11 +209,23 @@ const AdminSettings = () => {
           <div className="space-y-2">
             <label className="flex items-center justify-between border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
               <span className="text-sm font-medium text-foreground">{t("settings.pushNotifications")}</span>
-              <Checkbox defaultChecked className="h-5 w-5" />
+              <Checkbox
+                checked={notifications.pushNotifications}
+                onCheckedChange={(checked) =>
+                  setNotifications((prev) => ({ ...prev, pushNotifications: checked === true }))
+                }
+                className="h-5 w-5"
+              />
             </label>
             <label className="flex items-center justify-between border border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-secondary/30 transition-colors">
               <span className="text-sm font-medium text-foreground">{t("settings.emailAlerts")}</span>
-              <Checkbox defaultChecked className="h-5 w-5" />
+              <Checkbox
+                checked={notifications.emailAlerts}
+                onCheckedChange={(checked) =>
+                  setNotifications((prev) => ({ ...prev, emailAlerts: checked === true }))
+                }
+                className="h-5 w-5"
+              />
             </label>
           </div>
         </div>
