@@ -83,25 +83,60 @@ const SoilAnalysis = () => {
           </Button>
         </div>
 
-        {result && (
-          <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-            <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
-            {result.soil_type && (
-              <p className="text-2xl font-bold text-primary">{result.soil_type}</p>
-            )}
-            {result.recommendation && (
-              <p className="text-sm text-muted-foreground">{result.recommendation}</p>
-            )}
-            {result.confidence && (
-              <p className="text-sm text-muted-foreground">Confidence: <span className="font-medium text-foreground">{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : result.confidence}</span></p>
-            )}
-            {!result.soil_type && (
-              <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            )}
-          </div>
-        )}
+        {result && (() => {
+          // Handle API error/detail message
+          if (result.detail) {
+            return (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
+                <FlaskConical className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
+                <p className="text-sm text-destructive font-medium">{result.detail}</p>
+              </div>
+            );
+          }
+
+          const soilType = result.soil_type || result.predicted_class || result.prediction;
+          const recommendation = result.recommendation || result.description;
+          const confidence = result.confidence;
+          const inputData = result.input_data;
+
+          return (
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
+              {soilType ? (
+                <>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t("soil.title")}</p>
+                    <p className="text-3xl font-bold text-primary capitalize">{soilType}</p>
+                  </div>
+
+                  {confidence && (
+                    <p className="text-sm text-muted-foreground">
+                      Confidence: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
+                    </p>
+                  )}
+
+                  {recommendation && (
+                    <p className="text-sm text-muted-foreground">{recommendation}</p>
+                  )}
+
+                  {inputData && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-border">
+                      {Object.entries(inputData).map(([key, val]) => (
+                        <div key={key} className="p-3 bg-secondary/50 rounded-xl">
+                          <p className="text-xs text-muted-foreground uppercase">{key}</p>
+                          <p className="text-sm font-medium text-foreground">{String(val)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
+                  {JSON.stringify(result, null, 2)}
+                </pre>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </DashboardLayout>
   );
