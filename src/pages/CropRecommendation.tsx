@@ -89,25 +89,82 @@ const CropRecommendation = () => {
           </Button>
         </div>
 
-        {result && (
-          <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-            <h3 className="text-lg font-semibold text-foreground">Recommendation</h3>
-            {result.recommended_crop && (
-              <p className="text-2xl font-bold text-primary">{result.recommended_crop}</p>
-            )}
-            {result.confidence && (
-              <p className="text-sm text-muted-foreground">Confidence: <span className="font-medium text-foreground">{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : result.confidence}</span></p>
-            )}
-            {result.description && (
-              <p className="text-sm text-muted-foreground">{result.description}</p>
-            )}
-            {!result.recommended_crop && (
-              <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            )}
-          </div>
-        )}
+        {result && (() => {
+          const primary = result.recommendations?.primary || result.recommended_crop;
+          const alternatives = result.recommendations?.alternatives || [];
+          const description = result.description || "";
+          const confidence = result.confidence;
+          const inputData = result.input_data;
+
+          return (
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
+              {primary ? (
+                <>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Recommended Crop</p>
+                    <p className="text-3xl font-bold text-primary capitalize">{primary}</p>
+                  </div>
+
+                  {alternatives.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Alternatives</p>
+                      <div className="flex flex-wrap gap-2">
+                        {alternatives.map((alt: string, i: number) => (
+                          <span key={i} className="px-4 py-1.5 bg-secondary text-foreground rounded-full text-sm font-medium capitalize">
+                            {alt}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {confidence && (
+                    <p className="text-sm text-muted-foreground">
+                      Confidence: <span className="font-semibold text-foreground">{typeof confidence === 'number' ? `${(confidence * 100).toFixed(1)}%` : confidence}</span>
+                    </p>
+                  )}
+
+                  {description && (
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                  )}
+
+                  {inputData && (
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                      {inputData.temperature && (
+                        <div className="p-3 bg-secondary/50 rounded-xl">
+                          <p className="text-xs text-muted-foreground">{t("crop.temperature")}</p>
+                          <p className="text-sm font-medium text-foreground">{inputData.temperature}</p>
+                        </div>
+                      )}
+                      {inputData.humidity && (
+                        <div className="p-3 bg-secondary/50 rounded-xl">
+                          <p className="text-xs text-muted-foreground">{t("crop.humidity")}</p>
+                          <p className="text-sm font-medium text-foreground">{inputData.humidity}</p>
+                        </div>
+                      )}
+                      {inputData.rainfall && (
+                        <div className="p-3 bg-secondary/50 rounded-xl">
+                          <p className="text-xs text-muted-foreground">{t("crop.rainfall")}</p>
+                          <p className="text-sm font-medium text-foreground">{inputData.rainfall}</p>
+                        </div>
+                      )}
+                      {inputData.soil_type && (
+                        <div className="p-3 bg-secondary/50 rounded-xl">
+                          <p className="text-xs text-muted-foreground">{t("crop.soilType")}</p>
+                          <p className="text-sm font-medium text-foreground">{inputData.soil_type}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
+                  {JSON.stringify(result, null, 2)}
+                </pre>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </DashboardLayout>
   );
