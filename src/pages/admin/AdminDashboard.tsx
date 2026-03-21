@@ -176,6 +176,39 @@ const AdminDashboard = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Recent System Activity */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold text-foreground text-lg mb-4">{t("adminDash.recentActivity")}</h3>
+          <div className="divide-y divide-border">
+            {(data?.recent_activity && data.recent_activity.length > 0
+              ? data.recent_activity
+              : []
+            ).map((item: any, idx: number) => {
+              const timeStr = item.time || "";
+              const date = timeStr ? new Date(timeStr) : null;
+              const ago = date ? getTimeAgo(date) : "";
+
+              return (
+                <div key={idx} className="flex items-center justify-between py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{item.user}</p>
+                      <p className="text-sm text-muted-foreground">{item.action}</p>
+                    </div>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{ago}</span>
+                </div>
+              );
+            })}
+            {(!data?.recent_activity || data.recent_activity.length === 0) && (
+              <p className="text-muted-foreground text-sm py-4">{t("adminDash.noActivity")}</p>
+            )}
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );
