@@ -299,7 +299,7 @@ const AdminSystem = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{setting.desc || setting.description}</p>
                 </div>
                 <Switch
-                  defaultChecked={setting.defaultOn ?? setting.enabled ?? setting.is_enabled}
+                  checked={setting.enabled ?? setting.defaultOn ?? false}
                   onCheckedChange={() => handleToggleSetting(setting.key || setting.setting_name || setting.name)}
                 />
               </div>
