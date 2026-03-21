@@ -64,7 +64,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className={cn("h-screen w-64 bg-card border-border flex flex-col sticky top-0 order-first", isRTL ? "border-l order-last" : "border-r")}>
+      <aside className={cn("h-screen w-64 bg-card border-border flex flex-col sticky top-0", isRTL ? "border-l order-last" : "border-r order-first")}>
         <div className={cn("p-5 flex items-center gap-3", isRTL && "flex-row-reverse")}>
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
             <Leaf className="w-5 h-5 text-primary-foreground" />
@@ -100,18 +100,16 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-10">
-          <div className="flex-1" />
-          <h2 className="text-lg font-medium text-foreground">{title}</h2>
-          <div className="flex-1 flex items-center gap-4 justify-end">
+        <header className="h-16 bg-card border-b border-border flex items-center px-6 sticky top-0 z-10">
+          <div className={cn("flex items-center gap-4", isRTL ? "order-first" : "order-last")}>
             <Popover>
               <PopoverTrigger asChild>
                 <button className="relative text-muted-foreground hover:text-foreground transition-colors">
                   <Bell className="w-5 h-5" />
-                  <span className={cn("absolute -top-1 w-2 h-2 bg-destructive rounded-full", isRTL ? "-left-1" : "-right-1")} />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-96 p-0" align="end">
+              <PopoverContent className="w-96 p-0" align={isRTL ? "start" : "end"}>
                 <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
                   <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">2 new</span>
@@ -141,37 +139,38 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className={cn("flex items-center gap-2 cursor-pointer", isRTL && "flex-row-reverse")}>
+                <button className="flex items-center gap-2 cursor-pointer">
                   <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center relative overflow-hidden">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-primary text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
                     )}
-                    <span className={cn("absolute -bottom-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card", isRTL ? "-left-0.5" : "-right-0.5")} />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
                   </div>
-                  <div className={isRTL ? "text-left" : "text-right"}>
+                  <div className="text-right">
                     <p className="text-sm font-medium text-foreground leading-tight">{userName}</p>
                     <p className="text-xs text-muted-foreground leading-tight">{t("common.admin")}</p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48">
                 <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/admin/profile")} className={cn("cursor-pointer", isRTL && "flex-row-reverse")}>
-                  <User className={cn("w-4 h-4", isRTL ? "ml-2" : "mr-2")} /> {t("header.profile")}
+                <DropdownMenuItem onClick={() => navigate("/admin/profile")} className="cursor-pointer">
+                  <User className="w-4 h-4 mr-2" /> {t("header.profile")}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/admin/settings")} className={cn("cursor-pointer", isRTL && "flex-row-reverse")}>
-                  <Settings className={cn("w-4 h-4", isRTL ? "ml-2" : "mr-2")} /> {t("admin.settings")}
+                <DropdownMenuItem onClick={() => navigate("/admin/settings")} className="cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" /> {t("admin.settings")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className={cn("cursor-pointer", isRTL && "flex-row-reverse")}>
-                  <LogOut className={cn("w-4 h-4", isRTL ? "ml-2" : "mr-2")} /> {t("header.logout")}
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          <h2 className="text-lg font-medium text-foreground flex-1 text-center">{title}</h2>
         </header>
 
         <main className="flex-1 p-8">{children}</main>
