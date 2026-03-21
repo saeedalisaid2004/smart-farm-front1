@@ -379,6 +379,9 @@ const translations = {
     "plantDisease.title": "كشف أمراض النبات (CNN)",
     // Animal Weight
     "animalWeight.title": "تقدير وزن الحيوان",
+    "animalWeight.estimationResult": "نتيجة التقدير",
+    "animalWeight.animalName": "اسم الحيوان",
+    "animalWeight.confidence": "نسبة الثقة",
     // Fruit Quality
     "fruitQuality.title": "تحليل جودة الفاكهة",
     // Crop Recommendation
