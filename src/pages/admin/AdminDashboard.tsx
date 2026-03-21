@@ -26,16 +26,17 @@ const AdminDashboard = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const summary = data?.summary;
   const statsCards = [
-    { icon: Users, label: t("adminDash.totalUsers"), value: data?.active_users ?? "—", sub: t("adminDash.registered"), change: "+12%", changeColor: "text-primary" },
-    { icon: Activity, label: t("adminDash.totalAnalyses"), value: data?.total_analyses ?? "—", sub: t("adminDash.thisMonth"), change: "+23%", changeColor: "text-primary" },
-    { icon: Cpu, label: t("adminDash.aiServices"), value: data?.ai_services_count ?? "6 of 6", sub: t("adminDash.active"), badge: t("adminDash.allOnline"), badgeColor: "text-primary" },
-    { icon: TrendingUp, label: t("adminDash.mostUsed"), value: t("adminDash.plantDisease"), sub: t("adminDash.detection"), badge: t("adminDash.top"), badgeColor: "text-primary" },
+    { icon: Users, label: t("adminDash.totalUsers"), value: summary?.total_users ?? "—", sub: t("adminDash.registered"), change: "+12%", changeColor: "text-primary" },
+    { icon: Activity, label: t("adminDash.totalAnalyses"), value: summary?.total_analyses ?? "—", sub: t("adminDash.thisMonth"), change: "+23%", changeColor: "text-primary" },
+    { icon: Cpu, label: t("adminDash.aiServices"), value: summary?.active_services ?? "6 of 6", sub: t("adminDash.active"), badge: t("adminDash.allOnline"), badgeColor: "text-primary" },
+    { icon: TrendingUp, label: t("adminDash.mostUsed"), value: summary?.top_service ?? t("adminDash.plantDisease"), sub: t("adminDash.detection"), badge: t("adminDash.top"), badgeColor: "text-primary" },
   ];
 
   // Transform charts data from API
-  const usageByService = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([name, value]) => ({ name, value }))
+  const usageByService = data?.charts?.service_distribution
+    ? Object.entries(data.charts.service_distribution).map(([name, value]) => ({ name, value }))
     : [
         { name: t("adminDash.plantDisease"), value: 25 },
         { name: t("adminDash.chatbot"), value: 21 },
@@ -45,8 +46,8 @@ const AdminDashboard = () => {
         { name: t("adminDash.fruitQuality"), value: 10 },
       ];
 
-  const userGrowth = data?.charts?.user_growth
-    ? Object.entries(data.charts.user_growth).map(([month, value]) => ({ month, value }))
+  const userGrowth = data?.charts?.usage_over_time
+    ? Object.entries(data.charts.usage_over_time).map(([month, value]) => ({ month, value }))
     : [
         { month: "Jan", value: 150 },
         { month: "Feb", value: 180 },
@@ -56,8 +57,8 @@ const AdminDashboard = () => {
         { month: "Jun", value: 400 },
       ];
 
-  const dailyActivity = data?.charts?.daily_activity
-    ? Object.entries(data.charts.daily_activity).map(([day, users]) => ({ day, users }))
+  const dailyActivity = data?.charts?.active_users_week
+    ? Object.entries(data.charts.active_users_week).map(([day, users]) => ({ day, users }))
     : [
         { day: "Mon", users: 32 },
         { day: "Tue", users: 40 },
