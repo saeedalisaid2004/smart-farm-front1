@@ -35,7 +35,7 @@ const getStoredSettings = () => {
     const parsed = stored ? JSON.parse(stored) : {};
 
     return {
-      phone: parsed.phone ?? "",
+      phone: parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "",
       notifications: {
         ...defaultNotifications,
         ...(parsed.notifications || {}),
