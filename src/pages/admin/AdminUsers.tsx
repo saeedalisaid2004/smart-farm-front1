@@ -99,6 +99,16 @@ const AdminUsers = () => {
     }
   };
 
+  const handleActivateUser = async (user: any) => {
+    try {
+      await apiActivateUser(user.id || user.user_id);
+      toast({ title: `${user.name} activated` });
+      loadData();
+    } catch {
+      toast({ title: "Failed", variant: "destructive" });
+    }
+  };
+
   return (
     <AdminLayout title={t("adminUsers.title")}>
       <div className="space-y-6">
@@ -215,13 +225,23 @@ const AdminUsers = () => {
                             <Eye className="w-4 h-4 text-muted-foreground" />
                             {t("adminUsers.viewProfile")}
                           </button>
-                          <button
-                            onClick={() => handleDeactivateUser(user)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
-                          >
-                            <UserMinus className="w-4 h-4 text-muted-foreground" />
-                            {t("adminUsers.deactivate")}
-                          </button>
+                          {(user.status === "Active" || user.status === "active" || user.is_active) ? (
+                            <button
+                              onClick={() => handleDeactivateUser(user)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground rounded-md hover:bg-secondary transition-colors"
+                            >
+                              <UserMinus className="w-4 h-4 text-muted-foreground" />
+                              {t("adminUsers.deactivate")}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleActivateUser(user)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-primary rounded-md hover:bg-primary/10 transition-colors"
+                            >
+                              <UserCheck className="w-4 h-4" />
+                              {t("adminUsers.activate")}
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteUser(user)}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive rounded-md hover:bg-destructive/10 transition-colors"
