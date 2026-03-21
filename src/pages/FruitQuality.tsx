@@ -78,28 +78,51 @@ const FruitQuality = () => {
         </div>
 
         {result && (() => {
-          if (result.detail) {
+          if (result.detail || result.status === "Rejected") {
+            const msg = result.detail || result.message || "Request rejected";
             return (
               <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
                 <Apple className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive font-medium">{result.detail}</p>
+                <p className="text-sm text-destructive font-medium">{msg}</p>
               </div>
             );
           }
 
+          const grade = result.quality_grade || result.quality || result.grade;
+          const gradeDescription = result.grade_description || result.description;
+          const ripeness = result.ripeness_level || result.ripeness;
+          const defect = result.defect_detection || result.defects;
+          const isLowGrade = grade && (grade.toLowerCase().includes('c') || grade.toLowerCase().includes('low'));
+
           return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-              <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
-              {result.quality && (
-                <p className="text-2xl font-bold text-primary">{result.quality}</p>
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Analysis Results</h3>
+
+              {grade && (
+                <div className={`border-2 rounded-2xl p-5 ${isLowGrade ? 'bg-destructive/5 border-destructive/30' : 'bg-primary/10 border-primary/30'}`}>
+                  <p className="text-sm text-muted-foreground mb-1">Quality Grade</p>
+                  <p className={`text-2xl font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{grade}</p>
+                  {gradeDescription && (
+                    <p className="text-sm text-muted-foreground mt-1">{gradeDescription}</p>
+                  )}
+                </div>
               )}
-              {result.fruit_type && (
-                <p className="text-sm text-muted-foreground">Fruit: <span className="font-medium text-foreground">{result.fruit_type}</span></p>
+
+              {ripeness && (
+                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
+                  <span className="font-semibold text-foreground">Ripeness Level: </span>
+                  <span className="text-foreground">{ripeness}</span>
+                </div>
               )}
-              {result.confidence && (
-                <p className="text-sm text-muted-foreground">Confidence: <span className="font-medium text-foreground">{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : result.confidence}</span></p>
+
+              {defect && (
+                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
+                  <span className="font-semibold text-foreground">Defect Detection: </span>
+                  <span className="text-foreground">{defect}</span>
+                </div>
               )}
-              {!result.quality && !result.fruit_type && (
+
+              {!grade && !ripeness && !defect && (
                 <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
                   {JSON.stringify(result, null, 2)}
                 </pre>
