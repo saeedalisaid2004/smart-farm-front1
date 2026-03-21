@@ -21,10 +21,6 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) {
-      toast({ variant: "destructive", title: "Error", description: "Please select your role" });
-      return;
-    }
     setLoading(true);
     try {
       // Login with Supabase
