@@ -31,17 +31,30 @@ const AdminSystem = () => {
       if (Array.isArray(modelsData)) setModels(modelsData);
       else if (modelsData?.models) setModels(modelsData.models);
 
-      // Build services from status or use defaults
+      // Build services from status or use defaults, cross-reference with models table
       if (status?.services) {
         setServices(status.services);
       } else {
+        const modelsList = Array.isArray(modelsData) ? modelsData : (modelsData?.models || []);
+        // Map model name prefixes to service modules
+        const modelStatusMap: Record<string, boolean> = {};
+        modelsList.forEach((m: any) => {
+          const name = (m.name || "").toLowerCase();
+          const isActive = (m.status || "").toLowerCase() === "active" || (m.status || "").toLowerCase() === "online";
+          if (name.includes("plant")) modelStatusMap["plant_disease"] = isActive;
+          if (name.includes("animal")) modelStatusMap["animal_weight"] = isActive;
+          if (name.includes("crop")) modelStatusMap["crop_recommendation"] = isActive;
+          if (name.includes("soil")) modelStatusMap["soil_analysis"] = isActive;
+          if (name.includes("fruit")) modelStatusMap["fruit_quality"] = isActive;
+          if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
+        });
         setServices([
-          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: true },
-          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: true },
-          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: true },
-          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: true },
-          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: true },
-          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: true },
+          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
+          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
+          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: modelStatusMap["crop_recommendation"] ?? true },
+          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
+          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
+          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
         ]);
       }
     }).finally(() => setLoading(false));
