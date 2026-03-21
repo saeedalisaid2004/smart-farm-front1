@@ -211,17 +211,17 @@ export const promoteToAdmin = async (email: string) => {
 };
 
 export const getSystemStatus = async () => {
-  const res = await fetch(`${API_BASE}/admin/system/status`);
+  const res = await fetch(`${API_BASE}/admin/system/admin/system/status`);
   return res.json();
 };
 
 export const getSystemSettings = async () => {
-  const res = await fetch(`${API_BASE}/admin/system/settings`);
+  const res = await fetch(`${API_BASE}/admin/system/admin/system/settings`);
   return res.json();
 };
 
 export const toggleSystemSetting = async (settingName: string) => {
-  const res = await fetch(`${API_BASE}/admin/system/settings/toggle/${settingName}`, {
+  const res = await fetch(`${API_BASE}/admin/system/admin/system/settings/toggle/${settingName}`, {
     method: "POST",
   });
   return res.json();
