@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Camera, Save, X } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Camera, Save, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
