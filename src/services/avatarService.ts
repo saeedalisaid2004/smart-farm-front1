@@ -78,18 +78,7 @@ export async function uploadAvatar(userId: string | number, file: File): Promise
 export function getSavedAvatarUrl(userId?: string | number | null): string | null {
   try {
     const scopedKey = getAvatarStorageKey(userId);
-    const scopedAvatar = localStorage.getItem(scopedKey);
-    if (scopedAvatar) {
-      return scopedAvatar;
-    }
-
-    const legacyAvatar = localStorage.getItem(AVATAR_URL_KEY);
-    if (legacyAvatar && resolveUserId(userId) !== "default") {
-      localStorage.setItem(scopedKey, legacyAvatar);
-      return legacyAvatar;
-    }
-
-    return legacyAvatar || null;
+    return localStorage.getItem(scopedKey) || null;
   } catch {
     return null;
   }
