@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
   id: string;
-  user_id: string;
   title: string;
   description: string | null;
   type: string;
@@ -11,80 +9,61 @@ export interface Notification {
   created_at: string;
 }
 
+const STORAGE_KEY = "smart_farm_notifications";
+
+function getStoredNotifications(): Notification[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveNotifications(notifications: Notification[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+  window.dispatchEvent(new Event("notifications-updated"));
+}
+
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>(getStoredNotifications);
 
-  const fetchNotifications = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setLoading(false); return; }
-
-    const { data, error } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(50);
-
-    if (!error && data) {
-      setNotifications(data as Notification[]);
-    }
-    setLoading(false);
+  const sync = useCallback(() => {
+    setNotifications(getStoredNotifications());
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-
-    const channel = supabase
-      .channel("notifications-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        () => {
-          fetchNotifications();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchNotifications]);
+    window.addEventListener("notifications-updated", sync);
+    return () => window.removeEventListener("notifications-updated", sync);
+  }, [sync]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const markAsRead = async (id: string) => {
-    await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", id);
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-    );
+  const markAsRead = (id: string) => {
+    const updated = notifications.map((n) => (n.id === id ? { ...n, is_read: true } : n));
+    saveNotifications(updated);
+    setNotifications(updated);
   };
 
-  const markAllAsRead = async () => {
-    const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
-    if (unreadIds.length === 0) return;
-    await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .in("id", unreadIds);
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+  const markAllAsRead = () => {
+    const updated = notifications.map((n) => ({ ...n, is_read: true }));
+    saveNotifications(updated);
+    setNotifications(updated);
   };
 
-  const deleteNotification = async (id: string) => {
-    await supabase.from("notifications").delete().eq("id", id);
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const deleteNotification = (id: string) => {
+    const updated = notifications.filter((n) => n.id !== id);
+    saveNotifications(updated);
+    setNotifications(updated);
   };
 
   return {
     notifications,
-    loading,
     unreadCount,
+    loading: false,
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    refetch: fetchNotifications,
+    refetch: sync,
   };
 }
