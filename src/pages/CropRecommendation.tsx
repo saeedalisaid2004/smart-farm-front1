@@ -178,9 +178,9 @@ const CropRecommendation = () => {
                     )}
 
                     {description && (
-                      <div className="bg-secondary/40 border border-border rounded-2xl p-5">
-                        <p className="text-xs font-medium text-muted-foreground mb-2">Details</p>
-                        <p className="text-sm text-foreground leading-relaxed" dir="auto">{description}</p>
+                      <div className="bg-gradient-to-br from-secondary/60 to-secondary/30 border border-border rounded-2xl p-6">
+                        <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">Details</p>
+                        <p className="text-base text-foreground leading-7 font-medium" dir="auto" style={{ lineHeight: 1.9 }}>{description}</p>
                       </div>
                     )}
 
