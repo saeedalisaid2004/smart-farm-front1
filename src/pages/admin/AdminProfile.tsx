@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
-import { uploadAvatar, getSavedAvatarUrl } from "@/services/avatarService";
+import { uploadAvatar, getSavedAvatarUrl, removeAvatar } from "@/services/avatarService";
 
 const AdminProfile = () => {
   const { user, setUser } = useAuth();
