@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { askFarmBot, getChatHistory, getExternalUserId } from "@/services/smartFarmApi";
+import { incrementAnalysis } from "@/services/analysisStats";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SmartFarmChatbot = () => {
