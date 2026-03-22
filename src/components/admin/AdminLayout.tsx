@@ -47,6 +47,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const { t, isRTL } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const formatTime = (dateStr: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: isRTL ? ar : enUS });
+    } catch { return dateStr; }
+  };
+
   const toggleTheme = () => document.documentElement.classList.toggle("dark");
 
   const handleLogout = async () => {
