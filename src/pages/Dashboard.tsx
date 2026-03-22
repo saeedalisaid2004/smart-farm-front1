@@ -66,6 +66,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
+          <p className="text-sm font-semibold text-primary mb-1 tracking-wide">Smart Farm AI</p>
           <h1 className="text-2xl font-bold text-foreground mb-1">{t("dashboard.welcomeUser")}, {userName} 👋</h1>
           <p className="text-muted-foreground mb-6">{t("dashboard.useAI")}</p>
         </motion.div>
