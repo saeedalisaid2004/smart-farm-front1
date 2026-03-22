@@ -83,7 +83,8 @@ const Register = () => {
               <Label htmlFor="email" className="text-foreground font-medium text-sm">{t("register.email")}</Label>
               <div className="relative">
                 <Mail className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-                <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"}`} required />
+                <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"} ${errors.email ? "border-destructive" : ""}`} />
+                {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
               </div>
             </div>
             <div className="space-y-2">
