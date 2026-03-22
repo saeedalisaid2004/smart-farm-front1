@@ -75,7 +75,8 @@ const Register = () => {
               <Label htmlFor="name" className="text-foreground font-medium text-sm">{t("register.fullName")}</Label>
               <div className="relative">
                 <User className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-                <Input id="name" type="text" placeholder={t("register.fullNamePlaceholder")} value={name} onChange={(e) => setName(e.target.value)} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"}`} required />
+                <Input id="name" type="text" placeholder={t("register.fullNamePlaceholder")} value={name} onChange={(e) => { setName(e.target.value); setErrors(p => ({ ...p, name: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"} ${errors.name ? "border-destructive" : ""}`} />
+                {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
               </div>
             </div>
             <div className="space-y-2">
