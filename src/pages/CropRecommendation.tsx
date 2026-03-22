@@ -40,6 +40,11 @@ const CropRecommendation = () => {
         soil,
       });
       setResult(data);
+      sendNotification({
+        title: "Crop Recommendation Ready 🌾",
+        description: `Recommended: ${data?.recommended_crop || data?.prediction || "Available"}`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Failed", description: "Please try again" });
     } finally {

@@ -39,6 +39,11 @@ const FruitQuality = () => {
     try {
       const data = await analyzeFruit(userId, file);
       setResult(data);
+      sendNotification({
+        title: "Fruit Quality Analyzed 🍎",
+        description: `Quality: ${data?.quality || data?.prediction || "Completed"}`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

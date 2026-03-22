@@ -41,6 +41,11 @@ const SoilAnalysis = () => {
         k: parseFloat(k),
       });
       setResult(data);
+      sendNotification({
+        title: "Soil Analysis Complete 🧪",
+        description: `Soil type: ${data?.soil_type || data?.prediction || "Analyzed"}`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {
