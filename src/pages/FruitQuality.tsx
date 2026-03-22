@@ -126,10 +126,36 @@ const FruitQuality = () => {
                   );
                 }
 
+                if (result.status === "low_confidence") {
+                  return (
+                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5 flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-6 h-6 text-amber-500" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="font-semibold text-amber-600 text-sm">Low Confidence</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed" dir="auto">{result.message}</p>
+                        {result.confidence && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="h-2 flex-1 rounded-full bg-secondary overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-amber-500/60 transition-all duration-500"
+                                style={{ width: result.confidence }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-amber-600">{result.confidence}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
                 const grade = result.quality_grade || result.quality || result.grade;
                 const gradeDescription = result.grade_description || result.description;
                 const ripeness = result.ripeness_level || result.ripeness;
                 const defect = result.defect_detection || result.defects;
+                const confidence = result.confidence;
                 const isLowGrade = grade && (grade.toLowerCase().includes('c') || grade.toLowerCase().includes('low'));
 
                 return (
@@ -144,13 +170,19 @@ const FruitQuality = () => {
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isLowGrade ? 'bg-destructive/10' : 'bg-primary/10'}`}>
                           <Star className={`w-6 h-6 ${isLowGrade ? 'text-destructive' : 'text-primary'}`} />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="text-xs text-muted-foreground mb-0.5">Quality Grade</p>
                           <p className={`text-2xl font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{grade}</p>
                           {gradeDescription && (
-                            <p className="text-xs text-muted-foreground mt-0.5">{gradeDescription}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5" dir="auto">{gradeDescription}</p>
                           )}
                         </div>
+                        {confidence && (
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground">Confidence</p>
+                            <p className={`text-lg font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{confidence}</p>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -161,7 +193,7 @@ const FruitQuality = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Ripeness Level</p>
-                          <p className="font-semibold text-foreground">{ripeness}</p>
+                          <p className="font-semibold text-foreground" dir="auto">{ripeness}</p>
                         </div>
                       </div>
                     )}
@@ -169,7 +201,7 @@ const FruitQuality = () => {
                     {defect && (
                       <div className="bg-secondary/40 border border-border rounded-2xl p-4">
                         <p className="text-xs text-muted-foreground mb-1">Defect Detection</p>
-                        <p className="text-sm text-foreground">{defect}</p>
+                        <p className="text-sm text-foreground" dir="auto">{defect}</p>
                       </div>
                     )}
 
