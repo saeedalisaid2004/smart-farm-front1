@@ -64,7 +64,7 @@ const AdminProfile = () => {
     setAvatarUrl(null);
     setUser({ ...user, avatar_url: undefined });
     window.dispatchEvent(new CustomEvent("avatar-updated", { detail: null }));
-    toast({ title: "Profile photo removed" });
+    toast({ title: t("profile.photoRemoved") });
   };
 
   const handleSave = async () => {
@@ -121,12 +121,12 @@ const AdminProfile = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Remove profile photo?</AlertDialogTitle>
-                        <AlertDialogDescription>This action cannot be undone. Your profile photo will be permanently deleted.</AlertDialogDescription>
+                        <AlertDialogTitle>{t("profile.removePhotoTitle")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("profile.removePhotoDesc")}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleRemoveAvatar} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remove</AlertDialogAction>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRemoveAvatar} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t("profile.remove")}</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
