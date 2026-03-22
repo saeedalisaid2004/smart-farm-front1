@@ -69,17 +69,18 @@ const Profile = () => {
     if (!file || !user) return;
 
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setAvatarUrl(base64);
-      localStorage.setItem(AVATAR_STORAGE_KEY, base64);
-      setUser({ ...user, avatar_url: base64 });
-      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: base64 }));
+    try {
+      const userId = getExternalUserId() || user.id;
+      const url = await uploadAvatar(String(userId), file);
+      setAvatarUrl(url);
+      setUser({ ...user, avatar_url: url });
+      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: url }));
       toast({ title: t("profile.photoUpdated") });
+    } catch {
+      toast({ title: "Failed to upload photo", variant: "destructive" });
+    } finally {
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async () => {
