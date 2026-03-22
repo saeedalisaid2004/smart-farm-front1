@@ -49,7 +49,8 @@ const translations = {
     "header.logout": "Logout",
     // Common
     "common.farmer": "Farmer",
-    "common.admin": "Admin",
+     "common.admin": "Admin",
+     "common.cancel": "Cancel",
     "app.name": "Smart Farm AI",
     "common.chooseImage": "Choose Image",
     "common.analyzeImage": "Analyze Image",
