@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Sprout, Loader2 } from "lucide-react";
+import { Sprout, Loader2, AlertCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,9 +7,8 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { recommendCrop, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CropRecommendation = () => {
   const { t } = useLanguage();
@@ -50,30 +49,39 @@ const CropRecommendation = () => {
   return (
     <DashboardLayout title={t("crop.title")}>
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-card border border-border rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Sprout className="w-5 h-5 text-primary" />
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-card border border-border rounded-2xl p-8 shadow-card"
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
+              <Sprout className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-lg font-medium text-foreground">{t("crop.envParams")}</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">{t("crop.envParams")}</h2>
+              <p className="text-sm text-muted-foreground">Enter environmental conditions</p>
+            </div>
           </div>
-          <div className="space-y-5 mb-8">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
-              <Label className="text-foreground mb-2 block">{t("crop.temperature")}</Label>
-              <Input placeholder="e.g., 25" type="number" value={temperature} onChange={(e) => setTemperature(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
+              <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.temperature")}</Label>
+              <Input placeholder="e.g., 25" type="number" value={temperature} onChange={(e) => setTemperature(e.target.value)} className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-colors" />
             </div>
             <div>
-              <Label className="text-foreground mb-2 block">{t("crop.humidity")}</Label>
-              <Input placeholder="e.g., 65" type="number" value={humidity} onChange={(e) => setHumidity(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
+              <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.humidity")}</Label>
+              <Input placeholder="e.g., 65" type="number" value={humidity} onChange={(e) => setHumidity(e.target.value)} className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-colors" />
             </div>
             <div>
-              <Label className="text-foreground mb-2 block">{t("crop.rainfall")}</Label>
-              <Input placeholder="e.g., 120" type="number" value={rainfall} onChange={(e) => setRainfall(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
+              <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.rainfall")}</Label>
+              <Input placeholder="e.g., 120" type="number" value={rainfall} onChange={(e) => setRainfall(e.target.value)} className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-colors" />
             </div>
             <div>
-              <Label className="text-foreground mb-2 block">{t("crop.soilType")}</Label>
+              <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.soilType")}</Label>
               <Select value={soil} onValueChange={setSoil}>
-                <SelectTrigger className="rounded-full h-11 bg-secondary border-0 px-4">
+                <SelectTrigger className="rounded-xl h-12 bg-secondary/50 border-border px-4">
                   <SelectValue placeholder={t("crop.selectSoil")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -86,61 +94,96 @@ const CropRecommendation = () => {
               </Select>
             </div>
           </div>
-          <Button className="w-full rounded-full py-6 text-base font-medium" onClick={handleSubmit} disabled={loading}>
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("crop.recommend")}
+
+          <Button className="w-full rounded-xl h-12 text-sm font-semibold shadow-primary" onClick={handleSubmit} disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sprout className="w-4 h-4 mr-2" />}
+            {loading ? "Processing..." : t("crop.recommend")}
           </Button>
-        </div>
+        </motion.div>
 
-        {result && (() => {
-          if (result.detail) {
-            return (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6">
-                <p className="text-destructive font-medium">{result.detail}</p>
-              </div>
-            );
-          }
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              {(() => {
+                if (result.detail) {
+                  return (
+                    <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-5 h-5 text-destructive" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-destructive text-sm">Error</p>
+                        <p className="text-sm text-muted-foreground mt-1">{result.detail}</p>
+                      </div>
+                    </div>
+                  );
+                }
 
-          const crop = result.recommendations?.primary || result.recommended_crop || result.prediction || result.predicted_class;
-          const yieldLevel = result.expected_yield || result.yield_level;
-          const description = result.description || result.recommendation || result.summary;
+                const crop = result.recommendations?.primary || result.recommended_crop || result.prediction || result.predicted_class;
+                const yieldLevel = result.expected_yield || result.yield_level;
+                const description = result.description || result.recommendation || result.summary;
 
-          return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Recommendation Result</h3>
+                const getYieldStyle = (level: string) => {
+                  const l = level.toLowerCase();
+                  if (l === 'high') return 'text-primary';
+                  if (l === 'medium') return 'text-warning';
+                  return 'text-destructive';
+                };
 
-              {crop && (
-                <div className="bg-primary/10 border-2 border-primary/30 rounded-2xl p-5">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sprout className="w-5 h-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Recommended Crop</span>
+                return (
+                  <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <h3 className="text-lg font-semibold text-foreground">Recommendation Result</h3>
+                    </div>
+
+                    {crop && (
+                      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shrink-0">
+                          <Sprout className="w-7 h-7 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-0.5">Recommended Crop</p>
+                          <p className="text-2xl font-bold text-foreground capitalize">{crop}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {yieldLevel && (
+                      <div className="bg-secondary/40 border border-border rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                          <TrendingUp className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Expected Yield Level</p>
+                          <p className={`font-bold ${getYieldStyle(yieldLevel)}`}>{yieldLevel}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {description && (
+                      <div className="bg-secondary/40 border border-border rounded-2xl p-5">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">Details</p>
+                        <p className="text-sm text-foreground leading-relaxed">{description}</p>
+                      </div>
+                    )}
+
+                    {!crop && (
+                      <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">
+                        {JSON.stringify(result, null, 2)}
+                      </pre>
+                    )}
                   </div>
-                  <p className="text-2xl font-bold text-foreground capitalize">{crop}</p>
-                </div>
-              )}
-
-              {yieldLevel && (
-                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
-                  <span className="font-semibold text-foreground">Expected Yield Level: </span>
-                  <span className={`font-semibold ${yieldLevel.toLowerCase() === 'high' ? 'text-primary' : yieldLevel.toLowerCase() === 'medium' ? 'text-yellow-500' : 'text-orange-500'}`}>
-                    {yieldLevel}
-                  </span>
-                </div>
-              )}
-
-              {description && (
-                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                </div>
-              )}
-
-              {!crop && (
-                <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
-              )}
-            </div>
-          );
-        })()}
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </DashboardLayout>
   );

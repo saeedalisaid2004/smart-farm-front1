@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { FlaskConical, Loader2 } from "lucide-react";
+import { FlaskConical, Loader2, AlertCircle, Droplets, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeSoil, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SoilAnalysis = () => {
   const { t } = useLanguage();
@@ -46,114 +47,148 @@ const SoilAnalysis = () => {
     }
   };
 
+  const inputFields = [
+    { label: t("soil.ph"), value: ph, setter: setPh, placeholder: "e.g., 6.5", step: "0.1" },
+    { label: t("soil.moisture"), value: moisture, setter: setMoisture, placeholder: "e.g., 45" },
+    { label: t("soil.nitrogen"), value: n, setter: setN, placeholder: "e.g., 20" },
+    { label: t("soil.phosphorus"), value: p, setter: setP, placeholder: "e.g., 30" },
+    { label: t("soil.potassium"), value: k, setter: setK, placeholder: "e.g., 25" },
+  ];
+
   return (
     <DashboardLayout title={t("soil.title")}>
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-card border border-border rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-              <FlaskConical className="w-5 h-5 text-accent-foreground" />
-            </div>
-            <h2 className="text-lg font-medium text-foreground">{t("soil.manualInput")}</h2>
-          </div>
-          <div className="space-y-5 mb-8">
-            <div>
-              <Label className="text-foreground mb-2 block">{t("soil.ph")}</Label>
-              <Input placeholder="e.g., 6.5" type="number" step="0.1" value={ph} onChange={(e) => setPh(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-card border border-border rounded-2xl p-8 shadow-card"
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg">
+              <FlaskConical className="w-6 h-6 text-white" />
             </div>
             <div>
-              <Label className="text-foreground mb-2 block">{t("soil.moisture")}</Label>
-              <Input placeholder="e.g., 45" type="number" value={moisture} onChange={(e) => setMoisture(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
-            </div>
-            <div>
-              <Label className="text-foreground mb-2 block">{t("soil.nitrogen")}</Label>
-              <Input placeholder="e.g., 20" type="number" value={n} onChange={(e) => setN(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
-            </div>
-            <div>
-              <Label className="text-foreground mb-2 block">{t("soil.phosphorus")}</Label>
-              <Input placeholder="e.g., 30" type="number" value={p} onChange={(e) => setP(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
-            </div>
-            <div>
-              <Label className="text-foreground mb-2 block">{t("soil.potassium")}</Label>
-              <Input placeholder="e.g., 25" type="number" value={k} onChange={(e) => setK(e.target.value)} className="rounded-full h-11 bg-secondary border-0 px-4" />
+              <h2 className="text-lg font-semibold text-foreground">{t("soil.manualInput")}</h2>
+              <p className="text-sm text-muted-foreground">Enter soil parameters for analysis</p>
             </div>
           </div>
-          <Button className="w-full rounded-full py-6 text-base font-medium" onClick={handleSubmit} disabled={loading}>
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("soil.analyze")}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            {inputFields.map((field, i) => (
+              <div key={i} className={i === 0 ? "sm:col-span-2" : ""}>
+                <Label className="text-foreground mb-2 block text-sm font-medium">{field.label}</Label>
+                <Input
+                  placeholder={field.placeholder}
+                  type="number"
+                  step={field.step || "1"}
+                  value={field.value}
+                  onChange={(e) => field.setter(e.target.value)}
+                  className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-colors"
+                />
+              </div>
+            ))}
+          </div>
+
+          <Button className="w-full rounded-xl h-12 text-sm font-semibold shadow-primary" onClick={handleSubmit} disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FlaskConical className="w-4 h-4 mr-2" />}
+            {loading ? "Analyzing..." : t("soil.analyze")}
           </Button>
-        </div>
+        </motion.div>
 
-        {result && (() => {
-          if (result.detail || result.status === "Rejected") {
-            const msg = result.detail || result.message || "Request rejected";
-            return (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
-                <FlaskConical className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive font-medium">{msg}</p>
-              </div>
-            );
-          }
-
-          const nested = result.result || {};
-          const soilType = result.soil_type || nested.detected_soil_type || result.predicted_class || result.prediction;
-          const fertility = result.fertility_level || nested.fertility_level || result.fertility;
-          const recommendation = result.recommendation || result.description || nested.message;
-
-          const getFertilityColor = (level: string) => {
-            const l = level.toLowerCase();
-            if (l === 'high') return 'bg-primary/10 border-primary/40 text-primary';
-            if (l === 'medium') return 'bg-yellow-50 border-yellow-400 text-yellow-600';
-            return 'bg-destructive/10 border-destructive/40 text-destructive';
-          };
-
-          return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
-
-              <div className="grid grid-cols-2 gap-4">
-                {soilType && (
-                  <div className="bg-secondary/30 border border-border rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <FlaskConical className="w-4 h-4 text-primary" />
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              {(() => {
+                if (result.detail || result.status === "Rejected") {
+                  const msg = result.detail || result.message || "Request rejected";
+                  return (
+                    <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-5 h-5 text-destructive" />
                       </div>
-                      <span className="text-sm text-muted-foreground">Soil Type</span>
-                    </div>
-                    <div className="bg-primary/10 border-2 border-primary/30 rounded-xl py-2 px-4 text-center">
-                      <span className="font-semibold text-foreground capitalize">{soilType}</span>
-                    </div>
-                  </div>
-                )}
-
-                {fertility && (
-                  <div className="bg-secondary/30 border border-border rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <FlaskConical className="w-4 h-4 text-primary" />
+                      <div>
+                        <p className="font-medium text-destructive text-sm">Analysis Error</p>
+                        <p className="text-sm text-muted-foreground mt-1">{msg}</p>
                       </div>
-                      <span className="text-sm text-muted-foreground">Fertility Level</span>
                     </div>
-                    <div className={`border-2 rounded-xl py-2 px-4 text-center ${getFertilityColor(fertility)}`}>
-                      <span className="font-semibold capitalize">{fertility}</span>
+                  );
+                }
+
+                const nested = result.result || {};
+                const soilType = result.soil_type || nested.detected_soil_type || result.predicted_class || result.prediction;
+                const fertility = result.fertility_level || nested.fertility_level || result.fertility;
+                const recommendation = result.recommendation || result.description || nested.message;
+
+                const getFertilityStyle = (level: string) => {
+                  const l = level.toLowerCase();
+                  if (l === 'high') return { bg: 'bg-primary/5 border-primary/20', text: 'text-primary', icon: 'bg-primary/10' };
+                  if (l === 'medium') return { bg: 'bg-warning/5 border-warning/20', text: 'text-warning', icon: 'bg-warning/10' };
+                  return { bg: 'bg-destructive/5 border-destructive/20', text: 'text-destructive', icon: 'bg-destructive/10' };
+                };
+
+                return (
+                  <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
                     </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {soilType && (
+                        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <FlaskConical className="w-4 h-4 text-primary" />
+                            </div>
+                            <span className="text-xs text-muted-foreground">Soil Type</span>
+                          </div>
+                          <p className="text-xl font-bold text-foreground capitalize">{soilType}</p>
+                        </div>
+                      )}
+
+                      {fertility && (() => {
+                        const style = getFertilityStyle(fertility);
+                        return (
+                          <div className={`border rounded-2xl p-5 ${style.bg}`}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.icon}`}>
+                                <Droplets className={`w-4 h-4 ${style.text}`} />
+                              </div>
+                              <span className="text-xs text-muted-foreground">Fertility Level</span>
+                            </div>
+                            <p className={`text-xl font-bold capitalize ${style.text}`}>{fertility}</p>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {recommendation && (
+                      <div className="bg-secondary/40 border border-border rounded-2xl p-5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sprout className="w-4 h-4 text-primary" />
+                          <p className="text-xs font-medium text-muted-foreground">Recommendation</p>
+                        </div>
+                        <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
+                      </div>
+                    )}
+
+                    {!soilType && !fertility && (
+                      <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">
+                        {JSON.stringify(result, null, 2)}
+                      </pre>
+                    )}
                   </div>
-                )}
-              </div>
-
-              {recommendation && (
-                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
-                  <p className="text-sm text-muted-foreground">{recommendation}</p>
-                </div>
-              )}
-
-              {!soilType && !fertility && (
-                <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
-              )}
-            </div>
-          );
-        })()}
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </DashboardLayout>
   );

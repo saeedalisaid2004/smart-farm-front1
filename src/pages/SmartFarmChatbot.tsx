@@ -1,11 +1,12 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { MessageCircle, Send, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { askFarmBot, getChatHistory, getExternalUserId } from "@/services/smartFarmApi";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
@@ -20,7 +21,6 @@ const SmartFarmChatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load chat history on mount
   useEffect(() => {
     const userId = getExternalUserId();
     if (userId) {
@@ -68,67 +68,107 @@ const SmartFarmChatbot = () => {
   return (
     <DashboardLayout title={t("chatbot.title")}>
       <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-10rem)]">
-        <div className="flex items-center justify-between mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-4"
+        >
           <div>
-            <h1 className="text-xl font-semibold text-foreground">{t("chatbot.heading")}</h1>
+            <h1 className="text-xl font-bold text-foreground">{t("chatbot.heading")}</h1>
             <p className="text-sm text-muted-foreground">{t("chatbot.subtitle")}</p>
           </div>
-        </div>
-        <div className="bg-card border border-border rounded-2xl flex-1 flex flex-col overflow-hidden">
-          <div className="bg-primary px-6 py-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-primary-foreground" />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="bg-card border border-border rounded-2xl flex-1 flex flex-col overflow-hidden shadow-card"
+        >
+          {/* Chat header */}
+          <div className="gradient-primary px-6 py-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+              <Bot className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <p className="text-primary-foreground font-medium">{t("chatbot.assistant")}</p>
-              <p className="text-primary-foreground/70 text-xs">{t("chatbot.online")}</p>
+              <p className="text-primary-foreground font-semibold">{t("chatbot.assistant")}</p>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
+                <p className="text-primary-foreground/70 text-xs">{t("chatbot.online")}</p>
+              </div>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            {messages.map((msg, i) => (
-              <div key={i} className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}>
-                {msg.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-1 shrink-0">
-                    <MessageCircle className="w-4 h-4 text-primary" />
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+            <AnimatePresence initial={false}>
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+                >
+                  {msg.role === "assistant" && (
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center mr-2 mt-1 shrink-0">
+                      <Bot className="w-4 h-4 text-primary" />
+                    </div>
+                  )}
+                  <div className="max-w-[75%]">
+                    <div className={cn(
+                      "px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed",
+                      msg.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-secondary text-foreground rounded-bl-md"
+                    )}>
+                      {msg.content}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</p>
                   </div>
-                )}
-                <div>
-                  <div className={cn(
-                    "max-w-md px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap",
-                    msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
-                  )}>
-                    {msg.content}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1 px-1">{msg.time}</p>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
             {loading && (
-              <div className="flex justify-start">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-1 shrink-0">
-                  <MessageCircle className="w-4 h-4 text-primary" />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-start"
+              >
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center mr-2 mt-1 shrink-0">
+                  <Bot className="w-4 h-4 text-primary" />
                 </div>
-                <div className="bg-secondary px-4 py-3 rounded-2xl">
-                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                <div className="bg-secondary px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
-              </div>
+              </motion.div>
             )}
             <div ref={messagesEndRef} />
           </div>
-          <div className="p-4 border-t border-border flex gap-2">
+
+          {/* Input */}
+          <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !loading && handleSend()}
               placeholder={t("chatbot.placeholder")}
-              className="rounded-full h-11 bg-secondary border-0 px-4"
+              className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-colors"
               disabled={loading}
             />
-            <Button onClick={handleSend} size="icon" className="rounded-full h-11 w-11 shrink-0" disabled={loading}>
+            <Button
+              onClick={handleSend}
+              size="icon"
+              className="rounded-xl h-12 w-12 shrink-0 shadow-primary"
+              disabled={loading}
+            >
               <Send className="w-4 h-4" />
             </Button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </DashboardLayout>
   );
