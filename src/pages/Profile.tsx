@@ -8,9 +8,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { uploadAvatar, getSavedAvatarUrl } from "@/services/avatarService";
 
 const SETTINGS_STORAGE_KEY = "dashboard_settings";
-const AVATAR_STORAGE_KEY = "avatar_base64";
 
 const getStoredPhone = () => {
   try {
