@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, FileText, Settings, Bell, Moon, Sun,
-  User, LogOut, CheckCircle, AlertCircle, Globe, FlaskRound
+  User, LogOut, CheckCircle, AlertCircle, Info, Trash2, CheckCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNotifications, type Notification } from "@/hooks/useNotifications";
+import { formatDistanceToNow } from "date-fns";
+import { ar, enUS } from "date-fns/locale";
 
 const menuItems = [
   { icon: Home, labelKey: "dashboard.welcome" as const, path: "/dashboard" },
@@ -31,18 +34,21 @@ interface DashboardLayoutProps {
   title: string;
 }
 
-const notifications = [
-  { id: 1, icon: CheckCircle, title: "AI analysis completed", desc: "Your plant disease scan is ready to view", time: "5 min ago", color: "text-green-500", bg: "bg-green-50 dark:bg-green-500/10", unread: true },
-  { id: 2, icon: AlertCircle, title: "Disease detected warning", desc: "Late blight found in tomato plants", time: "30 min ago", color: "text-red-500", bg: "bg-red-50 dark:bg-red-500/10", unread: true },
-  { id: 3, icon: Globe, title: "Crop recommendation ready", desc: "Best crops for your soil type available", time: "2 hours ago", color: "text-primary", bg: "bg-primary/10", unread: true },
-  { id: 4, icon: FlaskRound, title: "Soil analysis results", desc: "Soil nutrient analysis report is ready", time: "5 hours ago", color: "text-primary", bg: "bg-primary/10", unread: false },
-];
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case "success": return { icon: CheckCircle, color: "text-green-500", bg: "bg-green-500/10" };
+    case "warning": return { icon: AlertCircle, color: "text-amber-500", bg: "bg-amber-500/10" };
+    case "error": return { icon: AlertCircle, color: "text-destructive", bg: "bg-destructive/10" };
+    default: return { icon: Info, color: "text-primary", bg: "bg-primary/10" };
+  }
+};
 
 const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -68,6 +74,17 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
     window.addEventListener("avatar-updated", handler);
     return () => window.removeEventListener("avatar-updated", handler);
   }, []);
+
+  const formatTime = (dateStr: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateStr), {
+        addSuffix: true,
+        locale: isRTL ? ar : enUS,
+      });
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex" dir={isRTL ? "rtl" : "ltr"}>
@@ -127,28 +144,82 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
               <PopoverTrigger asChild>
                 <button className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all relative">
                   <Bell className="w-4 h-4" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground rounded-full text-[10px] font-bold flex items-center justify-center px-1">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-96 p-0 rounded-2xl shadow-lg" align={isRTL ? "start" : "end"}>
                 <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
-                  <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">3 new</span>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <>
+                        <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
+                          {unreadCount} new
+                        </span>
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors"
+                          title="Mark all as read"
+                        >
+                          <CheckCheck className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer">
-                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", n.bg)}>
-                        <n.icon className={cn("w-5 h-5", n.color)} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{n.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{n.time}</p>
-                      </div>
-                      {n.unread && <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-2" />}
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No notifications yet</p>
                     </div>
-                  ))}
+                  ) : (
+                    <AnimatePresence>
+                      {notifications.map((n) => {
+                        const { icon: Icon, color, bg } = getNotificationIcon(n.type);
+                        return (
+                          <motion.div
+                            key={n.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            className={cn(
+                              "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
+                              !n.is_read && "bg-primary/5"
+                            )}
+                            onClick={() => !n.is_read && markAsRead(n.id)}
+                          >
+                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
+                              <Icon className={cn("w-5 h-5", color)} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={cn("text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                              {n.description && (
+                                <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteNotification(n.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-all"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
