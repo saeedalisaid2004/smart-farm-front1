@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronRight, ChevronLeft, Leaf, BarChart3, MessageCircle, Bell } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, Leaf, BarChart3, MessageCircle, Bell, Bug, Weight, Sprout, FlaskConical, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Step {
@@ -16,17 +16,37 @@ const steps: Step[] = [
     icon: <Leaf className="w-6 h-6" />,
   },
   {
-    title: "AI Analysis Tools",
-    description: "Upload images to detect plant diseases, estimate animal weight, analyze soil, and more.",
-    icon: <BarChart3 className="w-6 h-6" />,
+    title: "🌿 Plant Disease Detection",
+    description: "Upload a photo of your plant leaf and our AI will detect diseases instantly with confidence scores.",
+    icon: <Bug className="w-6 h-6" />,
   },
   {
-    title: "Smart Chatbot",
-    description: "Ask any farming question and get instant AI-powered answers.",
+    title: "🐄 Animal Weight Estimation",
+    description: "Take a photo of your animal and get an accurate weight estimate using computer vision.",
+    icon: <Weight className="w-6 h-6" />,
+  },
+  {
+    title: "🌾 Crop Recommendation",
+    description: "Enter your soil parameters (N, P, K, pH, temperature, humidity, rainfall) and get the best crop suggestion.",
+    icon: <Sprout className="w-6 h-6" />,
+  },
+  {
+    title: "🧪 Soil Analysis",
+    description: "Upload a soil image to get detailed analysis of soil type, pH level, and nutrient content.",
+    icon: <FlaskConical className="w-6 h-6" />,
+  },
+  {
+    title: "🍎 Fruit Quality Check",
+    description: "Snap a photo of your fruit to determine its quality grade — fresh, moderate, or spoiled.",
+    icon: <Apple className="w-6 h-6" />,
+  },
+  {
+    title: "💬 Smart Chatbot",
+    description: "Ask any farming question in natural language. Get instant AI-powered advice on crops, diseases, weather, and more.",
     icon: <MessageCircle className="w-6 h-6" />,
   },
   {
-    title: "Real-time Notifications",
+    title: "🔔 Real-time Notifications",
     description: "Get notified when your analyses are complete. Check the bell icon anytime!",
     icon: <Bell className="w-6 h-6" />,
   },
