@@ -254,3 +254,39 @@ export const generatePremiumReport = async () => {
   }
   return data;
 };
+
+// ============ User Notification Settings ============
+
+export const getUserNotificationSettings = async (userId: number) => {
+  const res = await fetch(`${API_BASE}/admin/users/settings/notifications/${userId}`, {
+    method: "PATCH",
+  });
+  return res.json();
+};
+
+export const updateUserNotificationSettings = async (
+  userId: number,
+  settings: { push?: boolean; email?: boolean }
+) => {
+  const params = new URLSearchParams();
+  if (settings.push !== undefined) params.set("push", String(settings.push));
+  if (settings.email !== undefined) params.set("email", String(settings.email));
+  const res = await fetch(
+    `${API_BASE}/admin/users/settings/notifications/${userId}?${params.toString()}`,
+    { method: "PATCH" }
+  );
+  return res.json();
+};
+
+// ============ Alternative Farmer Report ============
+
+export const generateFarmerReportAlt = async (userId: number) => {
+  const res = await fetch(`${API_BASE}/reports/generate-farmer-report/${userId}`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (data.file_url && !data.file_url.startsWith("http")) {
+    data.file_url = `${API_BASE}${data.file_url}`;
+  }
+  return data;
+};

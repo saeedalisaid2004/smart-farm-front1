@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff } from "lucide-react";
 import { getSavedAvatarUrl } from "@/services/avatarService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -15,8 +15,10 @@ import {
   getUserManagementData, searchUsers as apiSearchUsers,
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
+  getUserNotificationSettings, updateUserNotificationSettings,
 } from "@/services/smartFarmApi";
 import { sendNotification } from "@/services/notificationService";
+import { Switch } from "@/components/ui/switch";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -36,6 +38,8 @@ const AdminUsers = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewUser, setViewUser] = useState<any>(null);
+  const [notifSettings, setNotifSettings] = useState<{ push: boolean; email: boolean } | null>(null);
+  const [loadingNotif, setLoadingNotif] = useState(false);
 
   const loadData = () => {
     setLoadingData(true);
@@ -121,6 +125,32 @@ const AdminUsers = () => {
       toast({ title: `${user.name} activated` });
       sendNotification({ title: "User Activated", description: `${user.name || user.email} account has been activated`, type: "success" });
       loadData();
+    } catch {
+      toast({ title: "Failed", variant: "destructive" });
+    }
+  };
+
+  const handleViewUser = async (user: any) => {
+    setViewUser(user);
+    setNotifSettings(null);
+    const uid = user.id || user.user_id;
+    if (uid) {
+      setLoadingNotif(true);
+      try {
+        const data = await getUserNotificationSettings(uid);
+        if (data.current_settings) setNotifSettings(data.current_settings);
+      } catch {}
+      setLoadingNotif(false);
+    }
+  };
+
+  const handleToggleNotif = async (key: "push" | "email", value: boolean) => {
+    if (!viewUser) return;
+    const uid = viewUser.id || viewUser.user_id;
+    try {
+      const data = await updateUserNotificationSettings(uid, { [key]: value });
+      if (data.current_settings) setNotifSettings(data.current_settings);
+      toast({ title: t("adminUsers.notifUpdated") || "Notification settings updated" });
     } catch {
       toast({ title: "Failed", variant: "destructive" });
     }
@@ -265,7 +295,7 @@ const AdminUsers = () => {
                           </PopoverTrigger>
                           <PopoverContent align="end" className="w-48 p-1.5 rounded-xl">
                             <button
-                              onClick={() => setViewUser(user)}
+                              onClick={() => handleViewUser(user)}
                               className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
                             >
                               <Eye className="w-4 h-4 text-muted-foreground" />
@@ -393,6 +423,32 @@ const AdminUsers = () => {
                   </div>
                 </div>
               )}
+
+              {/* Notification Settings */}
+              <div className="p-3.5 rounded-xl bg-secondary/50 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Bell className="w-4 h-4 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground font-medium">{t("adminUsers.notifications")}</p>
+                </div>
+                {loadingNotif ? (
+                  <div className="flex justify-center py-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : notifSettings ? (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-foreground">{t("adminUsers.pushNotif")}</span>
+                      <Switch checked={notifSettings.push} onCheckedChange={(v) => handleToggleNotif("push", v)} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-foreground">{t("adminUsers.emailNotif")}</span>
+                      <Switch checked={notifSettings.email} onCheckedChange={(v) => handleToggleNotif("email", v)} />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">N/A</p>
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>

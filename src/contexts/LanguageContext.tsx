@@ -251,6 +251,10 @@ const translations = {
     "adminUsers.userNotFound": "User not found with this email",
     "adminUsers.alreadyAdmin": "This user is already an admin",
     "adminUsers.enterEmail": "Please enter an email address",
+    "adminUsers.notifications": "Notifications",
+    "adminUsers.pushNotif": "Push Notifications",
+    "adminUsers.emailNotif": "Email Notifications",
+    "adminUsers.notifUpdated": "Notification settings updated",
     // Admin System
     "adminSys.title": "System Management",
     "adminSys.subtitle": "Monitor and manage all AI services and system components",
@@ -569,6 +573,10 @@ const translations = {
     "adminUsers.userNotFound": "لم يتم العثور على مستخدم بهذا البريد",
     "adminUsers.alreadyAdmin": "هذا المستخدم مسؤول بالفعل",
     "adminUsers.enterEmail": "يرجى إدخال البريد الإلكتروني",
+    "adminUsers.notifications": "الإشعارات",
+    "adminUsers.pushNotif": "إشعارات الدفع",
+    "adminUsers.emailNotif": "إشعارات البريد",
+    "adminUsers.notifUpdated": "تم تحديث إعدادات الإشعارات",
     // Admin System
     "adminSys.title": "إدارة النظام",
     "adminSys.subtitle": "مراقبة وإدارة جميع خدمات الذكاء الاصطناعي ومكونات النظام",
