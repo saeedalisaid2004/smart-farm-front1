@@ -53,7 +53,7 @@ const Dashboard = () => {
   const statCards = [
     { label: "Total Analyses", value: total, icon: BarChart3, gradient: "from-primary to-primary-glow" },
     { label: "Today", value: daily.find((d) => d.date === new Date().toISOString().split("T")[0])?.count || 0, icon: Activity, gradient: "from-emerald-500 to-green-600" },
-    { label: "Most Used", value: Object.entries(stats).sort((a, b) => b[1] - a[1])[0]?.[0]?.replace("_", " ") || "—", icon: TrendingUp, gradient: "from-amber-500 to-orange-600" },
+    { label: "Most Used", value: total > 0 ? (Object.entries(stats).filter(([k]) => k !== "chatbot").sort((a, b) => b[1] - a[1])[0]?.[0]?.replace("_", " ") || "N/A") : "N/A", icon: TrendingUp, gradient: "from-amber-500 to-orange-600" },
   ];
 
   return (
