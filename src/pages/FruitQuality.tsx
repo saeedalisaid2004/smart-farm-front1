@@ -1,10 +1,11 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Upload, Apple, Loader2 } from "lucide-react";
+import { Upload, Apple, Loader2, ImageIcon, AlertCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeFruit, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 const FruitQuality = () => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -47,89 +48,134 @@ const FruitQuality = () => {
   return (
     <DashboardLayout title={t("fruitQuality.title")}>
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-card border border-border rounded-2xl p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-card border border-border rounded-2xl p-8 shadow-card"
+        >
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-              <Apple className="w-7 h-7 text-destructive" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+              <Apple className="w-7 h-7 text-white" />
             </div>
           </div>
           <div
-            className="border-2 border-dashed border-border rounded-xl p-12 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-primary/40 transition-colors"
+            className="border-2 border-dashed border-border rounded-2xl p-10 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-all duration-300 group"
             onClick={() => fileRef.current?.click()}
           >
             {preview ? (
-              <img src={preview} alt="Preview" className="max-h-48 rounded-lg object-contain" />
+              <motion.img
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                src={preview}
+                alt="Preview"
+                className="max-h-52 rounded-xl object-contain"
+              />
             ) : (
               <>
-                <Upload className="w-10 h-10 text-muted-foreground mb-3" />
+                <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+                  <ImageIcon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
                 <p className="text-muted-foreground text-sm">{t("common.uploadHint")}</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">PNG, JPG, WEBP</p>
               </>
             )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-          <div className="flex gap-4">
-            <Button variant="outline" className="flex-1 rounded-full py-6 text-base font-medium" onClick={() => fileRef.current?.click()}>
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1 rounded-xl h-12 text-sm font-medium border-2" onClick={() => fileRef.current?.click()}>
+              <Upload className="w-4 h-4 mr-2" />
               {t("common.chooseImage")}
             </Button>
-            <Button className="flex-1 rounded-full py-6 text-base font-medium" onClick={handleAnalyze} disabled={loading || !file}>
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("common.analyzeImage")}
+            <Button className="flex-1 rounded-xl h-12 text-sm font-medium shadow-primary" onClick={handleAnalyze} disabled={loading || !file}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {loading ? "Analyzing..." : t("common.analyzeImage")}
             </Button>
           </div>
-        </div>
+        </motion.div>
 
-        {result && (() => {
-          if (result.detail || result.status === "Rejected") {
-            const msg = result.detail || result.message || "Request rejected";
-            return (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 flex items-start gap-3">
-                <Apple className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive font-medium">{msg}</p>
-              </div>
-            );
-          }
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              {(() => {
+                if (result.detail || result.status === "Rejected") {
+                  const msg = result.detail || result.message || "Request rejected";
+                  return (
+                    <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-5 h-5 text-destructive" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-destructive text-sm">Analysis Error</p>
+                        <p className="text-sm text-muted-foreground mt-1">{msg}</p>
+                      </div>
+                    </div>
+                  );
+                }
 
-          const grade = result.quality_grade || result.quality || result.grade;
-          const gradeDescription = result.grade_description || result.description;
-          const ripeness = result.ripeness_level || result.ripeness;
-          const defect = result.defect_detection || result.defects;
-          const isLowGrade = grade && (grade.toLowerCase().includes('c') || grade.toLowerCase().includes('low'));
+                const grade = result.quality_grade || result.quality || result.grade;
+                const gradeDescription = result.grade_description || result.description;
+                const ripeness = result.ripeness_level || result.ripeness;
+                const defect = result.defect_detection || result.defects;
+                const isLowGrade = grade && (grade.toLowerCase().includes('c') || grade.toLowerCase().includes('low'));
 
-          return (
-            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Analysis Results</h3>
+                return (
+                  <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${isLowGrade ? 'bg-destructive' : 'bg-primary'}`} />
+                      <h3 className="text-lg font-semibold text-foreground">Analysis Results</h3>
+                    </div>
 
-              {grade && (
-                <div className={`border-2 rounded-2xl p-5 ${isLowGrade ? 'bg-destructive/5 border-destructive/30' : 'bg-primary/10 border-primary/30'}`}>
-                  <p className="text-sm text-muted-foreground mb-1">Quality Grade</p>
-                  <p className={`text-2xl font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{grade}</p>
-                  {gradeDescription && (
-                    <p className="text-sm text-muted-foreground mt-1">{gradeDescription}</p>
-                  )}
-                </div>
-              )}
+                    {grade && (
+                      <div className={`rounded-2xl p-5 flex items-center gap-4 ${isLowGrade ? 'bg-destructive/5 border border-destructive/20' : 'bg-primary/5 border border-primary/20'}`}>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isLowGrade ? 'bg-destructive/10' : 'bg-primary/10'}`}>
+                          <Star className={`w-6 h-6 ${isLowGrade ? 'text-destructive' : 'text-primary'}`} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-0.5">Quality Grade</p>
+                          <p className={`text-2xl font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{grade}</p>
+                          {gradeDescription && (
+                            <p className="text-xs text-muted-foreground mt-0.5">{gradeDescription}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-              {ripeness && (
-                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
-                  <span className="font-semibold text-foreground">Ripeness Level: </span>
-                  <span className="text-foreground">{ripeness}</span>
-                </div>
-              )}
+                    {ripeness && (
+                      <div className="bg-secondary/40 border border-border rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                          <Apple className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Ripeness Level</p>
+                          <p className="font-semibold text-foreground">{ripeness}</p>
+                        </div>
+                      </div>
+                    )}
 
-              {defect && (
-                <div className="bg-secondary/50 border border-border rounded-2xl p-4">
-                  <span className="font-semibold text-foreground">Defect Detection: </span>
-                  <span className="text-foreground">{defect}</span>
-                </div>
-              )}
+                    {defect && (
+                      <div className="bg-secondary/40 border border-border rounded-2xl p-4">
+                        <p className="text-xs text-muted-foreground mb-1">Defect Detection</p>
+                        <p className="text-sm text-foreground">{defect}</p>
+                      </div>
+                    )}
 
-              {!grade && !ripeness && !defect && (
-                <pre className="text-xs text-muted-foreground bg-secondary rounded-lg p-4 overflow-auto max-h-60">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
-              )}
-            </div>
-          );
-        })()}
+                    {!grade && !ripeness && !defect && (
+                      <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">
+                        {JSON.stringify(result, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </DashboardLayout>
   );
