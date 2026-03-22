@@ -108,22 +108,6 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
           </ul>
         </nav>
 
-        {/* Sidebar footer */}
-        <div className="p-4 border-t border-border">
-          <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
-            <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-primary text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-              <p className="text-xs text-muted-foreground">{t("common.farmer")}</p>
-            </div>
-          </div>
-        </div>
       </aside>
 
       {/* Main */}
