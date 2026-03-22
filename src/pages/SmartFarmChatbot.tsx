@@ -57,7 +57,6 @@ const SmartFarmChatbot = () => {
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const reply = data.answer || data.response || data.reply || JSON.stringify(data);
       setMessages(prev => [...prev, { role: "assistant", content: reply, time }]);
-      incrementAnalysis("chatbot");
     } catch {
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong. Please try again.", time }]);
