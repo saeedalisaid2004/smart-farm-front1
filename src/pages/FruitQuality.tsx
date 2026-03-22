@@ -7,6 +7,7 @@ import { analyzeFruit, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendNotification } from "@/services/notificationService";
+import { incrementAnalysis } from "@/services/analysisStats";
 
 const FruitQuality = () => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -44,6 +45,7 @@ const FruitQuality = () => {
         description: `Quality: ${data?.quality || data?.prediction || "Completed"}`,
         type: "success",
       });
+      incrementAnalysis("fruit_quality");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

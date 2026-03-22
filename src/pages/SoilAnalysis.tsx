@@ -9,6 +9,7 @@ import { analyzeSoil, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendNotification } from "@/services/notificationService";
+import { incrementAnalysis } from "@/services/analysisStats";
 
 const SoilAnalysis = () => {
   const { t } = useLanguage();
@@ -46,6 +47,7 @@ const SoilAnalysis = () => {
         description: `Soil type: ${data?.soil_type || data?.prediction || "Analyzed"}`,
         type: "success",
       });
+      incrementAnalysis("soil_analysis");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

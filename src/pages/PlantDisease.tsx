@@ -8,6 +8,7 @@ import { detectPlantDisease, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendNotification } from "@/services/notificationService";
+import { incrementAnalysis } from "@/services/analysisStats";
 
 const PlantDisease = () => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,7 @@ const PlantDisease = () => {
         description: `Plant Disease Analysis: ${data?.prediction || "Completed"}`,
         type: isHealthy ? "success" : "warning",
       });
+      incrementAnalysis("plant_disease");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

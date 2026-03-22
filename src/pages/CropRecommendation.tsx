@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendNotification } from "@/services/notificationService";
+import { incrementAnalysis } from "@/services/analysisStats";
 
 const CropRecommendation = () => {
   const { t } = useLanguage();
@@ -45,6 +46,7 @@ const CropRecommendation = () => {
         description: `Recommended: ${data?.recommended_crop || data?.prediction || "Available"}`,
         type: "success",
       });
+      incrementAnalysis("crop_recommendation");
     } catch {
       toast({ variant: "destructive", title: "Failed", description: "Please try again" });
     } finally {
