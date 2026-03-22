@@ -8,9 +8,24 @@ interface SendNotificationParams {
 
 const STORAGE_KEY = "smart_farm_notifications";
 
+function getUserId(): string {
+  try {
+    const stored = localStorage.getItem("app_user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return String(parsed.id || parsed.email || "default");
+    }
+  } catch {}
+  return "default";
+}
+
+function userKey(): string {
+  return `${STORAGE_KEY}_${getUserId()}`;
+}
+
 export function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(userKey());
     const notifications = raw ? JSON.parse(raw) : [];
     
     notifications.unshift({
@@ -22,10 +37,9 @@ export function sendNotification({ title, description, type = "info" }: SendNoti
       created_at: new Date().toISOString(),
     });
 
-    // Keep max 100 notifications
     if (notifications.length > 100) notifications.length = 100;
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+    localStorage.setItem(userKey(), JSON.stringify(notifications));
     window.dispatchEvent(new Event("notifications-updated"));
   } catch {
     // Silent fail

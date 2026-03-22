@@ -11,9 +11,24 @@ export interface Notification {
 
 const STORAGE_KEY = "smart_farm_notifications";
 
+function getUserId(): string {
+  try {
+    const stored = localStorage.getItem("app_user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return String(parsed.id || parsed.email || "default");
+    }
+  } catch {}
+  return "default";
+}
+
+function userKey(): string {
+  return `${STORAGE_KEY}_${getUserId()}`;
+}
+
 function getStoredNotifications(): Notification[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(userKey());
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -21,7 +36,7 @@ function getStoredNotifications(): Notification[] {
 }
 
 function saveNotifications(notifications: Notification[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+  localStorage.setItem(userKey(), JSON.stringify(notifications));
   window.dispatchEvent(new Event("notifications-updated"));
 }
 
