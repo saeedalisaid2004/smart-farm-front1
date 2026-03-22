@@ -44,7 +44,7 @@ const Profile = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || getSavedAvatarUrl());
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
