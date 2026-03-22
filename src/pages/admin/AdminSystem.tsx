@@ -75,6 +75,11 @@ const AdminSystem = () => {
     try {
       await apiToggleService(svc.module || svc.name);
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
+      sendNotification({
+        title: newOnline ? "Service Enabled" : "Service Disabled",
+        description: `${svc.name} has been turned ${newOnline ? "on" : "off"}`,
+        type: newOnline ? "success" : "warning",
+      });
     } catch {
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     }
