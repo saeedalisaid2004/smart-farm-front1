@@ -180,7 +180,7 @@ const CropRecommendation = () => {
                     {description && (
                       <div className="bg-secondary/40 border border-border rounded-2xl p-5">
                         <p className="text-xs font-medium text-muted-foreground mb-2">Details</p>
-                        <p className="text-sm text-foreground leading-relaxed">{description}</p>
+                        <p className="text-sm text-foreground leading-relaxed" dir="auto">{description}</p>
                       </div>
                     )}
 
