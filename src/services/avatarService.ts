@@ -1,5 +1,5 @@
 const AVATAR_URL_KEY = "avatar_base64";
-const MAX_SIZE = 200; // max width/height in pixels
+const MAX_SIZE = 150; // max width/height in pixels
 
 function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -23,8 +23,8 @@ function compressImage(file: File): Promise<string> {
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0, w, h);
 
-        // Compress as JPEG
-        const base64 = canvas.toDataURL("image/jpeg", 0.7);
+        // Compress as JPEG with lower quality
+        const base64 = canvas.toDataURL("image/jpeg", 0.6);
         resolve(base64);
       };
       img.onerror = reject;
@@ -37,10 +37,20 @@ function compressImage(file: File): Promise<string> {
 
 export async function uploadAvatar(_userId: string | number, file: File): Promise<string> {
   const base64 = await compressImage(file);
-  localStorage.setItem(AVATAR_URL_KEY, base64);
+  try {
+    localStorage.setItem(AVATAR_URL_KEY, base64);
+  } catch {
+    // If localStorage is full, clear old data and retry
+    localStorage.removeItem(AVATAR_URL_KEY);
+    localStorage.setItem(AVATAR_URL_KEY, base64);
+  }
   return base64;
 }
 
 export function getSavedAvatarUrl(): string | null {
-  return localStorage.getItem(AVATAR_URL_KEY) || null;
+  try {
+    return localStorage.getItem(AVATAR_URL_KEY) || null;
+  } catch {
+    return null;
+  }
 }
