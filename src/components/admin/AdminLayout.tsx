@@ -185,28 +185,82 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
               <PopoverTrigger asChild>
                 <button className="relative w-9 h-9 rounded-xl bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all hover:bg-secondary">
                   <Bell className="w-4 h-4" />
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-destructive rounded-full border-2 border-card" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground rounded-full text-[10px] font-bold flex items-center justify-center px-1">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-96 p-0 rounded-2xl border-border/50 shadow-xl" align={isRTL ? "start" : "end"}>
                 <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
-                  <span className="text-xs bg-destructive text-destructive-foreground px-2.5 py-0.5 rounded-full font-medium">2 new</span>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <>
+                        <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
+                          {unreadCount} new
+                        </span>
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors"
+                          title="Mark all as read"
+                        >
+                          <CheckCheck className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="flex items-start gap-3 p-4 border-b border-border/50 last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer">
-                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", n.bg)}>
-                        <n.icon className={cn("w-5 h-5", n.color)} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{n.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
-                        <p className="text-xs text-muted-foreground/60 mt-1">{n.time}</p>
-                      </div>
-                      {n.unread && <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />}
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No notifications yet</p>
                     </div>
-                  ))}
+                  ) : (
+                    <AnimatePresence>
+                      {notifications.map((n) => {
+                        const { icon: Icon, color, bg } = getNotificationIcon(n.type);
+                        return (
+                          <motion.div
+                            key={n.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            className={cn(
+                              "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
+                              !n.is_read && "bg-primary/5"
+                            )}
+                            onClick={() => !n.is_read && markAsRead(n.id)}
+                          >
+                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
+                              <Icon className={cn("w-5 h-5", color)} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={cn("text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                              {n.description && (
+                                <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteNotification(n.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-all"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
