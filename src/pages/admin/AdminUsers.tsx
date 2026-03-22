@@ -95,6 +95,7 @@ const AdminUsers = () => {
     try {
       await apiDeleteUser(user.id || user.user_id);
       toast({ title: `${user.name} deleted`, variant: "destructive" });
+      sendNotification({ title: "User Deleted", description: `${user.name || user.email} has been removed from the system`, type: "warning" });
       loadData();
     } catch {
       toast({ title: "Failed to delete", variant: "destructive" });
