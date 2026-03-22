@@ -1,3 +1,18 @@
+function getUserId(): string {
+  try {
+    const stored = localStorage.getItem("app_user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return String(parsed.id || parsed.email || "default");
+    }
+  } catch {}
+  return "default";
+}
+
+function userKey(base: string): string {
+  return `${base}_${getUserId()}`;
+}
+
 const STATS_KEY = "analysis_stats";
 
 export interface AnalysisStats {
@@ -22,7 +37,7 @@ function getToday(): string {
 
 export function getAnalysisStats(): AnalysisStats {
   try {
-    const raw = localStorage.getItem(STATS_KEY);
+    const raw = localStorage.getItem(userKey(STATS_KEY));
     if (raw) return JSON.parse(raw);
   } catch {}
   return {
@@ -38,7 +53,7 @@ export function getAnalysisStats(): AnalysisStats {
 export function incrementAnalysis(type: keyof AnalysisStats) {
   const stats = getAnalysisStats();
   stats[type] = (stats[type] || 0) + 1;
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  localStorage.setItem(userKey(STATS_KEY), JSON.stringify(stats));
 
   // Track daily
   const daily = getDailyStats();
@@ -49,16 +64,15 @@ export function incrementAnalysis(type: keyof AnalysisStats) {
   } else {
     daily.push({ date: today, count: 1 });
   }
-  // Keep last 30 days
   const trimmed = daily.slice(-30);
-  localStorage.setItem(DAILY_KEY, JSON.stringify(trimmed));
+  localStorage.setItem(userKey(DAILY_KEY), JSON.stringify(trimmed));
 
   window.dispatchEvent(new Event("stats-updated"));
 }
 
 export function getDailyStats(): DailyEntry[] {
   try {
-    const raw = localStorage.getItem(DAILY_KEY);
+    const raw = localStorage.getItem(userKey(DAILY_KEY));
     if (raw) return JSON.parse(raw);
   } catch {}
   return [];
