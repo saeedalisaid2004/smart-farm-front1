@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeSoil, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendNotification } from "@/services/notificationService";
 
 const SoilAnalysis = () => {
   const { t } = useLanguage();
