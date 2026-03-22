@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
 import { getAnalysisStats, getDailyStats, getTotalAnalyses, type AnalysisStats } from "@/services/analysisStats";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
   const { user } = useAuth();
