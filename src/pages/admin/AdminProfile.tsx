@@ -109,6 +109,14 @@ const AdminProfile = () => {
                 >
                   <Camera className="w-4 h-4" />
                 </button>
+                {avatarUrl && (
+                  <button
+                    onClick={handleRemoveAvatar}
+                    className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>
               <div className="pb-2">
