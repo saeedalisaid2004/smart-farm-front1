@@ -77,6 +77,7 @@ const AdminUsers = () => {
       const result = await apiPromoteToAdmin(adminEmail.trim());
       if (result.success || result.status === "success") {
         toast({ title: t("adminUsers.addNewAdmin"), description: `${adminEmail} promoted successfully` });
+        sendNotification({ title: "New Admin Added", description: `${adminEmail} has been promoted to admin`, type: "success" });
         setShowAddAdmin(false);
         setAdminEmail("");
         loadData();
