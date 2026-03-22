@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BarChart3, Shield, Zap, Users, Leaf, Sprout, FlaskConical, ChevronDown } from "lucide-react";
+import { ArrowLeft, BarChart3, Shield, Zap, Users, Leaf, Sprout, FlaskConical, ChevronDown, Moon, Sun } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 
@@ -63,7 +63,14 @@ const Index = () => {
               </div>
               <span className="text-xl font-bold text-foreground tracking-tight">{t("index.brand")}</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => document.documentElement.classList.toggle("dark")}
+                className="w-9 h-9 rounded-xl bg-secondary/80 backdrop-blur-sm hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+              >
+                <Moon className="w-4 h-4 dark:hidden" />
+                <Sun className="w-4 h-4 hidden dark:block" />
+              </button>
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-foreground font-medium rounded-full px-5">
                   {t("index.login")}
