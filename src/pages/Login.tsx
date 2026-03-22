@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiLogin } from "@/services/smartFarmApi";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,31 +48,42 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-4">
-            <Leaf className="w-9 h-9 text-primary-foreground" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 gradient-hero" />
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-primary/6 rounded-full blur-[100px]" />
+      <div className="absolute bottom-1/3 right-1/4 w-[300px] h-[300px] bg-primary-glow/4 rounded-full blur-[80px]" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-card relative z-10"
+      >
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-5 shadow-glow">
+            <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold text-foreground">{t("login.title")}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("login.title")}</h1>
           <p className="text-muted-foreground text-sm mt-1">{t("login.subtitle")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground font-medium">{t("login.email")}</Label>
-            <Input id="email" type="email" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full bg-secondary border-0 px-4" />
+            <Label htmlFor="email" className="text-foreground font-medium text-sm">{t("login.email")}</Label>
+            <Input id="email" type="email" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} required className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 transition-colors" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground font-medium">{t("login.password")}</Label>
+            <Label htmlFor="password" className="text-foreground font-medium text-sm">{t("login.password")}</Label>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("login.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 rounded-full bg-secondary border-0 px-4 pr-11" />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("login.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 pr-11 transition-colors" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
-          <Button type="submit" disabled={loading} className="w-full h-12 rounded-full text-base font-semibold mt-2">
+          <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-semibold mt-2 shadow-primary">
             {loading ? t("login.signingIn") : t("login.signIn")}
           </Button>
         </form>
@@ -80,7 +92,7 @@ const Login = () => {
           {t("login.noAccount")}{" "}
           <Link to="/register" className="text-primary font-medium hover:underline">{t("login.signUp")}</Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };
