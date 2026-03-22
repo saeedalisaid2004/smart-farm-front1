@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
+import OnboardingTour from "@/components/OnboardingTour";
 
 const Dashboard = () => {
   const { user } = useAuth();
