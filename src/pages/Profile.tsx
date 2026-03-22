@@ -57,7 +57,7 @@ const Profile = () => {
   const [editPhone, setEditPhone] = useState(getStoredPhone());
 
   useEffect(() => {
-    setAvatarUrl(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
+    setAvatarUrl(user?.avatar_url || getSavedAvatarUrl());
   }, [user?.avatar_url]);
 
   useEffect(() => {
