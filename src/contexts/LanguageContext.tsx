@@ -367,7 +367,8 @@ const translations = {
     "header.logout": "تسجيل الخروج",
     // Common
     "common.farmer": "مزارع",
-    "common.admin": "مسؤول",
+     "common.admin": "مسؤول",
+     "common.cancel": "إلغاء",
     "app.name": "المزرعة الذكية",
     "common.chooseImage": "اختر صورة",
     "common.analyzeImage": "تحليل الصورة",
