@@ -573,6 +573,10 @@ const translations = {
     "adminUsers.userNotFound": "لم يتم العثور على مستخدم بهذا البريد",
     "adminUsers.alreadyAdmin": "هذا المستخدم مسؤول بالفعل",
     "adminUsers.enterEmail": "يرجى إدخال البريد الإلكتروني",
+    "adminUsers.notifications": "الإشعارات",
+    "adminUsers.pushNotif": "إشعارات الدفع",
+    "adminUsers.emailNotif": "إشعارات البريد",
+    "adminUsers.notifUpdated": "تم تحديث إعدادات الإشعارات",
     // Admin System
     "adminSys.title": "إدارة النظام",
     "adminSys.subtitle": "مراقبة وإدارة جميع خدمات الذكاء الاصطناعي ومكونات النظام",
