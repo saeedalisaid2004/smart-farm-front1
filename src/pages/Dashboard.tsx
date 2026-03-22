@@ -43,7 +43,6 @@ const Dashboard = () => {
     { name: "🌾 Crop", value: stats.crop_recommendation },
     { name: "🧪 Soil", value: stats.soil_analysis },
     { name: "🍎 Fruit", value: stats.fruit_quality },
-    { name: "💬 Chat", value: stats.chatbot },
   ];
 
   const dailyData = daily.slice(-7).map((d) => ({
