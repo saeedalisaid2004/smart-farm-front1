@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeSoil, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendNotification } from "@/services/notificationService";
 
 const SoilAnalysis = () => {
   const { t } = useLanguage();
@@ -40,6 +41,11 @@ const SoilAnalysis = () => {
         k: parseFloat(k),
       });
       setResult(data);
+      sendNotification({
+        title: "Soil Analysis Complete 🧪",
+        description: `Soil type: ${data?.soil_type || data?.prediction || "Analyzed"}`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

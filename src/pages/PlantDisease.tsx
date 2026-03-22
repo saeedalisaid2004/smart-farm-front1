@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { detectPlantDisease, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendNotification } from "@/services/notificationService";
 
 const PlantDisease = () => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -39,6 +40,12 @@ const PlantDisease = () => {
     try {
       const data = await detectPlantDisease(userId, file);
       setResult(data);
+      const isHealthy = data?.prediction?.toLowerCase().includes("healthy");
+      sendNotification({
+        title: isHealthy ? "Plant is Healthy ✅" : "Disease Detected ⚠️",
+        description: `Plant Disease Analysis: ${data?.prediction || "Completed"}`,
+        type: isHealthy ? "success" : "warning",
+      });
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

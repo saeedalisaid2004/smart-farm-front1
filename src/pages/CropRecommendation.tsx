@@ -9,6 +9,7 @@ import { recommendCrop, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendNotification } from "@/services/notificationService";
 
 const CropRecommendation = () => {
   const { t } = useLanguage();
@@ -39,6 +40,11 @@ const CropRecommendation = () => {
         soil,
       });
       setResult(data);
+      sendNotification({
+        title: "Crop Recommendation Ready 🌾",
+        description: `Recommended: ${data?.recommended_crop || data?.prediction || "Available"}`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Failed", description: "Please try again" });
     } finally {

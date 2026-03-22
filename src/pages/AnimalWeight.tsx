@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { estimateAnimalWeight, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendNotification } from "@/services/notificationService";
 
 const AnimalWeight = () => {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -39,6 +40,11 @@ const AnimalWeight = () => {
     try {
       const data = await estimateAnimalWeight(userId, file);
       setResult(data);
+      sendNotification({
+        title: "Animal Weight Estimated 🐄",
+        description: `Estimated weight: ${data?.weight || data?.estimated_weight || "N/A"} kg`,
+        type: "success",
+      });
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {
