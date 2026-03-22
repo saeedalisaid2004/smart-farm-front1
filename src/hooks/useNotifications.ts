@@ -9,6 +9,8 @@ export interface Notification {
   created_at: string;
 }
 
+const STORAGE_KEY = "smart_farm_notifications";
+
 function getUserId(): string {
   try {
     const stored = localStorage.getItem("app_user");
