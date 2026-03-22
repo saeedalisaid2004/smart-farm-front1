@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { getSavedAvatarUrl } from "@/services/avatarService";
 
 interface AppUser {
   id: number;
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        const savedAvatar = localStorage.getItem("avatar_base64");
+        const savedAvatar = getSavedAvatarUrl();
         if (savedAvatar) {
           parsed.avatar_url = savedAvatar;
         }

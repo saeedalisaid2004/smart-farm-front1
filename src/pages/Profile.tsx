@@ -8,9 +8,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { uploadAvatar, getSavedAvatarUrl } from "@/services/avatarService";
 
 const SETTINGS_STORAGE_KEY = "dashboard_settings";
-const AVATAR_STORAGE_KEY = "avatar_base64";
 
 const getStoredPhone = () => {
   try {
@@ -44,7 +44,7 @@ const Profile = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || getSavedAvatarUrl());
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -57,7 +57,7 @@ const Profile = () => {
   const [editPhone, setEditPhone] = useState(getStoredPhone());
 
   useEffect(() => {
-    setAvatarUrl(user?.avatar_url || localStorage.getItem(AVATAR_STORAGE_KEY) || null);
+    setAvatarUrl(user?.avatar_url || getSavedAvatarUrl());
   }, [user?.avatar_url]);
 
   useEffect(() => {
@@ -69,17 +69,18 @@ const Profile = () => {
     if (!file || !user) return;
 
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setAvatarUrl(base64);
-      localStorage.setItem(AVATAR_STORAGE_KEY, base64);
-      setUser({ ...user, avatar_url: base64 });
-      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: base64 }));
+    try {
+      const userId = getExternalUserId() || user.id;
+      const url = await uploadAvatar(String(userId), file);
+      setAvatarUrl(url);
+      setUser({ ...user, avatar_url: url });
+      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: url }));
       toast({ title: t("profile.photoUpdated") });
+    } catch {
+      toast({ title: "Failed to upload photo", variant: "destructive" });
+    } finally {
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async () => {
