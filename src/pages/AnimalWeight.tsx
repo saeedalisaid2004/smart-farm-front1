@@ -46,6 +46,7 @@ const AnimalWeight = () => {
         description: `Estimated weight: ${data?.weight || data?.estimated_weight || "N/A"} kg`,
         type: "success",
       });
+      incrementAnalysis("animal_weight");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

@@ -47,6 +47,7 @@ const SoilAnalysis = () => {
         description: `Soil type: ${data?.soil_type || data?.prediction || "Analyzed"}`,
         type: "success",
       });
+      incrementAnalysis("soil_analysis");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

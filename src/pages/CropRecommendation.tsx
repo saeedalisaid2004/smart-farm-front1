@@ -46,6 +46,7 @@ const CropRecommendation = () => {
         description: `Recommended: ${data?.recommended_crop || data?.prediction || "Available"}`,
         type: "success",
       });
+      incrementAnalysis("crop_recommendation");
     } catch {
       toast({ variant: "destructive", title: "Failed", description: "Please try again" });
     } finally {

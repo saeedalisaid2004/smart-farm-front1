@@ -45,6 +45,7 @@ const FruitQuality = () => {
         description: `Quality: ${data?.quality || data?.prediction || "Completed"}`,
         type: "success",
       });
+      incrementAnalysis("fruit_quality");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {

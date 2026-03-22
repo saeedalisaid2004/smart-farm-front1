@@ -47,6 +47,7 @@ const PlantDisease = () => {
         description: `Plant Disease Analysis: ${data?.prediction || "Completed"}`,
         type: isHealthy ? "success" : "warning",
       });
+      incrementAnalysis("plant_disease");
     } catch {
       toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" });
     } finally {
