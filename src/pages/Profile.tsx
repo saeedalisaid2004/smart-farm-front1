@@ -91,7 +91,7 @@ const Profile = () => {
     setAvatarUrl(null);
     setUser({ ...user, avatar_url: undefined });
     window.dispatchEvent(new CustomEvent("avatar-updated", { detail: null }));
-    toast({ title: "Profile photo removed" });
+    toast({ title: t("profile.photoRemoved") });
   };
 
   const handleSave = async () => {
