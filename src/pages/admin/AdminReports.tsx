@@ -218,6 +218,7 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.newRegistrations")}</p>
               </div>
             </div>
+            <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={growthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -227,7 +228,7 @@ const AdminReports = () => {
                 <Line type="monotone" dataKey="users" stroke="hsl(142, 71%, 45%)" strokeWidth={3} dot={{ fill: "hsl(142, 71%, 45%)", r: 5, strokeWidth: 2, stroke: "hsl(var(--card))" }} />
               </LineChart>
             </ResponsiveContainer>
-          </motion.div>
+            </div>
         </div>
 
         {/* Daily Activity */}
