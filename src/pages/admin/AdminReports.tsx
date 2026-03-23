@@ -68,15 +68,27 @@ const AdminReports = () => {
     }
   };
 
+  const serviceNameMap: Record<string, string> = {
+    "Plant Disease": t("dashboard.plantDisease"),
+    "Animal Weight": t("dashboard.animalWeight"),
+    "Crop AI": t("dashboard.cropRecommendation"),
+    "Crop Rec.": t("dashboard.cropRecommendation"),
+    "Soil Analysis": t("dashboard.soilAnalysis"),
+    "Fruit Quality": t("dashboard.fruitQuality"),
+    "Chatbot": t("dashboard.chatbot"),
+  };
+
+  const translateService = (name: string) => serviceNameMap[name] || name;
+
   const usageData = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service, value }))
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: translateService(service), value }))
     : [
-        { service: "Plant Disease", value: 340 },
-        { service: "Animal Weight", value: 250 },
-        { service: "Crop Rec.", value: 190 },
-        { service: "Soil Analysis", value: 160 },
-        { service: "Fruit Quality", value: 140 },
-        { service: "Chatbot", value: 310 },
+        { service: t("dashboard.plantDisease"), value: 340 },
+        { service: t("dashboard.animalWeight"), value: 250 },
+        { service: t("dashboard.cropRecommendation"), value: 190 },
+        { service: t("dashboard.soilAnalysis"), value: 160 },
+        { service: t("dashboard.fruitQuality"), value: 140 },
+        { service: t("dashboard.chatbot"), value: 310 },
       ];
 
   const growthData = data?.charts?.user_growth
