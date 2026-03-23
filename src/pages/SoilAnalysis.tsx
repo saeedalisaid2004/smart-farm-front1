@@ -146,7 +146,7 @@ const SoilAnalysis = () => {
                   <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t("soil.resultTitle")}</h3>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
