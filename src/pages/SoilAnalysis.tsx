@@ -131,9 +131,26 @@ const SoilAnalysis = () => {
                 }
 
                 const nested = result["Analysis Result"] || result.result || result;
-                const soilType = nested["Soil Type"] || nested.detected_soil_type || result.soil_type || result.predicted_class || result.prediction;
-                const fertility = nested["Fertility Level"] || nested.fertility_level || result.fertility_level || result.fertility;
+                const soilTypeRaw = nested["Soil Type"] || nested.detected_soil_type || result.soil_type || result.predicted_class || result.prediction;
+                const fertilityRaw = nested["Fertility Level"] || nested.fertility_level || result.fertility_level || result.fertility;
                 const recommendation = nested["Recommendation"] || result.recommendation || result.description || nested.message;
+
+                const soilTypeMap: Record<string, string> = {
+                  "loamy": t("soil.types.loamy"),
+                  "sandy": t("soil.types.sandy"),
+                  "clay": t("soil.types.clay"),
+                  "silty": t("soil.types.silty"),
+                  "peaty": t("soil.types.peaty"),
+                  "chalky": t("soil.types.chalky"),
+                  "saline": t("soil.types.saline"),
+                };
+                const fertilityMap: Record<string, string> = {
+                  "high": t("soil.fertility.high"),
+                  "medium": t("soil.fertility.medium"),
+                  "low": t("soil.fertility.low"),
+                };
+                const soilType = soilTypeRaw ? (soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
+                const fertility = fertilityRaw ? (fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
 
                 const getFertilityStyle = (level: string) => {
                   const l = level.toLowerCase();
