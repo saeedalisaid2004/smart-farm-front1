@@ -53,11 +53,12 @@ const getStoredSettings = (userId?: string | number) => {
   }
 };
 
-const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings();
+const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings(userId);
+  const key = getSettingsKey(userId);
 
   localStorage.setItem(
-    SETTINGS_STORAGE_KEY,
+    key,
     JSON.stringify({
       ...current,
       ...updates,
