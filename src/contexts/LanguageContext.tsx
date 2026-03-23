@@ -429,6 +429,11 @@ const translations = {
     "crop.peaty": "خثية",
     "crop.chalky": "طباشيرية",
     "crop.recommend": "توصية المحصول",
+    "crop.resultTitle": "نتيجة التوصية",
+    "crop.recommendedCrop": "المحصول الموصى به",
+    "crop.yieldLevel": "مستوى العائد المتوقع",
+    "crop.details": "التفاصيل",
+    "crop.error": "خطأ",
     // Soil Analysis
     "soil.title": "تحليل نوع التربة",
     "soil.manualInput": "إدخال خصائص التربة يدوياً",
