@@ -123,7 +123,7 @@ const SoilAnalysis = () => {
                         <AlertCircle className="w-5 h-5 text-destructive" />
                       </div>
                       <div>
-                        <p className="font-medium text-destructive text-sm">Analysis Error</p>
+                        <p className="font-medium text-destructive text-sm">{t("soil.error")}</p>
                         <p className="text-sm text-muted-foreground mt-1">{msg}</p>
                       </div>
                     </div>
