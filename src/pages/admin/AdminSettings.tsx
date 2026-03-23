@@ -105,7 +105,7 @@ const AdminSettings = () => {
         setUser({ ...user, name: fullName, email });
       }
 
-      persistSettings({ phone });
+      persistSettings(currentUserId, { phone });
       toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
