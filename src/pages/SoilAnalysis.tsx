@@ -42,9 +42,11 @@ const SoilAnalysis = () => {
         k: parseFloat(k),
       });
       setResult(data);
+      const nested = data?.["Analysis Result"] || data?.result || data;
+      const soilType = nested?.["Soil Type"] || nested?.detected_soil_type || data?.soil_type || data?.prediction || "Analyzed";
       sendNotification({
         title: "Soil Analysis Complete 🧪",
-        description: `Soil type: ${data?.soil_type || data?.prediction || "Analyzed"}`,
+        description: `Soil type: ${soilType}`,
         type: "success",
       });
       incrementAnalysis("soil_analysis");
