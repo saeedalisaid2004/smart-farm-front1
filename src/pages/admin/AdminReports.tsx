@@ -190,12 +190,13 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.totalPerService")}</p>
               </div>
             </div>
+            <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={usageData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ direction: 'ltr' }} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
+                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "rtl" }} />
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
