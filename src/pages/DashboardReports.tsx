@@ -77,7 +77,7 @@ const DashboardReports = () => {
     if (!userId) return;
     setGeneratingPdf(true);
     try {
-      const data = await generateFarmerPdf(userId);
+      const data = await generateFarmerPdf(userId, dateRange);
       let url = data.file_url || data.download_url;
       if (data.detail) {
         toast({ variant: "destructive", title: "Failed to generate report", description: "The server encountered an error generating the PDF. Please try again later." });
