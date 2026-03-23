@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SETTINGS_STORAGE_KEY = "admin_settings";
+const getSettingsKey = (userId?: string | number) =>
+  userId ? `admin_settings_${userId}` : "admin_settings";
 
 type NotificationSettings = {
   pushNotifications: boolean;
@@ -29,38 +30,29 @@ const defaultNotifications: NotificationSettings = {
   emailAlerts: true,
 };
 
-const getStoredSettings = () => {
+const getStoredSettings = (userId?: string | number) => {
+  if (!userId) return { phone: "", notifications: defaultNotifications };
   try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const stored = localStorage.getItem(getSettingsKey(userId));
     const parsed = stored ? JSON.parse(stored) : {};
-
     return {
       phone: parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "",
-      notifications: {
-        ...defaultNotifications,
-        ...(parsed.notifications || {}),
-      },
+      notifications: { ...defaultNotifications, ...(parsed.notifications || {}) },
     };
   } catch {
-    return {
-      phone: "",
-      notifications: defaultNotifications,
-    };
+    return { phone: "", notifications: defaultNotifications };
   }
 };
 
-const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings();
-
+const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings(userId);
+  const key = getSettingsKey(userId);
   localStorage.setItem(
-    SETTINGS_STORAGE_KEY,
+    key,
     JSON.stringify({
       ...current,
       ...updates,
-      notifications: {
-        ...current.notifications,
-        ...(updates.notifications || {}),
-      },
+      notifications: { ...current.notifications, ...(updates.notifications || {}) },
     }),
   );
 };
@@ -69,13 +61,14 @@ const AdminSettings = () => {
   const { user, setUser } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
+  const currentUserId = getExternalUserId() || user?.id;
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings().phone);
+  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings().notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -92,7 +85,7 @@ const AdminSettings = () => {
   }, [theme]);
 
   useEffect(() => {
-    persistSettings({ notifications });
+    persistSettings(currentUserId, { notifications });
   }, [notifications]);
 
   const handleSave = async () => {
@@ -112,7 +105,7 @@ const AdminSettings = () => {
         setUser({ ...user, name: fullName, email });
       }
 
-      persistSettings({ phone });
+      persistSettings(currentUserId, { phone });
       toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
