@@ -65,8 +65,8 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh reports list
-        listFarmerReports(userId).then(r => { if (Array.isArray(r)) setReports(r); });
+        // Refresh stats and reports list
+        fetchData();
       } else {
         toast({ title: data.message || "Report generated" });
       }
