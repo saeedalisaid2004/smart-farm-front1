@@ -16,7 +16,7 @@ const DashboardReports = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  useEffect(() => {
+  const fetchData = () => {
     const userId = getExternalUserId();
     if (!userId) return;
 
@@ -28,6 +28,10 @@ const DashboardReports = () => {
       if (statsData) setStats(statsData);
       if (Array.isArray(reportsData)) setReports(reportsData);
     }).finally(() => setLoadingStats(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const handleGeneratePdf = async () => {
