@@ -175,7 +175,7 @@ const DashboardReports = () => {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.this_month ?? stats?.this_month ?? 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{localStats?.thisMonth ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
                 </div>
               </div>
