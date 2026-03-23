@@ -85,7 +85,7 @@ const AdminSettings = () => {
   }, [theme]);
 
   useEffect(() => {
-    persistSettings({ notifications });
+    persistSettings(currentUserId, { notifications });
   }, [notifications]);
 
   const handleSave = async () => {
