@@ -103,7 +103,7 @@ const Profile = () => {
         phone: editPhone,
       });
 
-      persistPhone(editPhone);
+      persistPhone(editPhone, currentUserId);
       setUser({
         ...user,
         name: editName,
