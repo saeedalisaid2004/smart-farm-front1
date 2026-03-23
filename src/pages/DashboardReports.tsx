@@ -16,7 +16,7 @@ const DashboardReports = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  useEffect(() => {
+  const fetchData = () => {
     const userId = getExternalUserId();
     if (!userId) return;
 
@@ -28,6 +28,10 @@ const DashboardReports = () => {
       if (statsData) setStats(statsData);
       if (Array.isArray(reportsData)) setReports(reportsData);
     }).finally(() => setLoadingStats(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const handleGeneratePdf = async () => {
@@ -61,8 +65,8 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh reports list
-        listFarmerReports(userId).then(r => { if (Array.isArray(r)) setReports(r); });
+        // Refresh stats and reports list
+        fetchData();
       } else {
         toast({ title: data.message || "Report generated" });
       }
@@ -122,7 +126,7 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.total_reports || stats?.total_analyses || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.total_reports ?? stats?.total_reports ?? stats?.total_analyses ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
                 </div>
               </div>
@@ -131,7 +135,7 @@ const DashboardReports = () => {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.this_month || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.this_month ?? stats?.this_month ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
                 </div>
               </div>
@@ -140,7 +144,7 @@ const DashboardReports = () => {
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.growth || "N/A"}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.growth ?? stats?.growth ?? "N/A"}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
                 </div>
               </div>
