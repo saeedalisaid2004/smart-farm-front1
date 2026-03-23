@@ -396,6 +396,15 @@ const AdminUsers = () => {
                   <p className="text-sm font-medium text-foreground">{viewUser?.email}</p>
                 </div>
               </div>
+              {viewUser?.phone && (
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-secondary/50">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t("profile.phone")}</p>
+                    <p className="text-sm font-medium text-foreground">{viewUser.phone}</p>
+                  </div>
+                </div>
+              )
               <div className="flex items-center gap-3 p-3.5 rounded-xl bg-secondary/50">
                 <Shield className="w-4 h-4 text-muted-foreground" />
                 <div>
