@@ -8,6 +8,41 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { askFarmBot, getChatHistory, getExternalUserId } from "@/services/smartFarmApi";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Clean up weird API responses (JSON strings, nested objects, etc.)
+const cleanBotResponse = (raw: string): string => {
+  if (!raw) return "";
+  let text = raw.trim();
+
+  // If it looks like JSON, try to extract meaningful text
+  if (text.startsWith("{") || text.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(text);
+      // Extract known response keys
+      const extracted =
+        parsed.bot_response || parsed.answer || parsed.response || parsed.reply ||
+        parsed.message || parsed.text || parsed.content || parsed.result;
+      if (typeof extracted === "string") return extracted.trim();
+      // If it's an object with a nested response, try to stringify nicely
+      if (typeof extracted === "object") return JSON.stringify(extracted, null, 2);
+      // Last resort: pull all string values
+      const strings = Object.values(parsed).filter((v): v is string => typeof v === "string" && v.length > 3);
+      if (strings.length > 0) return strings.join("\n");
+    } catch {
+      // Not valid JSON, continue
+    }
+  }
+
+  // Remove wrapping quotes
+  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+    text = text.slice(1, -1);
+  }
+
+  // Clean escaped characters
+  text = text.replace(/\\n/g, "\n").replace(/\\"/g, '"').replace(/\\t/g, " ");
+
+  return text.trim();
+};
+
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
   const [messages, setMessages] = useState<{ role: string; content: string; time: string }[]>([
@@ -28,7 +63,7 @@ const SmartFarmChatbot = () => {
         if (Array.isArray(data) && data.length > 0) {
           const history = data.map((item: any) => {
             const isBot = item.role === "assistant" || item.sender === "bot" || item.is_bot;
-            const content = item.content || item.message || item.text || item.bot_response || item.user_message || "";
+            const content = cleanBotResponse(item.content || item.message || item.text || item.bot_response || item.user_message || "");
             const time = item.timestamp
               ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               : (item.time && item.time.includes(":") && item.time.length <= 5)
@@ -60,7 +95,8 @@ const SmartFarmChatbot = () => {
     try {
       const data = await askFarmBot(userId, userMsg, language === "ar" ? "ar" : "en");
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const reply = data.answer || data.response || data.reply || data.bot_response || JSON.stringify(data);
+      const rawReply = data.answer || data.response || data.reply || data.bot_response || JSON.stringify(data);
+      const reply = cleanBotResponse(rawReply);
       setMessages(prev => [...prev, { role: "assistant", content: reply, time }]);
     } catch {
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -126,7 +162,7 @@ const SmartFarmChatbot = () => {
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground rounded-br-md"
                         : "bg-secondary text-foreground rounded-bl-md"
-                    )}>
+                    )} dir="auto">
                       {msg.content}
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</p>
