@@ -8,6 +8,41 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { askFarmBot, getChatHistory, getExternalUserId } from "@/services/smartFarmApi";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Clean up weird API responses (JSON strings, nested objects, etc.)
+const cleanBotResponse = (raw: string): string => {
+  if (!raw) return "";
+  let text = raw.trim();
+
+  // If it looks like JSON, try to extract meaningful text
+  if (text.startsWith("{") || text.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(text);
+      // Extract known response keys
+      const extracted =
+        parsed.bot_response || parsed.answer || parsed.response || parsed.reply ||
+        parsed.message || parsed.text || parsed.content || parsed.result;
+      if (typeof extracted === "string") return extracted.trim();
+      // If it's an object with a nested response, try to stringify nicely
+      if (typeof extracted === "object") return JSON.stringify(extracted, null, 2);
+      // Last resort: pull all string values
+      const strings = Object.values(parsed).filter((v): v is string => typeof v === "string" && v.length > 3);
+      if (strings.length > 0) return strings.join("\n");
+    } catch {
+      // Not valid JSON, continue
+    }
+  }
+
+  // Remove wrapping quotes
+  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+    text = text.slice(1, -1);
+  }
+
+  // Clean escaped characters
+  text = text.replace(/\\n/g, "\n").replace(/\\"/g, '"').replace(/\\t/g, " ");
+
+  return text.trim();
+};
+
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
   const [messages, setMessages] = useState<{ role: string; content: string; time: string }[]>([
