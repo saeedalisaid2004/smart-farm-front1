@@ -4,7 +4,7 @@ import { FileText, Download, Calendar, TrendingUp, Filter, Loader2 } from "lucid
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getFarmerStats, generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
+import { generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 
 const getLocalReportStats = (userId: number) => {
