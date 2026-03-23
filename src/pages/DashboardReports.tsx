@@ -4,14 +4,46 @@ import { FileText, Download, Calendar, TrendingUp, Filter, Loader2 } from "lucid
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getFarmerStats, generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
+import { generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
+
+const getLocalReportStats = (userId: number) => {
+  const key = `report_stats_${userId}`;
+  const stored = localStorage.getItem(key);
+  if (stored) return JSON.parse(stored);
+  return { total: 0, thisMonth: 0, lastMonthTotal: 0, month: new Date().getMonth() };
+};
+
+const saveLocalReportStats = (userId: number, stats: any) => {
+  localStorage.setItem(`report_stats_${userId}`, JSON.stringify(stats));
+};
+
+const incrementReportStats = (userId: number) => {
+  const stats = getLocalReportStats(userId);
+  const currentMonth = new Date().getMonth();
+  if (stats.month !== currentMonth) {
+    stats.lastMonthTotal = stats.thisMonth;
+    stats.thisMonth = 0;
+    stats.month = currentMonth;
+  }
+  stats.total += 1;
+  stats.thisMonth += 1;
+  saveLocalReportStats(userId, stats);
+  return stats;
+};
+
+const calcGrowth = (thisMonth: number, lastMonth: number) => {
+  if (lastMonth === 0 && thisMonth === 0) return "N/A";
+  if (lastMonth === 0) return `+${thisMonth * 100}%`;
+  const pct = Math.round(((thisMonth - lastMonth) / lastMonth) * 100);
+  return pct >= 0 ? `+${pct}%` : `${pct}%`;
+};
 
 const DashboardReports = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [dateRange, setDateRange] = useState("last30");
-  const [stats, setStats] = useState<any>(null);
+  const [localStats, setLocalStats] = useState<any>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [generatingPdf, setGeneratingPdf] = useState(false);
@@ -21,11 +53,17 @@ const DashboardReports = () => {
     if (!userId) return;
 
     setLoadingStats(true);
-    Promise.all([
-      getFarmerStats(userId).catch(() => null),
-      listFarmerReports(userId).catch(() => []),
-    ]).then(([statsData, reportsData]) => {
-      if (statsData) setStats(statsData);
+    const stats = getLocalReportStats(userId);
+    const currentMonth = new Date().getMonth();
+    if (stats.month !== currentMonth) {
+      stats.lastMonthTotal = stats.thisMonth;
+      stats.thisMonth = 0;
+      stats.month = currentMonth;
+      saveLocalReportStats(userId, stats);
+    }
+    setLocalStats(stats);
+
+    listFarmerReports(userId).catch(() => []).then((reportsData) => {
       if (Array.isArray(reportsData)) setReports(reportsData);
     }).finally(() => setLoadingStats(false));
   };
@@ -65,8 +103,10 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh stats and reports list
-        fetchData();
+        // Increment local stats and refresh
+        const updatedStats = incrementReportStats(userId);
+        setLocalStats({ ...updatedStats });
+        listFarmerReports(userId).catch(() => []).then((r) => { if (Array.isArray(r)) setReports(r); });
       } else {
         toast({ title: data.message || "Report generated" });
       }
@@ -126,7 +166,7 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.total_reports ?? stats?.total_reports ?? stats?.total_analyses ?? 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{localStats?.total ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
                 </div>
               </div>
@@ -135,7 +175,7 @@ const DashboardReports = () => {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.this_month ?? stats?.this_month ?? 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{localStats?.thisMonth ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
                 </div>
               </div>
@@ -144,7 +184,7 @@ const DashboardReports = () => {
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.growth ?? stats?.growth ?? "N/A"}</p>
+                  <p className="text-2xl font-bold text-foreground">{calcGrowth(localStats?.thisMonth ?? 0, localStats?.lastMonthTotal ?? 0)}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
                 </div>
               </div>
