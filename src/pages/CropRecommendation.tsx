@@ -150,7 +150,7 @@ const CropRecommendation = () => {
                   <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <h3 className="text-lg font-semibold text-foreground">Recommendation Result</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t("crop.resultTitle")}</h3>
                     </div>
 
                     {crop && (
