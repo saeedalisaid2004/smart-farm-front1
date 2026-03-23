@@ -58,25 +58,15 @@ const AdminDashboard = () => {
     { icon: TrendingUp, label: t("adminDash.mostUsed"), value: summary?.top_service ?? t("adminDash.plantDisease"), sub: t("adminDash.detection"), badge: t("adminDash.top"), gradient: "from-orange-500 to-amber-600", bgGlow: "bg-orange-500/10" },
   ];
 
-  const serviceNameMap: Record<string, string> = {
-    "Plant Disease": t("dashboard.plantDisease"),
-    "Animal Weight": t("dashboard.animalWeight"),
-    "Crop AI": t("dashboard.cropRecommendation"),
-    "Soil Analysis": t("dashboard.soilAnalysis"),
-    "Fruit Quality": t("dashboard.fruitQuality"),
-    "Chatbot": t("dashboard.chatbot"),
-  };
-  const translateSvc = (name: string) => serviceNameMap[name] || name;
-
   const usageByService = data?.charts?.service_distribution
-    ? Object.entries(data.charts.service_distribution).map(([name, value]) => ({ name: translateSvc(name), value }))
+    ? Object.entries(data.charts.service_distribution).map(([name, value]) => ({ name, value }))
     : [
-        { name: t("dashboard.plantDisease"), value: 25 },
-        { name: t("dashboard.chatbot"), value: 21 },
-        { name: t("dashboard.animalWeight"), value: 18 },
-        { name: t("dashboard.cropRecommendation"), value: 14 },
-        { name: t("dashboard.soilAnalysis"), value: 12 },
-        { name: t("dashboard.fruitQuality"), value: 10 },
+        { name: "Plant Disease", value: 25 },
+        { name: "Chatbot", value: 21 },
+        { name: "Animal Weight", value: 18 },
+        { name: "Crop AI", value: 14 },
+        { name: "Soil Analysis", value: 12 },
+        { name: "Fruit Quality", value: 10 },
       ];
 
   const userGrowth = data?.charts?.usage_over_time
