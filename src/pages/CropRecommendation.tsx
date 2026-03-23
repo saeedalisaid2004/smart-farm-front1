@@ -128,8 +128,8 @@ const CropRecommendation = () => {
                         <AlertCircle className="w-5 h-5 text-destructive" />
                       </div>
                       <div>
-                        <p className="font-medium text-destructive text-sm">Error</p>
-                        <p className="text-sm text-muted-foreground mt-1">{detailMsg}</p>
+                        <p className="font-medium text-destructive text-sm">{t("crop.error")}</p>
+                        <p className="text-sm text-muted-foreground mt-1" dir="auto">{detailMsg}</p>
                       </div>
                     </div>
                   );
