@@ -146,9 +146,9 @@ const DashboardReports = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="last7">{t("adminReports.last7")}</SelectItem>
-                <SelectItem value="last30">{t("adminReports.last30")}</SelectItem>
-                <SelectItem value="last90">{t("adminReports.last90")}</SelectItem>
+                <SelectItem value="weekly">{t("reports.lastWeek")}</SelectItem>
+                <SelectItem value="monthly">{t("reports.lastMonth")}</SelectItem>
+                <SelectItem value="all">{t("reports.allTime")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
