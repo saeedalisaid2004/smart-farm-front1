@@ -95,6 +95,11 @@ const translations = {
     "crop.peaty": "Peaty",
     "crop.chalky": "Chalky",
     "crop.recommend": "Recommend Crop",
+    "crop.resultTitle": "Recommendation Result",
+    "crop.recommendedCrop": "Recommended Crop",
+    "crop.yieldLevel": "Expected Yield Level",
+    "crop.details": "Details",
+    "crop.error": "Error",
     // Soil Analysis
     "soil.title": "Soil Type Analysis",
     "soil.manualInput": "Manual Soil Properties Input",
