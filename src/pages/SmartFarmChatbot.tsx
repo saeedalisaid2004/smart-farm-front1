@@ -45,8 +45,8 @@ const cleanBotResponse = (raw: string): string => {
 
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
-  const [messages, setMessages] = useState<{ role: string; content: string; time: string }[]>([
-    { role: "assistant", content: t("chatbot.greeting"), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+  const [messages, setMessages] = useState<{ role: string; content: string; time: string; isGreeting?: boolean }[]>([
+    { role: "assistant", content: t("chatbot.greeting"), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), isGreeting: true }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,6 +55,13 @@ const SmartFarmChatbot = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Update greeting message when language changes
+  useEffect(() => {
+    setMessages(prev => prev.map(msg =>
+      msg.isGreeting ? { ...msg, content: t("chatbot.greeting") } : msg
+    ));
+  }, [language, t]);
 
   useEffect(() => {
     const userId = getExternalUserId();
