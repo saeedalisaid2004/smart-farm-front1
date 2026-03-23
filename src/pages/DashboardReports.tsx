@@ -197,13 +197,13 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Generated Reports</h3>
-                  <p className="text-sm text-muted-foreground">Download your farm analysis reports</p>
+                  <h3 className="font-semibold text-foreground">{t("reports.generatedReports")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("reports.generatedReportsDesc")}</p>
                 </div>
               </div>
               <Button className="rounded-full gap-2" onClick={handleGeneratePdf} disabled={generatingPdf}>
                 {generatingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Generate New Report
+                {t("reports.generateNew")}
               </Button>
             </div>
 
