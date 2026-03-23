@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SETTINGS_STORAGE_KEY = "admin_settings";
+const getSettingsKey = (userId?: string | number) =>
+  userId ? `admin_settings_${userId}` : "admin_settings";
 
 type NotificationSettings = {
   pushNotifications: boolean;
@@ -29,38 +30,29 @@ const defaultNotifications: NotificationSettings = {
   emailAlerts: true,
 };
 
-const getStoredSettings = () => {
+const getStoredSettings = (userId?: string | number) => {
+  if (!userId) return { phone: "", notifications: defaultNotifications };
   try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const stored = localStorage.getItem(getSettingsKey(userId));
     const parsed = stored ? JSON.parse(stored) : {};
-
     return {
       phone: parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "",
-      notifications: {
-        ...defaultNotifications,
-        ...(parsed.notifications || {}),
-      },
+      notifications: { ...defaultNotifications, ...(parsed.notifications || {}) },
     };
   } catch {
-    return {
-      phone: "",
-      notifications: defaultNotifications,
-    };
+    return { phone: "", notifications: defaultNotifications };
   }
 };
 
-const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings();
-
+const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings(userId);
+  const key = getSettingsKey(userId);
   localStorage.setItem(
-    SETTINGS_STORAGE_KEY,
+    key,
     JSON.stringify({
       ...current,
       ...updates,
-      notifications: {
-        ...current.notifications,
-        ...(updates.notifications || {}),
-      },
+      notifications: { ...current.notifications, ...(updates.notifications || {}) },
     }),
   );
 };
