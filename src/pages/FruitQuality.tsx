@@ -133,7 +133,7 @@ const FruitQuality = () => {
                         <AlertCircle className="w-6 h-6 text-amber-500" />
                       </div>
                       <div className="space-y-1.5">
-                        <p className="font-semibold text-amber-600 text-sm">Low Confidence</p>
+                        <p className="font-semibold text-amber-600 text-sm">{t("fruitQuality.lowConfidence")}</p>
                         <p className="text-sm text-muted-foreground leading-relaxed" dir="auto">{result.message}</p>
                         {result.confidence && (
                           <div className="flex items-center gap-2 mt-2">
