@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiLogin, apiGetProfileImage } from "@/services/smartFarmApi";
+import { apiLogin, buildProfileImageUrl } from "@/services/smartFarmApi";
+import { saveAvatarUrlFromApi } from "@/services/avatarService";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 
