@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SETTINGS_STORAGE_KEY = "dashboard_settings";
+const getSettingsKey = (userId?: string | number) =>
+  userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
 type NotificationSettings = {
   emailNotifications: boolean;
@@ -31,9 +32,10 @@ const defaultNotifications: NotificationSettings = {
   weeklyReport: true,
 };
 
-const getStoredSettings = () => {
+const getStoredSettings = (userId?: string | number) => {
   try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const key = getSettingsKey(userId);
+    const stored = localStorage.getItem(key);
     const parsed = stored ? JSON.parse(stored) : {};
 
     return {
@@ -51,11 +53,12 @@ const getStoredSettings = () => {
   }
 };
 
-const persistSettings = (updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings();
+const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
+  const current = getStoredSettings(userId);
+  const key = getSettingsKey(userId);
 
   localStorage.setItem(
-    SETTINGS_STORAGE_KEY,
+    key,
     JSON.stringify({
       ...current,
       ...updates,
@@ -71,13 +74,14 @@ const DashboardSettings = () => {
   const { user, setUser } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
+  const currentUserId = getExternalUserId() || user?.id;
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings().phone);
+  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings().notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -93,7 +97,7 @@ const DashboardSettings = () => {
   }, [theme]);
 
   useEffect(() => {
-    persistSettings({ notifications });
+    persistSettings(currentUserId, { notifications });
   }, [notifications]);
 
   const handleThemeChange = (value: "light" | "dark") => {
@@ -117,7 +121,7 @@ const DashboardSettings = () => {
         setUser({ ...user, name: fullName, email });
       }
 
-      persistSettings({ phone });
+      persistSettings(currentUserId, { phone });
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
