@@ -179,8 +179,8 @@ const SoilAnalysis = () => {
                         </div>
                       )}
 
-                      {fertility && (() => {
-                        const style = getFertilityStyle(fertility);
+                      {fertility && fertilityRaw && (() => {
+                        const style = getFertilityStyle(fertilityRaw);
                         return (
                           <div className={`border rounded-2xl p-5 ${style.bg}`}>
                             <div className="flex items-center gap-2 mb-3">
