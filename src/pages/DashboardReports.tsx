@@ -42,7 +42,7 @@ const calcGrowth = (thisMonth: number, lastMonth: number) => {
 const DashboardReports = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [dateRange, setDateRange] = useState("last30");
+  const [dateRange, setDateRange] = useState("all");
   const [localStats, setLocalStats] = useState<any>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -77,7 +77,7 @@ const DashboardReports = () => {
     if (!userId) return;
     setGeneratingPdf(true);
     try {
-      const data = await generateFarmerPdf(userId);
+      const data = await generateFarmerPdf(userId, dateRange);
       let url = data.file_url || data.download_url;
       if (data.detail) {
         toast({ variant: "destructive", title: "Failed to generate report", description: "The server encountered an error generating the PDF. Please try again later." });
@@ -137,18 +137,18 @@ const DashboardReports = () => {
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
               <Filter className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-sm font-semibold text-foreground">{t("adminReports.filters")}</p>
+            <p className="text-sm font-semibold text-foreground">{t("reports.filters")}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t("reports.dateRange")}</p>
             <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-full sm:w-56 bg-secondary/50 border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="last7">{t("adminReports.last7")}</SelectItem>
-                <SelectItem value="last30">{t("adminReports.last30")}</SelectItem>
-                <SelectItem value="last90">{t("adminReports.last90")}</SelectItem>
+                <SelectItem value="weekly">{t("reports.lastWeek")}</SelectItem>
+                <SelectItem value="monthly">{t("reports.lastMonth")}</SelectItem>
+                <SelectItem value="all">{t("reports.allTime")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -197,13 +197,13 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Generated Reports</h3>
-                  <p className="text-sm text-muted-foreground">Download your farm analysis reports</p>
+                  <h3 className="font-semibold text-foreground">{t("reports.generatedReports")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("reports.generatedReportsDesc")}</p>
                 </div>
               </div>
               <Button className="rounded-full gap-2" onClick={handleGeneratePdf} disabled={generatingPdf}>
                 {generatingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Generate New Report
+                {t("reports.generateNew")}
               </Button>
             </div>
 
@@ -243,7 +243,7 @@ const DashboardReports = () => {
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
-                No reports available yet
+                {t("reports.noReports")}
               </div>
             )}
           </>
