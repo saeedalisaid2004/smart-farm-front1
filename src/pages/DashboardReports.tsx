@@ -42,7 +42,7 @@ const calcGrowth = (thisMonth: number, lastMonth: number) => {
 const DashboardReports = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [dateRange, setDateRange] = useState("last30");
+  const [dateRange, setDateRange] = useState("all");
   const [localStats, setLocalStats] = useState<any>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
