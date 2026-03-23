@@ -68,8 +68,19 @@ const AdminReports = () => {
     }
   };
 
+  // API returns Arabic service names — map to English for chart labels
+  const arToEnService: Record<string, string> = {
+    "أمراض النباتات": "Plant Disease",
+    "وزن الماشية": "Animal Weight",
+    "توصية المحاصيل": "Crop Rec.",
+    "تحليل التربة": "Soil Analysis",
+    "جودة الفاكهة": "Fruit Quality",
+    "المساعد الذكي": "Chatbot",
+  };
+  const toEnglish = (name: string) => arToEnService[name] || name;
+
   const usageData = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service, value }))
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: toEnglish(service), value }))
     : [
         { service: "Plant Disease", value: 340 },
         { service: "Animal Weight", value: 250 },
