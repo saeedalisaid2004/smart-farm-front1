@@ -252,17 +252,20 @@ export const getModelsTable = async () => {
 };
 
 export const getAdminReportStats = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/dashboard-stats`);
+  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/dashboard-stats`);
   return res.json();
 };
 
 export const generatePremiumReport = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/generate-pdf`, {
+  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/generate-pdf`, {
     method: "POST",
   });
   const data = await res.json();
-  if (data.file_url && !data.file_url.startsWith("http")) {
-    data.file_url = `${API_BASE}${data.file_url}`;
+  const url = data.file_url || data.download_url;
+  if (url && !url.startsWith("http")) {
+    data.file_url = `${API_BASE}${url}`;
+  } else if (url) {
+    data.file_url = url;
   }
   return data;
 };
