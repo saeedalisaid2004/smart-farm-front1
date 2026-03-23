@@ -103,8 +103,10 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh stats and reports list
-        fetchData();
+        // Increment local stats and refresh
+        const updatedStats = incrementReportStats(userId);
+        setLocalStats({ ...updatedStats });
+        listFarmerReports(userId).catch(() => []).then((r) => { if (Array.isArray(r)) setReports(r); });
       } else {
         toast({ title: data.message || "Report generated" });
       }
