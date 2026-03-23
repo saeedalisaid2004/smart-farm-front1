@@ -156,7 +156,7 @@ const SoilAnalysis = () => {
                             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                               <FlaskConical className="w-4 h-4 text-primary" />
                             </div>
-                            <span className="text-xs text-muted-foreground">Soil Type</span>
+                            <span className="text-xs text-muted-foreground">{t("soil.soilType")}</span>
                           </div>
                           <p className="text-xl font-bold text-foreground capitalize">{soilType}</p>
                         </div>
