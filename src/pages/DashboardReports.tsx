@@ -126,7 +126,7 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.total_reports || stats?.total_analyses || 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.total_reports ?? stats?.total_reports ?? stats?.total_analyses ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
                 </div>
               </div>
