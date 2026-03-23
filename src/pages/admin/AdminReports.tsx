@@ -42,7 +42,21 @@ const AdminReports = () => {
     try {
       const result = await generatePremiumReport();
       if (result.file_url) {
-        window.open(result.file_url, "_blank");
+        // Download as blob to avoid browser blocking
+        try {
+          const pdfRes = await fetch(result.file_url);
+          const blob = await pdfRes.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = `Admin_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        } catch {
+          window.open(result.file_url, "_blank");
+        }
         toast({ title: "Report generated successfully" });
       } else {
         toast({ title: result.message || "Report generated" });
