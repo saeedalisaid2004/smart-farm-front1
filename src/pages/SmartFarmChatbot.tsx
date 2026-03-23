@@ -63,7 +63,7 @@ const SmartFarmChatbot = () => {
         if (Array.isArray(data) && data.length > 0) {
           const history = data.map((item: any) => {
             const isBot = item.role === "assistant" || item.sender === "bot" || item.is_bot;
-            const content = item.content || item.message || item.text || item.bot_response || item.user_message || "";
+            const content = cleanBotResponse(item.content || item.message || item.text || item.bot_response || item.user_message || "");
             const time = item.timestamp
               ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               : (item.time && item.time.includes(":") && item.time.length <= 5)
