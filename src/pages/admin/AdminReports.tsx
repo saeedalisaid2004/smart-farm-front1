@@ -200,6 +200,7 @@ const AdminReports = () => {
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
 
           <motion.div
