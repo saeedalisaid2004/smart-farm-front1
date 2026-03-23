@@ -36,11 +36,30 @@ const DashboardReports = () => {
     setGeneratingPdf(true);
     try {
       const data = await generateFarmerPdf(userId);
-      const url = data.file_url || data.download_url;
+      let url = data.file_url || data.download_url;
       if (data.detail) {
         toast({ variant: "destructive", title: "Failed to generate report", description: "The server encountered an error generating the PDF. Please try again later." });
       } else if (url) {
-        window.open(url, "_blank");
+        // Ensure absolute URL
+        if (!url.startsWith("http")) {
+          url = `https://mahmoud123mahmoud-smartfarm-api.hf.space${url}`;
+        }
+        // Download as blob to avoid browser blocking
+        try {
+          const pdfRes = await fetch(url);
+          const blob = await pdfRes.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = `Farm_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        } catch {
+          // Fallback: try opening directly
+          window.open(url, "_blank");
+        }
         toast({ title: "Report generated successfully" });
         // Refresh reports list
         listFarmerReports(userId).then(r => { if (Array.isArray(r)) setReports(r); });
