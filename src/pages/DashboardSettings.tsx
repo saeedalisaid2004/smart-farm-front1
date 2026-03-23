@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SETTINGS_STORAGE_KEY = "dashboard_settings";
+const getSettingsKey = (userId?: string | number) =>
+  userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
 type NotificationSettings = {
   emailNotifications: boolean;
@@ -31,9 +32,10 @@ const defaultNotifications: NotificationSettings = {
   weeklyReport: true,
 };
 
-const getStoredSettings = () => {
+const getStoredSettings = (userId?: string | number) => {
   try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const key = getSettingsKey(userId);
+    const stored = localStorage.getItem(key);
     const parsed = stored ? JSON.parse(stored) : {};
 
     return {
