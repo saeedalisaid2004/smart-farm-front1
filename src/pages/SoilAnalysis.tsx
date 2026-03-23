@@ -80,7 +80,7 @@ const SoilAnalysis = () => {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">{t("soil.manualInput")}</h2>
-              <p className="text-sm text-muted-foreground">Enter soil parameters for analysis</p>
+              <p className="text-sm text-muted-foreground">{t("soil.inputDesc")}</p>
             </div>
           </div>
 
