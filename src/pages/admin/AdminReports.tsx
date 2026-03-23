@@ -68,15 +68,27 @@ const AdminReports = () => {
     }
   };
 
+  const serviceNameMap: Record<string, string> = {
+    "Plant Disease": t("dashboard.plantDisease"),
+    "Animal Weight": t("dashboard.animalWeight"),
+    "Crop AI": t("dashboard.cropRecommendation"),
+    "Crop Rec.": t("dashboard.cropRecommendation"),
+    "Soil Analysis": t("dashboard.soilAnalysis"),
+    "Fruit Quality": t("dashboard.fruitQuality"),
+    "Chatbot": t("dashboard.chatbot"),
+  };
+
+  const translateService = (name: string) => serviceNameMap[name] || name;
+
   const usageData = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service, value }))
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: translateService(service), value }))
     : [
-        { service: "Plant Disease", value: 340 },
-        { service: "Animal Weight", value: 250 },
-        { service: "Crop Rec.", value: 190 },
-        { service: "Soil Analysis", value: 160 },
-        { service: "Fruit Quality", value: 140 },
-        { service: "Chatbot", value: 310 },
+        { service: t("dashboard.plantDisease"), value: 340 },
+        { service: t("dashboard.animalWeight"), value: 250 },
+        { service: t("dashboard.cropRecommendation"), value: 190 },
+        { service: t("dashboard.soilAnalysis"), value: 160 },
+        { service: t("dashboard.fruitQuality"), value: 140 },
+        { service: t("dashboard.chatbot"), value: 310 },
       ];
 
   const growthData = data?.charts?.user_growth
@@ -192,9 +204,31 @@ const AdminReports = () => {
             </div>
             <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={usageData}>
+              <BarChart data={usageData} margin={{ bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ direction: 'ltr' }} />
+                <XAxis
+                  dataKey="service"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                  interval={0}
+                  tick={({ x, y, payload }) => (
+                    <text x={x} y={y + 10} textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize={10} direction="ltr" style={{ unicodeBidi: "plaintext" }}>
+                      {payload.value.length > 12
+                        ? payload.value.split(" ").reduce((lines: string[], word: string) => {
+                            const last = lines[lines.length - 1];
+                            if (last && (last + " " + word).length <= 14) {
+                              lines[lines.length - 1] = last + " " + word;
+                            } else {
+                              lines.push(word);
+                            }
+                            return lines;
+                          }, []).map((line: string, i: number) => (
+                            <tspan key={i} x={x} dy={i === 0 ? 0 : 14}>{line}</tspan>
+                          ))
+                        : payload.value}
+                    </text>
+                  )}
+                />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
                 <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "rtl" }} />
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
