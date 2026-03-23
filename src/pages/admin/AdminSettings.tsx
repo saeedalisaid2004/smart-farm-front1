@@ -61,13 +61,14 @@ const AdminSettings = () => {
   const { user, setUser } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
+  const currentUserId = getExternalUserId() || user?.id;
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings().phone);
+  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings().notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
