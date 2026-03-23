@@ -133,6 +133,8 @@ const translations = {
     "reports.generatedReportsDesc": "Download your farm analysis reports",
     "reports.generateNew": "Generate New Report",
     "reports.noReports": "No reports available yet",
+    "reports.filters": "Report Filters",
+    "reports.dateRange": "Date Range",
     "reports.plantReport": "Plant Disease Analysis Report",
     "reports.plantReportDesc": "45 images analyzed, 3 diseases detected",
     "reports.livestockReport": "Livestock Weight Monitoring",
