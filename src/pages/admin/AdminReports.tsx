@@ -229,6 +229,7 @@ const AdminReports = () => {
               </LineChart>
             </ResponsiveContainer>
             </div>
+          </motion.div>
         </div>
 
         {/* Daily Activity */}
