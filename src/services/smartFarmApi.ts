@@ -73,18 +73,28 @@ export const apiLogout = async (userId: number) => {
 
 export const apiSaveSettings = async (
   userId: number,
-  settings: { full_name?: string; email?: string; phone?: string }
+  settings: { full_name?: string; email?: string; phone?: string; profile_img?: File }
 ) => {
+  const fd = new FormData();
+  Object.entries(settings).forEach(([key, value]) => {
+    if (value !== undefined) {
+      if (value instanceof File) {
+        fd.append(key, value);
+      } else {
+        fd.append(key, String(value));
+      }
+    }
+  });
+
   const res = await fetch(`${API_BASE}/save-all-settings/${userId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded(
-      Object.fromEntries(
-        Object.entries(settings).filter(([, v]) => v !== undefined) as [string, string][]
-      )
-    ),
+    body: fd,
   });
   return res.json();
+};
+
+export const apiGetProfileImage = (userId: number): string => {
+  return `${API_BASE}/profile-image/${userId}`;
 };
 
 // ============ AI Analysis ============
