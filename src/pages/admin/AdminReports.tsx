@@ -68,19 +68,20 @@ const AdminReports = () => {
     }
   };
 
-  // API returns Arabic service names — map to English for chart labels
-  const arToEnService: Record<string, string> = {
-    "أمراض النباتات": "Plant Disease",
-    "وزن الماشية": "Animal Weight",
-    "توصية المحاصيل": "Crop Rec.",
-    "تحليل التربة": "Soil Analysis",
-    "جودة الفاكهة": "Fruit Quality",
-    "المساعد الذكي": "Chatbot",
+  // API returns Arabic presentation-form strings — normalize to English
+  const toEnglishService = (name: string): string => {
+    const lower = name.toLowerCase();
+    if (lower.includes("plant") || lower.includes("نبات") || /\u{FE95}\u{FE8E}\u{FE92}/u.test(name)) return "Plant Disease";
+    if (lower.includes("animal") || lower.includes("ماشي") || /\u{FEF4}\u{FEB7}/u.test(name)) return "Animal Weight";
+    if (lower.includes("crop") || lower.includes("محاصيل") || /\u{FEF4}\u{FEBB}/u.test(name)) return "Crop Rec.";
+    if (lower.includes("soil") || lower.includes("ترب") || /\u{FE91}\u{FEAE}/u.test(name)) return "Soil Analysis";
+    if (lower.includes("fruit") || lower.includes("فاكه") || /\u{FEDB}\u{FE8E}\u{FED4}/u.test(name)) return "Fruit Quality";
+    if (lower.includes("chat") || lower.includes("ذكي") || lower.includes("مساعد") || /\u{FEDB}\u{FEAC}/u.test(name)) return "Chatbot";
+    return name;
   };
-  const toEnglish = (name: string) => arToEnService[name] || name;
 
   const usageData = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: toEnglish(service), value }))
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: toEnglishService(service), value }))
     : [
         { service: "Plant Disease", value: 340 },
         { service: "Animal Weight", value: 250 },
