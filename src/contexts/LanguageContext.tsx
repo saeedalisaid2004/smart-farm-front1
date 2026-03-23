@@ -476,6 +476,8 @@ const translations = {
     "reports.generatedReportsDesc": "حمّل تقارير تحليلات مزرعتك",
     "reports.generateNew": "إنشاء تقرير جديد",
     "reports.noReports": "لا توجد تقارير بعد",
+    "reports.filters": "فلاتر التقارير",
+    "reports.dateRange": "النطاق الزمني",
     "reports.plantReport": "تقرير تحليل أمراض النبات",
     "reports.plantReportDesc": "45 صورة تم تحليلها، 3 أمراض تم اكتشافها",
     "reports.livestockReport": "مراقبة وزن المواشي",
