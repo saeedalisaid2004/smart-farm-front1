@@ -243,7 +243,7 @@ const DashboardReports = () => {
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
-                No reports available yet
+                {t("reports.noReports")}
               </div>
             )}
           </>
