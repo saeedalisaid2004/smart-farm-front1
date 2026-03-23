@@ -109,6 +109,13 @@ const translations = {
     "soil.phosphorus": "Phosphorus (P)",
     "soil.potassium": "Potassium (K)",
     "soil.analyze": "Analyze Soil Properties",
+    "soil.inputDesc": "Enter soil parameters for analysis",
+    "soil.analyzing": "Analyzing...",
+    "soil.resultTitle": "Analysis Result",
+    "soil.soilType": "Soil Type",
+    "soil.fertilityLevel": "Fertility Level",
+    "soil.recommendation": "Recommendation",
+    "soil.error": "Analysis Error",
     // Chatbot
     "chatbot.title": "Smart Farm Chatbot (NLP)",
     "chatbot.heading": "Smart Farm Chatbot",
