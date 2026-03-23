@@ -11,8 +11,34 @@ import { motion, AnimatePresence } from "framer-motion";
 import { sendNotification } from "@/services/notificationService";
 import { incrementAnalysis } from "@/services/analysisStats";
 
+const translateRecommendation = (text: string, lang: string): string => {
+  if (lang !== "ar" || !text) return text;
+  
+  const soilNames: Record<string, string> = {
+    "sandy": "رملية", "loamy": "طينية رملية", "clay": "طينية",
+    "silty": "طميية", "peaty": "خثية", "chalky": "كلسية", "saline": "ملحية",
+  };
+
+  // Pattern: "Based on your soil's NPK (X, Y, Z), it is classified as SoilType."
+  const npkMatch = text.match(/Based on your soil's NPK \(([^)]+)\), it is classified as (\w+)/i);
+  if (npkMatch) {
+    const npk = npkMatch[1];
+    const type = npkMatch[2];
+    const arType = soilNames[type.toLowerCase()] || type;
+    return `بناءً على قيم NPK للتربة (${npk})، تم تصنيفها كتربة ${arType}.`;
+  }
+
+  // Generic translations for common phrases
+  return text
+    .replace(/Based on your soil/gi, "بناءً على تربتك")
+    .replace(/it is classified as/gi, "تم تصنيفها كـ")
+    .replace(/Recommendation/gi, "التوصية")
+    .replace(/Sandy/gi, "رملية").replace(/Loamy/gi, "طينية رملية")
+    .replace(/Clay/gi, "طينية").replace(/Silty/gi, "طميية");
+};
+
 const SoilAnalysis = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const [ph, setPh] = useState("");
   const [moisture, setMoisture] = useState("");
@@ -201,7 +227,7 @@ const SoilAnalysis = () => {
                           <Sprout className="w-4 h-4 text-primary" />
                           <p className="text-xs font-medium text-muted-foreground">{t("soil.recommendation")}</p>
                         </div>
-                        <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
+                        <p className="text-sm text-foreground leading-relaxed">{translateRecommendation(recommendation, language)}</p>
                       </div>
                     )}
 
