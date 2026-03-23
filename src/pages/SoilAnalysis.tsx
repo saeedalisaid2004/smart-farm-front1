@@ -227,7 +227,7 @@ const SoilAnalysis = () => {
                           <Sprout className="w-4 h-4 text-primary" />
                           <p className="text-xs font-medium text-muted-foreground">{t("soil.recommendation")}</p>
                         </div>
-                        <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
+                        <p className="text-sm text-foreground leading-relaxed">{translateRecommendation(recommendation, language)}</p>
                       </div>
                     )}
 
