@@ -95,7 +95,8 @@ const SmartFarmChatbot = () => {
     try {
       const data = await askFarmBot(userId, userMsg, language === "ar" ? "ar" : "en");
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const reply = data.answer || data.response || data.reply || data.bot_response || JSON.stringify(data);
+      const rawReply = data.answer || data.response || data.reply || data.bot_response || JSON.stringify(data);
+      const reply = cleanBotResponse(rawReply);
       setMessages(prev => [...prev, { role: "assistant", content: reply, time }]);
     } catch {
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
