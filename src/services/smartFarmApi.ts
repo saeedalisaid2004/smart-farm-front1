@@ -252,12 +252,12 @@ export const getModelsTable = async () => {
 };
 
 export const getAdminReportStats = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/dashboard-stats`);
+  const res = await fetch(`${API_BASE}/admin/reports/dashboard-stats`);
   return res.json();
 };
 
 export const generatePremiumReport = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/generate-pdf`, {
+  const res = await fetch(`${API_BASE}/admin/reports/generate-pdf`, {
     method: "POST",
   });
   const data = await res.json();
