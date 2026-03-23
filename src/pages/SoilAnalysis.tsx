@@ -80,7 +80,7 @@ const SoilAnalysis = () => {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">{t("soil.manualInput")}</h2>
-              <p className="text-sm text-muted-foreground">Enter soil parameters for analysis</p>
+              <p className="text-sm text-muted-foreground">{t("soil.inputDesc")}</p>
             </div>
           </div>
 
@@ -102,7 +102,7 @@ const SoilAnalysis = () => {
 
           <Button className="w-full rounded-xl h-12 text-sm font-semibold shadow-primary" onClick={handleSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FlaskConical className="w-4 h-4 mr-2" />}
-            {loading ? "Analyzing..." : t("soil.analyze")}
+            {loading ? t("soil.analyzing") : t("soil.analyze")}
           </Button>
         </motion.div>
 
@@ -123,7 +123,7 @@ const SoilAnalysis = () => {
                         <AlertCircle className="w-5 h-5 text-destructive" />
                       </div>
                       <div>
-                        <p className="font-medium text-destructive text-sm">Analysis Error</p>
+                        <p className="font-medium text-destructive text-sm">{t("soil.error")}</p>
                         <p className="text-sm text-muted-foreground mt-1">{msg}</p>
                       </div>
                     </div>
@@ -146,7 +146,7 @@ const SoilAnalysis = () => {
                   <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <h3 className="text-lg font-semibold text-foreground">Analysis Result</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t("soil.resultTitle")}</h3>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -156,7 +156,7 @@ const SoilAnalysis = () => {
                             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                               <FlaskConical className="w-4 h-4 text-primary" />
                             </div>
-                            <span className="text-xs text-muted-foreground">Soil Type</span>
+                            <span className="text-xs text-muted-foreground">{t("soil.soilType")}</span>
                           </div>
                           <p className="text-xl font-bold text-foreground capitalize">{soilType}</p>
                         </div>
@@ -170,7 +170,7 @@ const SoilAnalysis = () => {
                               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.icon}`}>
                                 <Droplets className={`w-4 h-4 ${style.text}`} />
                               </div>
-                              <span className="text-xs text-muted-foreground">Fertility Level</span>
+                              <span className="text-xs text-muted-foreground">{t("soil.fertilityLevel")}</span>
                             </div>
                             <p className={`text-xl font-bold capitalize ${style.text}`}>{fertility}</p>
                           </div>
@@ -182,7 +182,7 @@ const SoilAnalysis = () => {
                       <div className="bg-secondary/40 border border-border rounded-2xl p-5">
                         <div className="flex items-center gap-2 mb-2">
                           <Sprout className="w-4 h-4 text-primary" />
-                          <p className="text-xs font-medium text-muted-foreground">Recommendation</p>
+                          <p className="text-xs font-medium text-muted-foreground">{t("soil.recommendation")}</p>
                         </div>
                         <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
                       </div>
