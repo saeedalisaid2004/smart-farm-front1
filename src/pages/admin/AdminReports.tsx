@@ -190,15 +190,17 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.totalPerService")}</p>
               </div>
             </div>
+            <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={usageData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ direction: 'ltr' }} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
+                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "rtl" }} />
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
 
           <motion.div
@@ -216,6 +218,7 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.newRegistrations")}</p>
               </div>
             </div>
+            <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={growthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -225,6 +228,7 @@ const AdminReports = () => {
                 <Line type="monotone" dataKey="users" stroke="hsl(142, 71%, 45%)" strokeWidth={3} dot={{ fill: "hsl(142, 71%, 45%)", r: 5, strokeWidth: 2, stroke: "hsl(var(--card))" }} />
               </LineChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
         </div>
 
@@ -244,6 +248,7 @@ const AdminReports = () => {
               <p className="text-sm text-muted-foreground">{t("adminReports.platformActivity")}</p>
             </div>
           </div>
+          <div dir="ltr">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dailyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -253,6 +258,7 @@ const AdminReports = () => {
               <Line type="monotone" dataKey="activity" stroke="hsl(142, 71%, 45%)" strokeWidth={3} dot={{ fill: "hsl(142, 71%, 45%)", r: 5, strokeWidth: 2, stroke: "hsl(var(--card))" }} />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </motion.div>
 
         {/* Generate Report */}
