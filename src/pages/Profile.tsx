@@ -17,9 +17,26 @@ const getSettingsKey = (userId?: string | number) => {
 
 const getStoredPhone = (userId?: string | number) => {
   try {
-    const stored = localStorage.getItem(getSettingsKey(userId));
-    const parsed = stored ? JSON.parse(stored) : {};
-    return parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "";
+    // Try user-specific key first
+    const userKey = getSettingsKey(userId);
+    const stored = localStorage.getItem(userKey);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.phone && parsed.phone !== "+1234567890") return parsed.phone;
+    }
+    // Fallback: migrate from old generic key
+    const oldStored = localStorage.getItem("dashboard_settings");
+    if (oldStored) {
+      const oldParsed = JSON.parse(oldStored);
+      if (oldParsed.phone && oldParsed.phone !== "+1234567890") {
+        // Migrate to user-specific key
+        if (userId) {
+          localStorage.setItem(userKey, JSON.stringify({ phone: oldParsed.phone }));
+        }
+        return oldParsed.phone;
+      }
+    }
+    return "";
   } catch {
     return "";
   }
