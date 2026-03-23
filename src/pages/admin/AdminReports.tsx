@@ -204,9 +204,31 @@ const AdminReports = () => {
             </div>
             <div dir="ltr">
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={usageData}>
+              <BarChart data={usageData} margin={{ bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="service" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ direction: 'ltr' }} />
+                <XAxis
+                  dataKey="service"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                  interval={0}
+                  tick={({ x, y, payload }) => (
+                    <text x={x} y={y + 10} textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize={10} direction="ltr" style={{ unicodeBidi: "plaintext" }}>
+                      {payload.value.length > 12
+                        ? payload.value.split(" ").reduce((lines: string[], word: string) => {
+                            const last = lines[lines.length - 1];
+                            if (last && (last + " " + word).length <= 14) {
+                              lines[lines.length - 1] = last + " " + word;
+                            } else {
+                              lines.push(word);
+                            }
+                            return lines;
+                          }, []).map((line: string, i: number) => (
+                            <tspan key={i} x={x} dy={i === 0 ? 0 : 14}>{line}</tspan>
+                          ))
+                        : payload.value}
+                    </text>
+                  )}
+                />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
                 <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "rtl" }} />
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
