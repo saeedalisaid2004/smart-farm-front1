@@ -119,7 +119,7 @@ const FruitQuality = () => {
                         <AlertCircle className="w-5 h-5 text-destructive" />
                       </div>
                       <div>
-                        <p className="font-medium text-destructive text-sm">Analysis Error</p>
+                        <p className="font-medium text-destructive text-sm">{t("fruitQuality.error")}</p>
                         <p className="text-sm text-muted-foreground mt-1">{msg}</p>
                       </div>
                     </div>
@@ -133,7 +133,7 @@ const FruitQuality = () => {
                         <AlertCircle className="w-6 h-6 text-amber-500" />
                       </div>
                       <div className="space-y-1.5">
-                        <p className="font-semibold text-amber-600 text-sm">Low Confidence</p>
+                        <p className="font-semibold text-amber-600 text-sm">{t("fruitQuality.lowConfidence")}</p>
                         <p className="text-sm text-muted-foreground leading-relaxed" dir="auto">{result.message}</p>
                         {result.confidence && (
                           <div className="flex items-center gap-2 mt-2">
@@ -162,7 +162,7 @@ const FruitQuality = () => {
                   <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-card">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${isLowGrade ? 'bg-destructive' : 'bg-primary'}`} />
-                      <h3 className="text-lg font-semibold text-foreground">Analysis Results</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t("fruitQuality.results")}</h3>
                     </div>
 
                     {grade && (
@@ -171,7 +171,7 @@ const FruitQuality = () => {
                           <Star className={`w-6 h-6 ${isLowGrade ? 'text-destructive' : 'text-primary'}`} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs text-muted-foreground mb-0.5">Quality Grade</p>
+                          <p className="text-xs text-muted-foreground mb-0.5">{t("fruitQuality.qualityGrade")}</p>
                           <p className={`text-2xl font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{grade}</p>
                           {gradeDescription && (
                             <p className="text-xs text-muted-foreground mt-0.5" dir="auto">{gradeDescription}</p>
@@ -179,7 +179,7 @@ const FruitQuality = () => {
                         </div>
                         {confidence && (
                           <div className="text-right">
-                            <p className="text-xs text-muted-foreground">Confidence</p>
+                            <p className="text-xs text-muted-foreground">{t("fruitQuality.confidence")}</p>
                             <p className={`text-lg font-bold ${isLowGrade ? 'text-destructive' : 'text-primary'}`}>{confidence}</p>
                           </div>
                         )}
@@ -192,7 +192,7 @@ const FruitQuality = () => {
                           <Apple className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-xs text-muted-foreground">Ripeness Level</p>
+                          <p className="text-xs text-muted-foreground">{t("fruitQuality.ripenessLevel")}</p>
                           <p className="font-semibold text-foreground" dir="auto">{ripeness}</p>
                         </div>
                       </div>
@@ -200,7 +200,7 @@ const FruitQuality = () => {
 
                     {defect && (
                       <div className="bg-secondary/40 border border-border rounded-2xl p-4">
-                        <p className="text-xs text-muted-foreground mb-1">Defect Detection</p>
+                        <p className="text-xs text-muted-foreground mb-1">{t("fruitQuality.defectDetection")}</p>
                         <p className="text-sm text-foreground" dir="auto">{defect}</p>
                       </div>
                     )}

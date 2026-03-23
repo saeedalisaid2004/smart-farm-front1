@@ -73,6 +73,13 @@ const translations = {
     "animalWeight.confidence": "Confidence",
     // Fruit Quality
     "fruitQuality.title": "Fruit Quality Analysis",
+    "fruitQuality.results": "Analysis Results",
+    "fruitQuality.qualityGrade": "Quality Grade",
+    "fruitQuality.ripenessLevel": "Ripeness Level",
+    "fruitQuality.defectDetection": "Defect Detection",
+    "fruitQuality.confidence": "Confidence",
+    "fruitQuality.lowConfidence": "Low Confidence",
+    "fruitQuality.error": "Analysis Error",
     // Crop Recommendation
     "crop.title": "Crop Recommendation (ML)",
     "crop.envParams": "Environmental Parameters",
@@ -395,6 +402,13 @@ const translations = {
     "animalWeight.confidence": "نسبة الثقة",
     // Fruit Quality
     "fruitQuality.title": "تحليل جودة الفاكهة",
+    "fruitQuality.results": "نتائج التحليل",
+    "fruitQuality.qualityGrade": "درجة الجودة",
+    "fruitQuality.ripenessLevel": "مستوى النضج",
+    "fruitQuality.defectDetection": "كشف العيوب",
+    "fruitQuality.confidence": "نسبة الثقة",
+    "fruitQuality.lowConfidence": "ثقة منخفضة",
+    "fruitQuality.error": "خطأ في التحليل",
     // Crop Recommendation
     "crop.title": "توصيات المحاصيل (ML)",
     "crop.envParams": "المعايير البيئية",
