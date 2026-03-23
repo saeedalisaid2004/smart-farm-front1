@@ -459,6 +459,13 @@ const translations = {
     "soil.phosphorus": "الفوسفور (P)",
     "soil.potassium": "البوتاسيوم (K)",
     "soil.analyze": "تحليل خصائص التربة",
+    "soil.inputDesc": "أدخل معايير التربة للتحليل",
+    "soil.analyzing": "جاري التحليل...",
+    "soil.resultTitle": "نتيجة التحليل",
+    "soil.soilType": "نوع التربة",
+    "soil.fertilityLevel": "مستوى الخصوبة",
+    "soil.recommendation": "التوصية",
+    "soil.error": "خطأ في التحليل",
     // Chatbot
     "chatbot.title": "مساعد المزرعة الذكي (NLP)",
     "chatbot.heading": "مساعد المزرعة الذكي",
