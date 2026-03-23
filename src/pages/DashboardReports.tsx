@@ -137,10 +137,10 @@ const DashboardReports = () => {
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
               <Filter className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-sm font-semibold text-foreground">{t("adminReports.filters")}</p>
+            <p className="text-sm font-semibold text-foreground">{t("reports.filters")}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t("reports.dateRange")}</p>
             <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-full sm:w-56 bg-secondary/50 border-border">
                 <SelectValue />
