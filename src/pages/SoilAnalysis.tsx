@@ -102,7 +102,7 @@ const SoilAnalysis = () => {
 
           <Button className="w-full rounded-xl h-12 text-sm font-semibold shadow-primary" onClick={handleSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FlaskConical className="w-4 h-4 mr-2" />}
-            {loading ? "Analyzing..." : t("soil.analyze")}
+            {loading ? t("soil.analyzing") : t("soil.analyze")}
           </Button>
         </motion.div>
 
