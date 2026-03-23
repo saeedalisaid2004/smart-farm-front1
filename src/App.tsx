@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/AdminRoute";
 import { lazy, Suspense } from "react";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 import AnalysisSkeleton from "@/components/AnalysisSkeleton";
