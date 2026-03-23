@@ -144,7 +144,7 @@ const DashboardReports = () => {
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.growth || "N/A"}</p>
+                  <p className="text-2xl font-bold text-foreground">{stats?.top_cards?.growth ?? stats?.growth ?? "N/A"}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
                 </div>
               </div>
