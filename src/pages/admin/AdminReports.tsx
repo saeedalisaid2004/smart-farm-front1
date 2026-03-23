@@ -68,8 +68,20 @@ const AdminReports = () => {
     }
   };
 
+  // API returns Arabic presentation-form strings — normalize to English
+  const toEnglishService = (name: string): string => {
+    const lower = name.toLowerCase();
+    if (lower.includes("plant") || lower.includes("نبات") || /\u{FE95}\u{FE8E}\u{FE92}/u.test(name)) return "Plant Disease";
+    if (lower.includes("animal") || lower.includes("ماشي") || /\u{FEF4}\u{FEB7}/u.test(name)) return "Animal Weight";
+    if (lower.includes("crop") || lower.includes("محاصيل") || /\u{FEF4}\u{FEBB}/u.test(name)) return "Crop Rec.";
+    if (lower.includes("soil") || lower.includes("ترب") || /\u{FE91}\u{FEAE}/u.test(name)) return "Soil Analysis";
+    if (lower.includes("fruit") || lower.includes("فاكه") || /\u{FEDB}\u{FE8E}\u{FED4}/u.test(name)) return "Fruit Quality";
+    if (lower.includes("chat") || lower.includes("ذكي") || lower.includes("مساعد") || /\u{FEDB}\u{FEAC}/u.test(name)) return "Chatbot";
+    return name;
+  };
+
   const usageData = data?.charts?.usage_by_service
-    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service, value }))
+    ? Object.entries(data.charts.usage_by_service).map(([service, value]) => ({ service: toEnglishService(service), value }))
     : [
         { service: "Plant Disease", value: 340 },
         { service: "Animal Weight", value: 250 },
@@ -190,35 +202,21 @@ const AdminReports = () => {
                 <p className="text-sm text-muted-foreground">{t("adminReports.totalPerService")}</p>
               </div>
             </div>
-            <div dir="ltr">
+            <div dir="ltr" style={{ direction: "ltr", unicodeBidi: "bidi-override" as const }}>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={usageData} margin={{ bottom: 60 }}>
+              <BarChart data={usageData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis
                   dataKey="service"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={11}
                   interval={0}
-                  tick={({ x, y, payload }) => (
-                    <text x={x} y={y + 10} textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize={10} direction="ltr" style={{ unicodeBidi: "plaintext" }}>
-                      {payload.value.length > 12
-                        ? payload.value.split(" ").reduce((lines: string[], word: string) => {
-                            const last = lines[lines.length - 1];
-                            if (last && (last + " " + word).length <= 14) {
-                              lines[lines.length - 1] = last + " " + word;
-                            } else {
-                              lines.push(word);
-                            }
-                            return lines;
-                          }, []).map((line: string, i: number) => (
-                            <tspan key={i} x={x} dy={i === 0 ? 0 : 14}>{line}</tspan>
-                          ))
-                        : payload.value}
-                    </text>
-                  )}
+                  angle={-25}
+                  textAnchor="end"
+                  height={60}
                 />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "rtl" }} />
+                <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", direction: "ltr" }} />
                 <Bar dataKey="value" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
