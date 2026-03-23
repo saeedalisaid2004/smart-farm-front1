@@ -170,7 +170,7 @@ const SoilAnalysis = () => {
                               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.icon}`}>
                                 <Droplets className={`w-4 h-4 ${style.text}`} />
                               </div>
-                              <span className="text-xs text-muted-foreground">Fertility Level</span>
+                              <span className="text-xs text-muted-foreground">{t("soil.fertilityLevel")}</span>
                             </div>
                             <p className={`text-xl font-bold capitalize ${style.text}`}>{fertility}</p>
                           </div>
