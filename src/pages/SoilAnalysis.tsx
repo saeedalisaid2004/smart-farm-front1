@@ -182,7 +182,7 @@ const SoilAnalysis = () => {
                       <div className="bg-secondary/40 border border-border rounded-2xl p-5">
                         <div className="flex items-center gap-2 mb-2">
                           <Sprout className="w-4 h-4 text-primary" />
-                          <p className="text-xs font-medium text-muted-foreground">Recommendation</p>
+                          <p className="text-xs font-medium text-muted-foreground">{t("soil.recommendation")}</p>
                         </div>
                         <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
                       </div>
