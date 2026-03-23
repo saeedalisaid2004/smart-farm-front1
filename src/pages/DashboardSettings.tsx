@@ -121,7 +121,7 @@ const DashboardSettings = () => {
         setUser({ ...user, name: fullName, email });
       }
 
-      persistSettings({ phone });
+      persistSettings(currentUserId, { phone });
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
