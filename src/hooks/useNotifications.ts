@@ -72,6 +72,11 @@ export function useNotifications() {
     setNotifications(updated);
   };
 
+  const clearAll = () => {
+    saveNotifications([]);
+    setNotifications([]);
+  };
+
   return {
     notifications,
     unreadCount,
