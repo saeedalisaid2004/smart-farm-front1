@@ -155,15 +155,24 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                 <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
                   <div className="flex items-center gap-2">
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={clearAll}
+                        className="text-xs text-destructive hover:text-destructive/80 font-medium flex items-center gap-1 transition-colors"
+                        title={t("header.clearAll")}
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                     {unreadCount > 0 && (
                       <>
                         <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                          {unreadCount} new
+                          {unreadCount} {t("header.new")}
                         </span>
                         <button
                           onClick={markAllAsRead}
                           className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors"
-                          title="Mark all as read"
+                          title={t("header.markAllRead")}
                         >
                           <CheckCheck className="w-3.5 h-3.5" />
                         </button>
