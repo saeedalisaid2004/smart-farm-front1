@@ -72,6 +72,11 @@ export function useNotifications() {
     setNotifications(updated);
   };
 
+  const clearAll = () => {
+    saveNotifications([]);
+    setNotifications([]);
+  };
+
   return {
     notifications,
     unreadCount,
@@ -79,6 +84,7 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    clearAll,
     refetch: sync,
   };
 }

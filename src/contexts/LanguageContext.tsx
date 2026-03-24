@@ -44,6 +44,9 @@ const translations = {
     "settings.profileUpdatedDesc": "Your profile has been updated.",
     // Header
     "header.notifications": "Notifications",
+    "header.new": "new",
+    "header.clearAll": "Clear all",
+    "header.markAllRead": "Mark all as read",
     "header.myAccount": "My Account",
     "header.profile": "Profile",
     "header.logout": "Logout",
@@ -407,6 +410,9 @@ const translations = {
     "settings.profileUpdatedDesc": "تم تحديث ملفك الشخصي.",
     // Header
     "header.notifications": "الإشعارات",
+    "header.new": "جديد",
+    "header.clearAll": "مسح الكل",
+    "header.markAllRead": "تعليم الكل كمقروء",
     "header.myAccount": "حسابي",
     "header.profile": "الملف الشخصي",
     "header.logout": "تسجيل الخروج",
