@@ -84,6 +84,7 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    clearAll,
     refetch: sync,
   };
 }
