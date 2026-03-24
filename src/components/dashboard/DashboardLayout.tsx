@@ -48,7 +48,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
