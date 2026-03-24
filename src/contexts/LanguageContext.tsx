@@ -410,6 +410,9 @@ const translations = {
     "settings.profileUpdatedDesc": "تم تحديث ملفك الشخصي.",
     // Header
     "header.notifications": "الإشعارات",
+    "header.new": "جديد",
+    "header.clearAll": "مسح الكل",
+    "header.markAllRead": "تعليم الكل كمقروء",
     "header.myAccount": "حسابي",
     "header.profile": "الملف الشخصي",
     "header.logout": "تسجيل الخروج",
