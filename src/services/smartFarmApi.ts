@@ -115,9 +115,9 @@ export const estimateAnimalWeight = async (userId: number, image: File) => {
 
 export const recommendCrop = async (
   userId: number,
-  params: { temperature: number; humidity: number; rainfall: number; soil: string }
+  params: { city_name: string; soil: string }
 ) => {
-  const res = await fetch(`${API_BASE}/crops/recommend-crop`, {
+  const res = await fetch(`${API_BASE}/crops/recommend-smart-expert`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ user_id: userId, ...params }),
