@@ -44,6 +44,9 @@ const translations = {
     "settings.profileUpdatedDesc": "Your profile has been updated.",
     // Header
     "header.notifications": "Notifications",
+    "header.new": "new",
+    "header.clearAll": "Clear all",
+    "header.markAllRead": "Mark all as read",
     "header.myAccount": "My Account",
     "header.profile": "Profile",
     "header.logout": "Logout",
