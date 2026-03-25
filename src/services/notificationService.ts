@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 type NotificationType = "success" | "warning" | "error" | "info";
 
 interface SendNotificationParams {
@@ -6,40 +8,25 @@ interface SendNotificationParams {
   type?: NotificationType;
 }
 
-const STORAGE_KEY = "smart_farm_notifications";
-
-function getUserId(): string {
+function getUserId(): string | null {
   try {
     const stored = localStorage.getItem("app_user");
     if (stored) {
       const parsed = JSON.parse(stored);
-      return String(parsed.id || parsed.email || "default");
+      return String(parsed.id || parsed.email || "");
     }
   } catch {}
-  return "default";
+  return null;
 }
 
-function userKey(): string {
-  return `${STORAGE_KEY}_${getUserId()}`;
-}
+export async function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
+  const user_id = getUserId();
+  if (!user_id) return;
 
-export function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
   try {
-    const raw = localStorage.getItem(userKey());
-    const notifications = raw ? JSON.parse(raw) : [];
-    
-    notifications.unshift({
-      id: crypto.randomUUID(),
-      title,
-      description: description || null,
-      type,
-      is_read: false,
-      created_at: new Date().toISOString(),
+    await supabase.functions.invoke("manage-notifications", {
+      body: { action: "create", user_id, title, description, type },
     });
-
-    if (notifications.length > 100) notifications.length = 100;
-
-    localStorage.setItem(userKey(), JSON.stringify(notifications));
     window.dispatchEvent(new Event("notifications-updated"));
   } catch {
     // Silent fail
