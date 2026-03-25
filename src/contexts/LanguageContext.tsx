@@ -603,7 +603,7 @@ const translations = {
     "index.ctaTitle": "ابدأ رحلتك معنا اليوم",
     "index.ctaDesc": "انضم إلى آلاف المستخدمين الذين يديرون أعمالهم بكفاءة عالية",
     "index.ctaButton": "إنشاء حساب مجاني",
-    "index.footer": "© 2024 لوحة التحكم. جميع الحقوق محفوظة.",
+    "index.footer": "© 2026 Smart Farm AI. مشروع تخرج - كلية معهد القاهرة العالي",
     // Admin Dashboard
     "adminDash.title": "لوحة تحكم المسؤول",
     "adminDash.subtitle": "نظرة عامة على النظام وتحليلات منصة المزرعة الذكية",
