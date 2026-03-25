@@ -237,7 +237,7 @@ const translations = {
     "index.ctaTitle": "Start your journey with us today",
     "index.ctaDesc": "Join thousands of users who manage their businesses efficiently",
     "index.ctaButton": "Create Free Account",
-    "index.footer": "© 2024 Dashboard. All rights reserved.",
+    "index.footer": "© 2026 Smart Farm AI. Graduation Project - Faculty of Cairo Higher Institute",
     // Admin Dashboard
     "adminDash.title": "Admin Dashboard",
     "adminDash.subtitle": "System-wide overview and analytics for Smart Farm AI platform",
