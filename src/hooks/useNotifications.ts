@@ -50,10 +50,47 @@ export function useNotifications() {
   useEffect(() => {
     fetchNotifications();
 
-    // Listen for new notifications created locally
     const handler = () => fetchNotifications();
     window.addEventListener("notifications-updated", handler);
-    return () => window.removeEventListener("notifications-updated", handler);
+
+    // Realtime subscription
+    const userId = getUserId();
+    const channel = supabase
+      .channel("notifications-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        (payload) => {
+          const row = payload.new as Notification;
+          if (row.user_id === userId) {
+            setNotifications((prev) => [row, ...prev].slice(0, 100));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "notifications" },
+        (payload) => {
+          const row = payload.new as Notification;
+          if (row.user_id === userId) {
+            setNotifications((prev) => prev.map((n) => (n.id === row.id ? row : n)));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "notifications" },
+        (payload) => {
+          const oldRow = payload.old as { id: string };
+          setNotifications((prev) => prev.filter((n) => n.id !== oldRow.id));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener("notifications-updated", handler);
+      supabase.removeChannel(channel);
+    };
   }, [fetchNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
