@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
   id: string;
@@ -9,82 +10,82 @@ export interface Notification {
   created_at: string;
 }
 
-const STORAGE_KEY = "smart_farm_notifications";
-
-function getUserId(): string {
+function getUserId(): string | null {
   try {
     const stored = localStorage.getItem("app_user");
     if (stored) {
       const parsed = JSON.parse(stored);
-      return String(parsed.id || parsed.email || "default");
+      return String(parsed.id || parsed.email || "");
     }
   } catch {}
-  return "default";
+  return null;
 }
 
-function userKey(): string {
-  return `${STORAGE_KEY}_${getUserId()}`;
-}
+async function callNotificationApi(action: string, extra: Record<string, unknown> = {}) {
+  const user_id = getUserId();
+  if (!user_id) return null;
 
-function getStoredNotifications(): Notification[] {
-  try {
-    const raw = localStorage.getItem(userKey());
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+  const { data, error } = await supabase.functions.invoke("manage-notifications", {
+    body: { action, user_id, ...extra },
+  });
+
+  if (error) {
+    console.error("Notification API error:", error);
+    return null;
   }
-}
-
-function saveNotifications(notifications: Notification[]) {
-  localStorage.setItem(userKey(), JSON.stringify(notifications));
-  window.dispatchEvent(new Event("notifications-updated"));
+  return data;
 }
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<Notification[]>(getStoredNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const sync = useCallback(() => {
-    setNotifications(getStoredNotifications());
+  const fetchNotifications = useCallback(async () => {
+    setLoading(true);
+    const data = await callNotificationApi("list");
+    if (Array.isArray(data)) setNotifications(data);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("notifications-updated", sync);
-    return () => window.removeEventListener("notifications-updated", sync);
-  }, [sync]);
+    fetchNotifications();
+
+    // Listen for new notifications created locally
+    const handler = () => fetchNotifications();
+    window.addEventListener("notifications-updated", handler);
+    return () => window.removeEventListener("notifications-updated", handler);
+  }, [fetchNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const markAsRead = (id: string) => {
-    const updated = notifications.map((n) => (n.id === id ? { ...n, is_read: true } : n));
-    saveNotifications(updated);
-    setNotifications(updated);
+  const markAsRead = async (id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+    await callNotificationApi("mark_read", { notification_id: id });
   };
 
-  const markAllAsRead = () => {
-    const updated = notifications.map((n) => ({ ...n, is_read: true }));
-    saveNotifications(updated);
-    setNotifications(updated);
+  const markAllAsRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    await callNotificationApi("mark_all_read");
   };
 
-  const deleteNotification = (id: string) => {
-    const updated = notifications.filter((n) => n.id !== id);
-    saveNotifications(updated);
-    setNotifications(updated);
+  const deleteNotification = async (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    await callNotificationApi("delete", { notification_id: id });
   };
 
-  const clearAll = () => {
-    saveNotifications([]);
+  const clearAll = async () => {
     setNotifications([]);
+    await callNotificationApi("clear_all");
   };
 
   return {
     notifications,
     unreadCount,
-    loading: false,
+    loading,
     markAsRead,
     markAllAsRead,
     deleteNotification,
     clearAll,
-    refetch: sync,
+    refetch: fetchNotifications,
   };
 }
