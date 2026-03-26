@@ -270,26 +270,36 @@ export const generatePremiumReport = async () => {
   return data;
 };
 
-// ============ User Notification Settings ============
+// ============ Notification Settings ============
 
-export const getUserNotificationSettings = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/admin/users/settings/notifications/${userId}`, {
-    method: "PATCH",
-  });
+export const getUserNotifications = async (userId: number) => {
+  const res = await fetch(`${API_BASE}/notifications/notifications/${userId}`);
   return res.json();
 };
 
-export const updateUserNotificationSettings = async (
+export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const params = new URLSearchParams();
-  if (settings.push !== undefined) params.set("push", String(settings.push));
-  if (settings.email !== undefined) params.set("email", String(settings.email));
-  const res = await fetch(
-    `${API_BASE}/admin/users/settings/notifications/${userId}?${params.toString()}`,
-    { method: "PATCH" }
-  );
+  const res = await fetch(`${API_BASE}/notifications/notifications/admin-settings/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  });
+  if (!res.ok) throw new Error("Failed to update admin notification settings");
+  return res.json();
+};
+
+export const updateFarmerNotificationSettings = async (
+  userId: number,
+  settings: { push?: boolean; email?: boolean }
+) => {
+  const res = await fetch(`${API_BASE}/notifications/notifications/farmer-settings/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  });
+  if (!res.ok) throw new Error("Failed to update farmer notification settings");
   return res.json();
 };
 
