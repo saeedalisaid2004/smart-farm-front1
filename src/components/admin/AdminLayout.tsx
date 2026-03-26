@@ -237,15 +237,6 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteNotification(n.id);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-all"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
                             </div>
                           </motion.div>
                         );
