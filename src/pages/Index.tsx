@@ -126,13 +126,13 @@ const Index = () => {
                 className="flex flex-col sm:flex-row items-center justify-center gap-4"
               >
                 <Link to="/dashboard">
-                  <Button size="lg" className="text-base px-8 h-13 shadow-primary rounded-full font-semibold gap-2 group">
+                  <Button size="lg" className="text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-13 shadow-primary rounded-full font-semibold gap-2 group w-full sm:w-auto">
                     {t("index.tryFree")}
                     <ArrowLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? "rotate-180 group-hover:translate-x-1" : ""}`} />
                   </Button>
                 </Link>
                 <Link to="/login">
-                  <Button size="lg" variant="outline" className="text-base px-8 h-13 rounded-full font-medium border-2">
+                  <Button size="lg" variant="outline" className="text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-13 rounded-full font-medium border-2 w-full sm:w-auto">
                     {t("index.login")}
                   </Button>
                 </Link>
