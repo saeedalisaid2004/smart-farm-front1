@@ -128,9 +128,9 @@ const Profile = () => {
     <DashboardLayout title={t("profile.title")}>
       <div className="max-w-3xl mx-auto">
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="h-28 gradient-primary relative" />
-          <div className="px-8 pb-8">
-            <div className="flex items-end gap-6 -mt-8 mb-6">
+          <div className="h-20 sm:h-28 gradient-primary relative" />
+          <div className="px-4 sm:px-8 pb-6 sm:pb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 -mt-8 mb-6">
               <div className="relative flex-shrink-0">
                 <div className="w-24 h-24 rounded-2xl border-4 border-card bg-secondary flex items-center justify-center overflow-hidden">
                   {avatarUrl ? (
@@ -169,9 +169,9 @@ const Profile = () => {
                 )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>
-              <div className="pb-2">
-                <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
-                <p className="text-muted-foreground">{t("common.farmer")}</p>
+              <div className="pb-2 text-center sm:text-start">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">{userName}</h2>
+                <p className="text-muted-foreground text-sm">{t("common.farmer")}</p>
               </div>
             </div>
 

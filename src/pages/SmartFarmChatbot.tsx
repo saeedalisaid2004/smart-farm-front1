@@ -115,7 +115,7 @@ const SmartFarmChatbot = () => {
 
   return (
     <DashboardLayout title={t("chatbot.title")}>
-      <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-10rem)]">
+      <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)]">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

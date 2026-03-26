@@ -60,7 +60,7 @@ const FruitQuality = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-card border border-border rounded-2xl p-8 shadow-card"
+          className="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-card"
         >
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
@@ -68,7 +68,7 @@ const FruitQuality = () => {
             </div>
           </div>
           <div
-            className="border-2 border-dashed border-border rounded-2xl p-10 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-all duration-300 group"
+            className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 flex flex-col items-center justify-center mb-4 sm:mb-6 cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-all duration-300 group"
             onClick={() => fileRef.current?.click()}
           >
             {preview ? (
@@ -90,7 +90,7 @@ const FruitQuality = () => {
             )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button variant="outline" className="flex-1 rounded-xl h-12 text-sm font-medium border-2" onClick={() => fileRef.current?.click()}>
               <Upload className="w-4 h-4 mr-2" />
               {t("common.chooseImage")}

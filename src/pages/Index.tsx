@@ -54,30 +54,30 @@ const Index = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative z-10 container mx-auto px-6 py-6"
+          className="relative z-10 container mx-auto px-4 sm:px-6 py-4 sm:py-6"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
-                <Leaf className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+                <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground tracking-tight">{t("index.brand")}</span>
+              <span className="text-lg sm:text-xl font-bold text-foreground tracking-tight">{t("index.brand")}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => document.documentElement.classList.toggle("dark")}
-                className="w-9 h-9 rounded-xl bg-secondary/80 backdrop-blur-sm hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-secondary/80 backdrop-blur-sm hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
               >
                 <Moon className="w-4 h-4 dark:hidden" />
                 <Sun className="w-4 h-4 hidden dark:block" />
               </button>
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-foreground font-medium rounded-full px-5">
+                <Button variant="ghost" size="sm" className="text-foreground font-medium rounded-full px-3 sm:px-5 text-xs sm:text-sm">
                   {t("index.login")}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="shadow-primary rounded-full px-5 font-medium">
+                <Button size="sm" className="shadow-primary rounded-full px-3 sm:px-5 font-medium text-xs sm:text-sm">
                   {t("index.register")}
                 </Button>
               </Link>
@@ -106,7 +106,7 @@ const Index = () => {
               <motion.h1
                 custom={1}
                 variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-foreground mb-6 leading-[1.1] tracking-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-foreground mb-4 sm:mb-6 leading-[1.1] tracking-tight"
               >
                 {t("index.heroTitle1")}{" "}
                 <span className="text-gradient">{t("index.heroTitle2")}</span>
@@ -115,7 +115,7 @@ const Index = () => {
               <motion.p
                 custom={2}
                 variants={fadeUp}
-                className="text-lg lg:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
+                className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-2"
               >
                 {t("index.heroDesc")}
               </motion.p>
@@ -126,13 +126,13 @@ const Index = () => {
                 className="flex flex-col sm:flex-row items-center justify-center gap-4"
               >
                 <Link to="/dashboard">
-                  <Button size="lg" className="text-base px-8 h-13 shadow-primary rounded-full font-semibold gap-2 group">
+                  <Button size="lg" className="text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-13 shadow-primary rounded-full font-semibold gap-2 group w-full sm:w-auto">
                     {t("index.tryFree")}
                     <ArrowLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? "rotate-180 group-hover:translate-x-1" : ""}`} />
                   </Button>
                 </Link>
                 <Link to="/login">
-                  <Button size="lg" variant="outline" className="text-base px-8 h-13 rounded-full font-medium border-2">
+                  <Button size="lg" variant="outline" className="text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-13 rounded-full font-medium border-2 w-full sm:w-auto">
                     {t("index.login")}
                   </Button>
                 </Link>
@@ -142,7 +142,7 @@ const Index = () => {
               <motion.div
                 custom={4}
                 variants={fadeUp}
-                className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-20 max-w-xl mx-auto"
+                className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-20 max-w-xl mx-auto"
               >
                 {stats.map((stat, i) => (
                   <div key={i} className="text-center">
@@ -167,9 +167,9 @@ const Index = () => {
       </header>
 
       {/* Features */}
-      <section className="py-24 relative">
+      <section className="py-12 sm:py-24 relative">
         <div className="absolute inset-0 gradient-mesh" />
-        <div className="container mx-auto px-6 relative">
+        <div className="container mx-auto px-4 sm:px-6 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -207,8 +207,8 @@ const Index = () => {
       </section>
 
       {/* How it works */}
-      <section className="py-24 bg-card/50">
-        <div className="container mx-auto px-6">
+      <section className="py-12 sm:py-24 bg-card/50">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -254,14 +254,14 @@ const Index = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
+      <section className="py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="gradient-primary rounded-3xl p-12 lg:p-20 text-center relative overflow-hidden"
+            className="gradient-primary rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-20 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-10 right-10 w-60 h-60 bg-white rounded-full blur-[80px]" />
@@ -269,8 +269,8 @@ const Index = () => {
             </div>
             <div className="absolute inset-0 bg-grid opacity-10" />
             <div className="relative z-10">
-              <h2 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-6">{t("index.ctaTitle")}</h2>
-              <p className="text-primary-foreground/80 text-lg mb-10 max-w-xl mx-auto">{t("index.ctaDesc")}</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-primary-foreground mb-4 sm:mb-6">{t("index.ctaTitle")}</h2>
+              <p className="text-primary-foreground/80 text-base sm:text-lg mb-6 sm:mb-10 max-w-xl mx-auto">{t("index.ctaDesc")}</p>
               <Link to="/register">
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-base px-10 h-13 rounded-full font-semibold shadow-lg">
                   {t("index.ctaButton")}
@@ -282,8 +282,8 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-10">
-        <div className="container mx-auto px-6 text-center">
+      <footer className="bg-card border-t border-border py-8 sm:py-10">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-9 h-9 gradient-primary rounded-lg flex items-center justify-center">
               <Leaf className="w-5 h-5 text-primary-foreground" />

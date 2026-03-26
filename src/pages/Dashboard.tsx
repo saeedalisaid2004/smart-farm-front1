@@ -66,12 +66,12 @@ const Dashboard = () => {
           transition={{ duration: 0.4 }}
         >
           
-          <h1 className="text-2xl font-bold text-foreground mb-1">{t("dashboard.welcomeUser")}, {userName} 👋</h1>
-          <p className="text-muted-foreground mb-6">{t("dashboard.useAI")}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-1">{t("dashboard.welcomeUser")}, {userName} 👋</h1>
+          <p className="text-sm text-muted-foreground mb-4 sm:mb-6">{t("dashboard.useAI")}</p>
         </motion.div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
           {statCards.map((s, i) => (
             <motion.div
               key={s.label}
@@ -127,7 +127,7 @@ const Dashboard = () => {
         )}
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {features.map((f, i) => (
             <motion.div
               key={f.path}

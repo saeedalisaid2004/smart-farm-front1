@@ -59,7 +59,7 @@ const CropRecommendation = () => {
     <DashboardLayout title={t("crop.title")}>
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Input Form */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-card border border-border rounded-2xl p-8 shadow-card">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-card">
           <div className="flex items-center gap-4 mb-8">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
               <Sprout className="w-6 h-6 text-white" />
