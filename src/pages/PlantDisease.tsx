@@ -70,7 +70,7 @@ const PlantDisease = () => {
             </div>
           </div>
           <div
-            className="border-2 border-dashed border-border rounded-2xl p-10 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-all duration-300 group"
+            className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 flex flex-col items-center justify-center mb-4 sm:mb-6 cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-all duration-300 group"
             onClick={() => fileRef.current?.click()}
           >
             {preview ? (
