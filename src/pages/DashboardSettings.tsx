@@ -278,30 +278,19 @@ const DashboardSettings = () => {
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.emailNotifications")}</Label>
+                <Label className="text-foreground">Push Notifications</Label>
                 <Switch
-                  checked={notifications.emailNotifications}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, emailNotifications: checked }))
-                  }
+                  disabled={notifLoading}
+                  checked={notifications.push}
+                  onCheckedChange={(checked) => handleNotificationToggle("push", checked)}
                 />
               </div>
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.analysisAlerts")}</Label>
+                <Label className="text-foreground">Email Alerts</Label>
                 <Switch
-                  checked={notifications.analysisAlerts}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, analysisAlerts: checked }))
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.weeklyReport")}</Label>
-                <Switch
-                  checked={notifications.weeklyReport}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, weeklyReport: checked }))
-                  }
+                  disabled={notifLoading}
+                  checked={notifications.email}
+                  onCheckedChange={(checked) => handleNotificationToggle("email", checked)}
                 />
               </div>
             </div>
