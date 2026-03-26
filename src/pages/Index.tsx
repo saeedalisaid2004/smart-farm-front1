@@ -207,8 +207,8 @@ const Index = () => {
       </section>
 
       {/* How it works */}
-      <section className="py-24 bg-card/50">
-        <div className="container mx-auto px-6">
+      <section className="py-12 sm:py-24 bg-card/50">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
