@@ -79,7 +79,8 @@ const DashboardSettings = () => {
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [notifLoading, setNotifLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
