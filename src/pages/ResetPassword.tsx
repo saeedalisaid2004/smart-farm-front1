@@ -102,6 +102,7 @@ const ResetPassword = () => {
                   placeholder={t("reset.newPasswordPlaceholder")}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 pr-11"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
