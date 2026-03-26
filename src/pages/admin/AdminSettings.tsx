@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
