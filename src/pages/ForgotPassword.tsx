@@ -20,20 +20,20 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      toast({ variant: "destructive", title: "Please enter your email" });
+      toast({ variant: "destructive", title: t("forgot.email") });
       return;
     }
     setLoading(true);
     try {
       const data = await apiForgotPassword(email);
       if (data.detail && data.detail.toLowerCase().includes("not found")) {
-        toast({ variant: "destructive", title: "Email not found" });
+        toast({ variant: "destructive", title: t("forgot.notFound") });
       } else {
         setSent(true);
-        toast({ title: "OTP Sent", description: "Check your email for the reset code" });
+        toast({ title: t("forgot.sent"), description: t("forgot.checkEmail") });
       }
     } catch {
-      toast({ variant: "destructive", title: "Something went wrong" });
+      toast({ variant: "destructive", title: t("forgot.error") });
     } finally {
       setLoading(false);
     }
@@ -55,25 +55,25 @@ const ForgotPassword = () => {
           <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-5 shadow-glow">
             <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Forgot Password</h1>
-          <p className="text-muted-foreground text-sm mt-1">Enter your email to receive a reset code</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("forgot.title")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("forgot.subtitle")}</p>
         </div>
 
         {!sent ? (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground font-medium text-sm">Email</Label>
+              <Label htmlFor="email" className="text-foreground font-medium text-sm">{t("forgot.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("forgot.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4"
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-semibold shadow-primary">
-              {loading ? "Sending..." : "Send Reset Code"}
+              {loading ? t("forgot.sending") : t("forgot.send")}
             </Button>
           </form>
         ) : (
@@ -81,17 +81,17 @@ const ForgotPassword = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
               <Mail className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-foreground font-medium">Reset code sent!</p>
-            <p className="text-sm text-muted-foreground">Check your email for the OTP code</p>
+            <p className="text-foreground font-medium">{t("forgot.sent")}</p>
+            <p className="text-sm text-muted-foreground">{t("forgot.checkEmail")}</p>
             <Button onClick={() => navigate("/reset-password", { state: { email } })} className="w-full h-12 rounded-xl text-base font-semibold">
-              Enter Reset Code
+              {t("forgot.enterCode")}
             </Button>
           </div>
         )}
 
         <div className="mt-6 text-center">
           <Link to="/login" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" /> Back to Login
+            <ArrowLeft className="w-4 h-4" /> {t("forgot.backToLogin")}
           </Link>
         </div>
       </motion.div>
