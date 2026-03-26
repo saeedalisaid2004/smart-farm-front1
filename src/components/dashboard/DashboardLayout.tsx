@@ -285,6 +285,12 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                     )}
                     <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full border-2 border-card" />
                   </div>
+                  <div className="hidden md:flex flex-col items-start">
+                    <span className="text-sm font-semibold text-foreground leading-tight">{userName}</span>
+                    <span className="text-xs text-muted-foreground leading-tight capitalize">
+                      {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
+                    </span>
+                  </div>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48 rounded-xl">
