@@ -15,7 +15,7 @@ import {
   getUserManagementData, searchUsers as apiSearchUsers,
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
-  getUserNotificationSettings, updateUserNotificationSettings,
+  updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
 import { sendNotification } from "@/services/notificationService";
 import { Switch } from "@/components/ui/switch";
