@@ -212,6 +212,9 @@ const translations = {
     "forgot.enterCode": "Enter Reset Code",
     "forgot.notFound": "Email not found",
     "forgot.error": "Something went wrong",
+    "forgot.timeout": "The server is not responding. It may be sleeping — please try again in a minute.",
+    "api.timeout": "The server is not responding. Please try again shortly.",
+    "api.connectionError": "Could not connect to the server. Please check your internet connection.",
     "forgot.backToLogin": "Back to Login",
     // Reset Password
     "reset.title": "Reset Password",

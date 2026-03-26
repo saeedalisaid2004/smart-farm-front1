@@ -67,7 +67,7 @@ const toUrlEncoded = (data: Record<string, string | number>) => {
 // ============ Authentication ============
 
 export const apiForgotPassword = async (email: string) => {
-  const res = await fetch(`${API_BASE}/forgot-password`, {
+  const res = await fetchWithTimeout(`${API_BASE}/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ email }),
@@ -76,7 +76,7 @@ export const apiForgotPassword = async (email: string) => {
 };
 
 export const apiResetPassword = async (email: string, otp: string, new_password: string) => {
-  const res = await fetch(`${API_BASE}/reset-password`, {
+  const res = await fetchWithTimeout(`${API_BASE}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ email, otp, new_password }),
@@ -85,7 +85,7 @@ export const apiResetPassword = async (email: string, otp: string, new_password:
 };
 
 export const apiRegister = async (name: string, email: string, password: string) => {
-  const res = await fetch(`${API_BASE}/register`, {
+  const res = await fetchWithTimeout(`${API_BASE}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ name, email, password }),
@@ -94,7 +94,7 @@ export const apiRegister = async (name: string, email: string, password: string)
 };
 
 export const apiLogin = async (email: string, password: string) => {
-  const res = await fetch(`${API_BASE}/login`, {
+  const res = await fetchWithTimeout(`${API_BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ email, password }),
@@ -107,7 +107,7 @@ export const apiLogin = async (email: string, password: string) => {
 };
 
 export const apiLogout = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/logout/${userId}`, { method: "POST" });
+  const res = await fetchWithTimeout(`${API_BASE}/logout/${userId}`, { method: "POST" });
   setExternalUserId(null);
   return res.json();
 };
@@ -127,7 +127,7 @@ export const apiSaveSettings = async (
     }
   });
 
-  const res = await fetch(`${API_BASE}/save-all-settings/${userId}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/save-all-settings/${userId}`, {
     method: "PUT",
     body: fd,
   });
@@ -144,13 +144,13 @@ export const buildProfileImageUrl = (profileImagePath?: string): string | null =
 
 export const detectPlantDisease = async (userId: number, image: File) => {
   const fd = toFormData({ user_id: userId, image });
-  const res = await fetch(`${API_BASE}/plants/detect`, { method: "POST", body: fd });
+  const res = await fetchWithTimeout(`${API_BASE}/plants/detect`, { method: "POST", body: fd });
   return res.json();
 };
 
 export const estimateAnimalWeight = async (userId: number, image: File) => {
   const fd = toFormData({ user_id: userId, image });
-  const res = await fetch(`${API_BASE}/animals/estimate-weight`, { method: "POST", body: fd });
+  const res = await fetchWithTimeout(`${API_BASE}/animals/estimate-weight`, { method: "POST", body: fd });
   return res.json();
 };
 
@@ -158,7 +158,7 @@ export const recommendCrop = async (
   userId: number,
   params: { city_name: string; soil: string }
 ) => {
-  const res = await fetch(`${API_BASE}/crops/recommend-smart-expert`, {
+  const res = await fetchWithTimeout(`${API_BASE}/crops/recommend-smart-expert`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ user_id: userId, ...params }),
@@ -170,7 +170,7 @@ export const analyzeSoil = async (
   userId: number,
   params: { ph: number; moisture: number; n: number; p: number; k: number }
 ) => {
-  const res = await fetch(`${API_BASE}/soil/analyze-soil`, {
+  const res = await fetchWithTimeout(`${API_BASE}/soil/analyze-soil`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ user_id: userId, ...params }),
@@ -180,14 +180,14 @@ export const analyzeSoil = async (
 
 export const analyzeFruit = async (userId: number, image: File) => {
   const fd = toFormData({ user_id: userId, image });
-  const res = await fetch(`${API_BASE}/fruits/analyze-fruit`, { method: "POST", body: fd });
+  const res = await fetchWithTimeout(`${API_BASE}/fruits/analyze-fruit`, { method: "POST", body: fd });
   return res.json();
 };
 
 // ============ Chatbot ============
 
 export const askFarmBot = async (userId: number, question: string, language = "ar") => {
-  const res = await fetch(`${API_BASE}/chatbot/ask-farm-bot`, {
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/ask-farm-bot`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ user_id: userId, question, language }),
@@ -196,66 +196,66 @@ export const askFarmBot = async (userId: number, question: string, language = "a
 };
 
 export const getChatHistory = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/chatbot/chat-history/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/chat-history/${userId}`);
   return res.json();
 };
 
 // ============ Reports ============
 
 export const getUserReportSummary = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/reports/user-summary/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/reports/user-summary/${userId}`);
   return res.json();
 };
 
 export const getFarmerStats = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/farmer_reports/stats/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/stats/${userId}`);
   return res.json();
 };
 
 export const generateFarmerPdf = async (userId: number, period: string = "all") => {
-  const res = await fetch(`${API_BASE}/farmer_reports/generate/${userId}?period=${encodeURIComponent(period)}`, { method: "POST" });
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/generate/${userId}?period=${encodeURIComponent(period)}`, { method: "POST" });
   return res.json();
 };
 
 export const listFarmerReports = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/farmer_reports/list/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/list/${userId}`);
   return res.json();
 };
 
 // ============ Admin ============
 
 export const getAdminDashboardStats = async () => {
-  const res = await fetch(`${API_BASE}/admin/dashboard/stats`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/dashboard/stats`);
   return res.json();
 };
 
 export const getUserManagementData = async () => {
-  const res = await fetch(`${API_BASE}/admin/users/summary-and-list`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/summary-and-list`);
   return res.json();
 };
 
 export const searchUsers = async (query: string) => {
-  const res = await fetch(`${API_BASE}/admin/users/search?query=${encodeURIComponent(query)}`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/search?query=${encodeURIComponent(query)}`);
   return res.json();
 };
 
 export const deleteUser = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/admin/users/delete/${userId}`, { method: "DELETE" });
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/delete/${userId}`, { method: "DELETE" });
   return res.json();
 };
 
 export const deactivateUser = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/admin/users/deactivate/${userId}`, { method: "PATCH" });
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/deactivate/${userId}`, { method: "PATCH" });
   return res.json();
 };
 
 export const activateUser = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/admin/users/activate/${userId}`, { method: "PATCH" });
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/activate/${userId}`, { method: "PATCH" });
   return res.json();
 };
 
 export const promoteToAdmin = async (email: string) => {
-  const res = await fetch(`${API_BASE}/admin/users/promote-to-admin`, {
+  const res = await fetchWithTimeout(`${API_BASE}/admin/users/promote-to-admin`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ email }),
@@ -264,41 +264,41 @@ export const promoteToAdmin = async (email: string) => {
 };
 
 export const getSystemStatus = async () => {
-  const res = await fetch(`${API_BASE}/admin/system/admin/system/status`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/status`);
   return res.json();
 };
 
 export const getSystemSettings = async () => {
-  const res = await fetch(`${API_BASE}/admin/system/admin/system/settings`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/settings`);
   return res.json();
 };
 
 export const toggleSystemSetting = async (settingName: string) => {
-  const res = await fetch(`${API_BASE}/admin/system/admin/system/settings/toggle/${settingName}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/settings/toggle/${settingName}`, {
     method: "POST",
   });
   return res.json();
 };
 
 export const toggleService = async (moduleName: string) => {
-  const res = await fetch(`${API_BASE}/admin/system/toggle-service/${moduleName}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/toggle-service/${moduleName}`, {
     method: "POST",
   });
   return res.json();
 };
 
 export const getModelsTable = async () => {
-  const res = await fetch(`${API_BASE}/admin/system/models-table`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/models-table`);
   return res.json();
 };
 
 export const getAdminReportStats = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/dashboard-stats`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/reports/admin/reports/dashboard-stats`);
   return res.json();
 };
 
 export const generatePremiumReport = async () => {
-  const res = await fetch(`${API_BASE}/admin/reports/admin/reports/generate-pdf`, {
+  const res = await fetchWithTimeout(`${API_BASE}/admin/reports/admin/reports/generate-pdf`, {
     method: "POST",
   });
   const data = await res.json();
@@ -314,7 +314,7 @@ export const generatePremiumReport = async () => {
 // ============ Notification Settings ============
 
 export const getUserNotifications = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/notifications/notifications/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/${userId}`);
   return res.json();
 };
 
@@ -322,7 +322,7 @@ export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const res = await fetch(`${API_BASE}/notifications/notifications/admin-settings/${userId}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/admin-settings/${userId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(settings),
@@ -335,7 +335,7 @@ export const updateFarmerNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const res = await fetch(`${API_BASE}/notifications/notifications/farmer-settings/${userId}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/farmer-settings/${userId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(settings),
@@ -347,7 +347,7 @@ export const updateFarmerNotificationSettings = async (
 // ============ Alternative Farmer Report ============
 
 export const generateFarmerReportAlt = async (userId: number) => {
-  const res = await fetch(`${API_BASE}/reports/generate-farmer-report/${userId}`, {
+  const res = await fetchWithTimeout(`${API_BASE}/reports/generate-farmer-report/${userId}`, {
     method: "POST",
   });
   const data = await res.json();
