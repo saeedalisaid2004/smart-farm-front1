@@ -43,6 +43,24 @@ const toUrlEncoded = (data: Record<string, string | number>) => {
 
 // ============ Authentication ============
 
+export const apiForgotPassword = async (email: string) => {
+  const res = await fetch(`${API_BASE}/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: toUrlEncoded({ email }),
+  });
+  return res.json();
+};
+
+export const apiResetPassword = async (email: string, otp: string, new_password: string) => {
+  const res = await fetch(`${API_BASE}/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: toUrlEncoded({ email, otp, new_password }),
+  });
+  return res.json();
+};
+
 export const apiRegister = async (name: string, email: string, password: string) => {
   const res = await fetch(`${API_BASE}/register`, {
     method: "POST",
