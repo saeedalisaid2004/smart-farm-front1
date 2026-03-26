@@ -175,7 +175,9 @@ const Profile = () => {
                 <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
                 <div className="flex items-center gap-2 justify-center sm:justify-start mt-1">
                   <Shield className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-muted-foreground font-medium">{t("common.farmer")}</span>
+                  <span className="text-sm text-muted-foreground font-medium capitalize">
+                    {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
+                  </span>
                 </div>
               </div>
             </div>
