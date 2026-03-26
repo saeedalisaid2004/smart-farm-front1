@@ -171,7 +171,7 @@ const Profile = () => {
                 )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>
-              <div className="pb-2 text-center sm:text-start">
+              <div className="pt-4 pb-2 text-center sm:text-start">
                 <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
                 <div className="flex items-center gap-2 justify-center sm:justify-start mt-1">
                   <Shield className="w-4 h-4 text-primary" />
