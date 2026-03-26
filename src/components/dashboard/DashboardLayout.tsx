@@ -223,7 +223,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                               "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
-                            onClick={() => !n.is_read && markAsRead(n.id)}
+                            onClick={() => {}}
                           >
                             <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
                               <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
