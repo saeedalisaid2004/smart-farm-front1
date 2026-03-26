@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiSaveSettings, getExternalUserId, getUserNotificationSettings, updateUserNotificationSettings } from "@/services/smartFarmApi";
+import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
 import {
   Select,
   SelectContent,
@@ -82,6 +83,7 @@ const DashboardSettings = () => {
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [notifLoading, setNotifLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
 
   useEffect(() => {
     if (!user) return;
@@ -291,6 +293,16 @@ const DashboardSettings = () => {
                   disabled={notifLoading}
                   checked={notifications.email}
                   onCheckedChange={(checked) => handleNotificationToggle("email", checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border">
+                <Label className="text-foreground">Analysis Completion Alerts</Label>
+                <Switch
+                  checked={analysisAlerts}
+                  onCheckedChange={(checked) => {
+                    setAnalysisAlerts(checked);
+                    setAnalysisAlertsEnabled(checked);
+                  }}
                 />
               </div>
             </div>
