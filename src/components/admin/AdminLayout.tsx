@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, Monitor, BarChart3, Settings, Bell, Moon, Sun,
-  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X, Trash2, CheckCheck
+  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,7 +40,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children, title }: AdminLayoutProps) => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -197,18 +197,9 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
-                      <>
-                        <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                          {unreadCount} new
-                        </span>
-                        <button
-                          onClick={markAllAsRead}
-                          className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors"
-                          title="Mark all as read"
-                        >
-                          <CheckCheck className="w-3.5 h-3.5" />
-                        </button>
-                      </>
+                      <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
+                        {unreadCount} new
+                      </span>
                     )}
                   </div>
                 </div>
@@ -232,7 +223,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                               "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
-                            onClick={() => !n.is_read && markAsRead(n.id)}
+                            onClick={() => {}}
                           >
                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
                               <Icon className={cn("w-5 h-5", color)} />
@@ -246,15 +237,6 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteNotification(n.id);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-all"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
                             </div>
                           </motion.div>
                         );
