@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, getUserNotificationSettings, updateUserNotificationSettings } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
@@ -21,15 +21,13 @@ const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
 type NotificationSettings = {
-  emailNotifications: boolean;
-  analysisAlerts: boolean;
-  weeklyReport: boolean;
+  push: boolean;
+  email: boolean;
 };
 
 const defaultNotifications: NotificationSettings = {
-  emailNotifications: false,
-  analysisAlerts: true,
-  weeklyReport: true,
+  push: true,
+  email: true,
 };
 
 const getStoredSettings = (userId?: string | number) => {
@@ -81,27 +79,56 @@ const DashboardSettings = () => {
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [notifLoading, setNotifLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-
     setFullName(user.name || "Farm Owner");
     setEmail(user.email || "owner@smartfarm.com");
   }, [user]);
+
+  // Fetch notification settings from API
+  useEffect(() => {
+    const userId = getExternalUserId();
+    if (!userId) return;
+    setNotifLoading(true);
+    getUserNotificationSettings(userId)
+      .then((data) => {
+        if (data?.push !== undefined || data?.email !== undefined) {
+          setNotifications({
+            push: data.push ?? true,
+            email: data.email ?? true,
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setNotifLoading(false));
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  useEffect(() => {
-    persistSettings(currentUserId, { notifications });
-  }, [notifications]);
-
   const handleThemeChange = (value: "light" | "dark") => {
     setTheme(value);
+  };
+
+  const handleNotificationToggle = async (key: "push" | "email", value: boolean) => {
+    const userId = getExternalUserId();
+    const updated = { ...notifications, [key]: value };
+    setNotifications(updated);
+    if (userId) {
+      try {
+        await updateUserNotificationSettings(userId, { [key]: value });
+        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+      } catch {
+        setNotifications(notifications); // revert
+        toast({ title: "Failed to update notifications", variant: "destructive" });
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -251,30 +278,19 @@ const DashboardSettings = () => {
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.emailNotifications")}</Label>
+                <Label className="text-foreground">Push Notifications</Label>
                 <Switch
-                  checked={notifications.emailNotifications}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, emailNotifications: checked }))
-                  }
+                  disabled={notifLoading}
+                  checked={notifications.push}
+                  onCheckedChange={(checked) => handleNotificationToggle("push", checked)}
                 />
               </div>
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.analysisAlerts")}</Label>
+                <Label className="text-foreground">Email Alerts</Label>
                 <Switch
-                  checked={notifications.analysisAlerts}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, analysisAlerts: checked }))
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                <Label className="text-foreground">{t("settings.weeklyReport")}</Label>
-                <Switch
-                  checked={notifications.weeklyReport}
-                  onCheckedChange={(checked) =>
-                    setNotifications((prev) => ({ ...prev, weeklyReport: checked }))
-                  }
+                  disabled={notifLoading}
+                  checked={notifications.email}
+                  onCheckedChange={(checked) => handleNotificationToggle("email", checked)}
                 />
               </div>
             </div>
