@@ -1,5 +1,28 @@
 const API_BASE = "https://mahmoud123mahmoud-smartfarm-api.hf.space";
 
+const TIMEOUT_MS = 15000;
+
+class ApiTimeoutError extends Error {
+  constructor() {
+    super("API_TIMEOUT");
+    this.name = "ApiTimeoutError";
+  }
+}
+
+const fetchWithTimeout = (url: string, options?: RequestInit): Promise<Response> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  return fetch(url, { ...options, signal: controller.signal })
+    .catch((err) => {
+      if (err.name === "AbortError") throw new ApiTimeoutError();
+      throw err;
+    })
+    .finally(() => clearTimeout(timer));
+};
+
+export const isTimeoutError = (err: unknown): boolean =>
+  err instanceof ApiTimeoutError || (err instanceof DOMException && err.name === "AbortError");
+
 // Store external API user ID
 let externalUserId: number | null = null;
 
