@@ -46,6 +46,7 @@ const Login = () => {
           email: data.user.email,
           role: data.user.role,
           avatar_url: avatarUrl || undefined,
+          created_at: data.user.created_at || new Date().toISOString(),
         });
         if (data.user.role === "admin") {
           navigate("/admin/dashboard");

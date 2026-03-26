@@ -190,7 +190,7 @@ const AdminProfile = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <InfoCard icon={Mail} label={t("profile.email")} value={userEmail} gradient="from-blue-500 to-cyan-500" index={0} />
                   <InfoCard icon={Phone} label={t("profile.phone")} value={editPhone || "—"} gradient="from-emerald-500 to-green-500" index={1} />
-                  <InfoCard icon={Calendar} label={t("profile.memberSince")} value="2024" gradient="from-violet-500 to-purple-500" index={2} />
+                  <InfoCard icon={Calendar} label={t("profile.memberSince")} value={user?.created_at ? new Date(user.created_at).getFullYear().toString() : "—"} gradient="from-violet-500 to-purple-500" index={2} />
                 </div>
                 <Button className="mt-6 rounded-xl h-11 px-6 shadow-sm hover:shadow-md transition-shadow" onClick={() => setEditing(true)}>
                   <Edit2 className="w-4 h-4 mr-2" />{t("profile.editProfile")}
