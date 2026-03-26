@@ -107,8 +107,28 @@ const DashboardSettings = () => {
       .finally(() => setNotifLoading(false));
   }, []);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   const handleThemeChange = (value: "light" | "dark") => {
     setTheme(value);
+  };
+
+  const handleNotificationToggle = async (key: "push" | "email", value: boolean) => {
+    const userId = getExternalUserId();
+    const updated = { ...notifications, [key]: value };
+    setNotifications(updated);
+    if (userId) {
+      try {
+        await updateUserNotificationSettings(userId, { [key]: value });
+        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+      } catch {
+        setNotifications(notifications); // revert
+        toast({ title: "Failed to update notifications", variant: "destructive" });
+      }
+    }
   };
 
   const handleSave = async () => {
