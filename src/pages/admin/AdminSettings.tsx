@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
@@ -70,6 +70,7 @@ const AdminSettings = () => {
   );
   const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [saving, setSaving] = useState(false);
+  const [notifSaving, setNotifSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -84,9 +85,26 @@ const AdminSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  useEffect(() => {
-    persistSettings(currentUserId, { notifications });
-  }, [notifications]);
+  const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {
+    const userId = getExternalUserId();
+    const prev = { ...notifications };
+    setNotifications((p) => ({ ...p, [key]: checked }));
+    persistSettings(currentUserId, { notifications: { ...notifications, [key]: checked } });
+    if (userId) {
+      setNotifSaving(true);
+      try {
+        const apiKey = key === "pushNotifications" ? "push" : "email";
+        await updateAdminNotificationSettings(userId, { [apiKey]: checked });
+        toast({ title: t("settings.settingsSaved") });
+      } catch {
+        setNotifications(prev);
+        persistSettings(currentUserId, { notifications: prev });
+        toast({ title: "Failed to update notifications", variant: "destructive" });
+      } finally {
+        setNotifSaving(false);
+      }
+    }
+  };
 
   const handleSave = async () => {
     const userId = getExternalUserId();
@@ -204,9 +222,8 @@ const AdminSettings = () => {
               <span className="text-sm font-medium text-foreground">{t("settings.pushNotifications")}</span>
               <Checkbox
                 checked={notifications.pushNotifications}
-                onCheckedChange={(checked) =>
-                  setNotifications((prev) => ({ ...prev, pushNotifications: checked === true }))
-                }
+                disabled={notifSaving}
+                onCheckedChange={(checked) => handleNotifToggle("pushNotifications", checked === true)}
                 className="h-5 w-5"
               />
             </label>
@@ -214,9 +231,8 @@ const AdminSettings = () => {
               <span className="text-sm font-medium text-foreground">{t("settings.emailAlerts")}</span>
               <Checkbox
                 checked={notifications.emailAlerts}
-                onCheckedChange={(checked) =>
-                  setNotifications((prev) => ({ ...prev, emailAlerts: checked === true }))
-                }
+                disabled={notifSaving}
+                onCheckedChange={(checked) => handleNotifToggle("emailAlerts", checked === true)}
                 className="h-5 w-5"
               />
             </label>

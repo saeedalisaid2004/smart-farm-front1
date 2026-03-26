@@ -15,7 +15,7 @@ import {
   getUserManagementData, searchUsers as apiSearchUsers,
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
-  getUserNotificationSettings, updateUserNotificationSettings,
+  updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
 import { sendNotification } from "@/services/notificationService";
 import { Switch } from "@/components/ui/switch";
@@ -137,7 +137,7 @@ const AdminUsers = () => {
     if (uid) {
       setLoadingNotif(true);
       try {
-        const data = await getUserNotificationSettings(uid);
+        const data = await updateAdminNotificationSettings(uid, {});
         if (data.current_settings) setNotifSettings(data.current_settings);
       } catch {}
       setLoadingNotif(false);
@@ -148,7 +148,7 @@ const AdminUsers = () => {
     if (!viewUser) return;
     const uid = viewUser.id || viewUser.user_id;
     try {
-      const data = await updateUserNotificationSettings(uid, { [key]: value });
+      const data = await updateAdminNotificationSettings(uid, { [key]: value });
       if (data.current_settings) setNotifSettings(data.current_settings);
       toast({ title: t("adminUsers.notifUpdated") || "Notification settings updated" });
     } catch {

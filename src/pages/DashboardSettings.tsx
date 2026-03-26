@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId, getUserNotificationSettings, updateUserNotificationSettings } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
 import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
 import {
   Select,
@@ -81,7 +81,7 @@ const DashboardSettings = () => {
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
-  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
 
@@ -91,23 +91,7 @@ const DashboardSettings = () => {
     setEmail(user.email || "owner@smartfarm.com");
   }, [user]);
 
-  // Fetch notification settings from API
-  useEffect(() => {
-    const userId = getExternalUserId();
-    if (!userId) return;
-    setNotifLoading(true);
-    getUserNotificationSettings(userId)
-      .then((data) => {
-        if (data?.push !== undefined || data?.email !== undefined) {
-          setNotifications({
-            push: data.push ?? true,
-            email: data.email ?? true,
-          });
-        }
-      })
-      .catch(() => {})
-      .finally(() => setNotifLoading(false));
-  }, []);
+  // Notification settings are synced on toggle - no initial fetch needed for farmer
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -124,7 +108,7 @@ const DashboardSettings = () => {
     setNotifications(updated);
     if (userId) {
       try {
-        await updateUserNotificationSettings(userId, { [key]: value });
+        await updateFarmerNotificationSettings(userId, { [key]: value });
         toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
       } catch {
         setNotifications(notifications); // revert
@@ -282,7 +266,7 @@ const DashboardSettings = () => {
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">Push Notifications</Label>
                 <Switch
-                  disabled={notifLoading}
+                  disabled={notifSaving}
                   checked={notifications.push}
                   onCheckedChange={(checked) => handleNotificationToggle("push", checked)}
                 />
@@ -290,7 +274,7 @@ const DashboardSettings = () => {
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">Email Alerts</Label>
                 <Switch
-                  disabled={notifLoading}
+                  disabled={notifSaving}
                   checked={notifications.email}
                   onCheckedChange={(checked) => handleNotificationToggle("email", checked)}
                 />
