@@ -169,9 +169,9 @@ const Profile = () => {
                 )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>
-              <div className="pb-2">
-                <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
-                <p className="text-muted-foreground">{t("common.farmer")}</p>
+              <div className="pb-2 text-center sm:text-start">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">{userName}</h2>
+                <p className="text-muted-foreground text-sm">{t("common.farmer")}</p>
               </div>
             </div>
 
