@@ -90,7 +90,7 @@ const FruitQuality = () => {
             )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button variant="outline" className="flex-1 rounded-xl h-12 text-sm font-medium border-2" onClick={() => fileRef.current?.click()}>
               <Upload className="w-4 h-4 mr-2" />
               {t("common.chooseImage")}
