@@ -142,7 +142,7 @@ const Index = () => {
               <motion.div
                 custom={4}
                 variants={fadeUp}
-                className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-20 max-w-xl mx-auto"
+                className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-20 max-w-xl mx-auto"
               >
                 {stats.map((stat, i) => (
                   <div key={i} className="text-center">
