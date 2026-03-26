@@ -106,7 +106,7 @@ const Index = () => {
               <motion.h1
                 custom={1}
                 variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-foreground mb-6 leading-[1.1] tracking-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-foreground mb-4 sm:mb-6 leading-[1.1] tracking-tight"
               >
                 {t("index.heroTitle1")}{" "}
                 <span className="text-gradient">{t("index.heroTitle2")}</span>
