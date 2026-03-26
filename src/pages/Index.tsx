@@ -115,7 +115,7 @@ const Index = () => {
               <motion.p
                 custom={2}
                 variants={fadeUp}
-                className="text-lg lg:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
+                className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-2"
               >
                 {t("index.heroDesc")}
               </motion.p>
