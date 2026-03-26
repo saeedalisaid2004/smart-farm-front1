@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiResetPassword } from "@/services/smartFarmApi";
+import { apiResetPassword, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ResetPassword = () => {

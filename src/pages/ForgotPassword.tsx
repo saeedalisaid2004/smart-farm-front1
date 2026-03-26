@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiForgotPassword } from "@/services/smartFarmApi";
+import { apiForgotPassword, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ForgotPassword = () => {

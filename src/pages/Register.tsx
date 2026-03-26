@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiRegister } from "@/services/smartFarmApi";
+import { apiRegister, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const Register = () => {
