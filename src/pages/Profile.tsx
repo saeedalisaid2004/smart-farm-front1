@@ -136,7 +136,7 @@ const Profile = () => {
 
           <div className="px-5 sm:px-8 pb-8">
             {/* Avatar */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 -mt-14 mb-6">
+            <div className="flex flex-col items-center sm:items-start -mt-14 mb-2">
               <div className="relative flex-shrink-0">
                 <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                   className="w-28 h-28 rounded-2xl border-4 border-card bg-secondary flex items-center justify-center overflow-hidden shadow-lg ring-2 ring-primary/20">
@@ -171,14 +171,14 @@ const Profile = () => {
                 )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>
-              <div className="pt-4 pb-2 text-center sm:text-start">
-                <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
-                <div className="flex items-center gap-2 justify-center sm:justify-start mt-1">
-                  <Shield className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-muted-foreground font-medium capitalize">
-                    {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
-                  </span>
-                </div>
+            </div>
+            <div className="mb-6 text-center sm:text-start">
+              <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
+              <div className="flex items-center gap-2 justify-center sm:justify-start mt-1">
+                <Shield className="w-4 h-4 text-primary" />
+                <span className="text-sm text-muted-foreground font-medium capitalize">
+                  {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
+                </span>
               </div>
             </div>
 
