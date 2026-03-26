@@ -85,9 +85,26 @@ const AdminSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  useEffect(() => {
-    persistSettings(currentUserId, { notifications });
-  }, [notifications]);
+  const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {
+    const userId = getExternalUserId();
+    const prev = { ...notifications };
+    setNotifications((p) => ({ ...p, [key]: checked }));
+    persistSettings(currentUserId, { notifications: { ...notifications, [key]: checked } });
+    if (userId) {
+      setNotifSaving(true);
+      try {
+        const apiKey = key === "pushNotifications" ? "push" : "email";
+        await updateAdminNotificationSettings(userId, { [apiKey]: checked });
+        toast({ title: t("settings.settingsSaved") });
+      } catch {
+        setNotifications(prev);
+        persistSettings(currentUserId, { notifications: prev });
+        toast({ title: "Failed to update notifications", variant: "destructive" });
+      } finally {
+        setNotifSaving(false);
+      }
+    }
+  };
 
   const handleSave = async () => {
     const userId = getExternalUserId();
