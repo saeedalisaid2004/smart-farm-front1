@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, getUserNotificationSettings, updateUserNotificationSettings } from "@/services/smartFarmApi";
 import {
   Select,
   SelectContent,
