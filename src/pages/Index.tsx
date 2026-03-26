@@ -269,8 +269,8 @@ const Index = () => {
             </div>
             <div className="absolute inset-0 bg-grid opacity-10" />
             <div className="relative z-10">
-              <h2 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-6">{t("index.ctaTitle")}</h2>
-              <p className="text-primary-foreground/80 text-lg mb-10 max-w-xl mx-auto">{t("index.ctaDesc")}</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-primary-foreground mb-4 sm:mb-6">{t("index.ctaTitle")}</h2>
+              <p className="text-primary-foreground/80 text-base sm:text-lg mb-6 sm:mb-10 max-w-xl mx-auto">{t("index.ctaDesc")}</p>
               <Link to="/register">
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-base px-10 h-13 rounded-full font-semibold shadow-lg">
                   {t("index.ctaButton")}
