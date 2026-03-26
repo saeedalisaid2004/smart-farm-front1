@@ -44,8 +44,8 @@ const Register = () => {
         toast({ title: "✅", description: "تم إنشاء الحساب بنجاح! سجل دخولك الآن." });
         navigate("/login");
       }
-    } catch {
-      toast({ title: "Error", description: "حدث خطأ غير متوقع", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError"), variant: "destructive" });
     }
     setLoading(false);
   };

@@ -56,8 +56,8 @@ const Login = () => {
       } else {
         toast({ variant: "destructive", title: "Error", description: data.detail || "بيانات الدخول غير صحيحة" });
       }
-    } catch {
-      toast({ variant: "destructive", title: "Error", description: "حدث خطأ غير متوقع" });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError") });
     } finally {
       setLoading(false);
     }

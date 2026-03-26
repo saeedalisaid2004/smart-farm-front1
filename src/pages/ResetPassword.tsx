@@ -45,8 +45,8 @@ const ResetPassword = () => {
         setSuccess(true);
         toast({ title: t("reset.success") });
       }
-    } catch {
-      toast({ variant: "destructive", title: t("forgot.error") });
+    } catch (err) {
+      toast({ variant: "destructive", title: isTimeoutError(err) ? t("api.timeout") : t("forgot.error") });
     } finally {
       setLoading(false);
     }

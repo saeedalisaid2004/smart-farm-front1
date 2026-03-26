@@ -32,8 +32,8 @@ const ForgotPassword = () => {
         setSent(true);
         toast({ title: t("forgot.sent"), description: t("forgot.checkEmail") });
       }
-    } catch {
-      toast({ variant: "destructive", title: t("forgot.error") });
+    } catch (err) {
+      toast({ variant: "destructive", title: isTimeoutError(err) ? t("forgot.timeout") : t("forgot.error") });
     } finally {
       setLoading(false);
     }
