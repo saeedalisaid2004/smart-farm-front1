@@ -8,8 +8,21 @@ interface SendNotificationParams {
 
 const STORAGE_KEY = "app_notifications";
 
+export function isAnalysisAlertsEnabled(): boolean {
+  try {
+    return localStorage.getItem("analysis_alerts_enabled") !== "false";
+  } catch {
+    return true;
+  }
+}
+
+export function setAnalysisAlertsEnabled(enabled: boolean) {
+  localStorage.setItem("analysis_alerts_enabled", enabled ? "true" : "false");
+}
+
 export function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
   try {
+    if (!isAnalysisAlertsEnabled()) return;
     const stored = localStorage.getItem(STORAGE_KEY);
     const notifications = stored ? JSON.parse(stored) : [];
     const newNotification = {

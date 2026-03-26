@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiSaveSettings, getExternalUserId, getUserNotificationSettings, updateUserNotificationSettings } from "@/services/smartFarmApi";
+import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
 import {
   Select,
   SelectContent,
