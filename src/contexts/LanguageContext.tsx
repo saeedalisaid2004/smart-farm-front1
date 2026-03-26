@@ -212,6 +212,9 @@ const translations = {
     "forgot.enterCode": "Enter Reset Code",
     "forgot.notFound": "Email not found",
     "forgot.error": "Something went wrong",
+    "forgot.timeout": "The server is not responding. It may be sleeping — please try again in a minute.",
+    "api.timeout": "The server is not responding. Please try again shortly.",
+    "api.connectionError": "Could not connect to the server. Please check your internet connection.",
     "forgot.backToLogin": "Back to Login",
     // Reset Password
     "reset.title": "Reset Password",
@@ -611,6 +614,9 @@ const translations = {
     "forgot.enterCode": "إدخال الرمز",
     "forgot.notFound": "البريد الإلكتروني غير موجود",
     "forgot.error": "حدث خطأ ما",
+    "forgot.timeout": "السيرفر مش بيرد. ممكن يكون نايم — جرب تاني بعد دقيقة.",
+    "api.timeout": "السيرفر مش بيرد حالياً. جرب تاني بعد شوية.",
+    "api.connectionError": "مش قادر يتصل بالسيرفر. تأكد من اتصالك بالإنترنت.",
     "forgot.backToLogin": "العودة لتسجيل الدخول",
     // Reset Password
     "reset.title": "إعادة تعيين كلمة المرور",

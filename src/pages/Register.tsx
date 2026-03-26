@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiRegister } from "@/services/smartFarmApi";
+import { apiRegister, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const Register = () => {
@@ -44,8 +44,8 @@ const Register = () => {
         toast({ title: "✅", description: "تم إنشاء الحساب بنجاح! سجل دخولك الآن." });
         navigate("/login");
       }
-    } catch {
-      toast({ title: "Error", description: "حدث خطأ غير متوقع", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError"), variant: "destructive" });
     }
     setLoading(false);
   };

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiResetPassword } from "@/services/smartFarmApi";
+import { apiResetPassword, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ResetPassword = () => {
@@ -45,8 +45,8 @@ const ResetPassword = () => {
         setSuccess(true);
         toast({ title: t("reset.success") });
       }
-    } catch {
-      toast({ variant: "destructive", title: t("forgot.error") });
+    } catch (err) {
+      toast({ variant: "destructive", title: isTimeoutError(err) ? t("api.timeout") : t("forgot.error") });
     } finally {
       setLoading(false);
     }

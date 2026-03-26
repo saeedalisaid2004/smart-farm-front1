@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiLogin, buildProfileImageUrl } from "@/services/smartFarmApi";
+import { apiLogin, buildProfileImageUrl, isTimeoutError } from "@/services/smartFarmApi";
 import { saveAvatarUrlFromApi } from "@/services/avatarService";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -56,8 +56,8 @@ const Login = () => {
       } else {
         toast({ variant: "destructive", title: "Error", description: data.detail || "بيانات الدخول غير صحيحة" });
       }
-    } catch {
-      toast({ variant: "destructive", title: "Error", description: "حدث خطأ غير متوقع" });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError") });
     } finally {
       setLoading(false);
     }

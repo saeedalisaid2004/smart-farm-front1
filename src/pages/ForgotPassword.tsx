@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiForgotPassword } from "@/services/smartFarmApi";
+import { apiForgotPassword, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ForgotPassword = () => {
@@ -32,8 +32,8 @@ const ForgotPassword = () => {
         setSent(true);
         toast({ title: t("forgot.sent"), description: t("forgot.checkEmail") });
       }
-    } catch {
-      toast({ variant: "destructive", title: t("forgot.error") });
+    } catch (err) {
+      toast({ variant: "destructive", title: isTimeoutError(err) ? t("forgot.timeout") : t("forgot.error") });
     } finally {
       setLoading(false);
     }
