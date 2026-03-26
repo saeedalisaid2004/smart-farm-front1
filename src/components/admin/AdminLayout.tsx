@@ -223,7 +223,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                               "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
-                            onClick={() => !n.is_read && markAsRead(n.id)}
+                            onClick={() => {}}
                           >
                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
                               <Icon className={cn("w-5 h-5", color)} />
