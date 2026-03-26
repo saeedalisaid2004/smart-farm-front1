@@ -109,7 +109,7 @@ const AdminProfile = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
           className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden shadow-sm">
           {/* Hero Header */}
-          <div className="relative h-32 sm:h-40 bg-gradient-to-br from-primary via-primary/80 to-primary/60 overflow-hidden">
+          <div className="relative h-24 sm:h-28 bg-gradient-to-br from-primary via-primary/80 to-primary/60 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.1),transparent_40%)]" />
             <Sparkles className="absolute top-4 right-4 w-5 h-5 text-white/30" />
