@@ -231,9 +231,8 @@ const AdminSettings = () => {
               <span className="text-sm font-medium text-foreground">{t("settings.emailAlerts")}</span>
               <Checkbox
                 checked={notifications.emailAlerts}
-                onCheckedChange={(checked) =>
-                  setNotifications((prev) => ({ ...prev, emailAlerts: checked === true }))
-                }
+                disabled={notifSaving}
+                onCheckedChange={(checked) => handleNotifToggle("emailAlerts", checked === true)}
                 className="h-5 w-5"
               />
             </label>
