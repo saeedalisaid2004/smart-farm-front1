@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 type NotificationType = "success" | "warning" | "error" | "info";
 
 interface SendNotificationParams {
@@ -8,27 +6,23 @@ interface SendNotificationParams {
   type?: NotificationType;
 }
 
-function getUserId(): string | null {
-  try {
-    const stored = localStorage.getItem("app_user");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return String(parsed.id || parsed.email || "");
-    }
-  } catch {}
-  return null;
-}
+const STORAGE_KEY = "app_notifications";
 
-export async function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
-  const user_id = getUserId();
-  if (!user_id) return;
-
+export function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
   try {
-    await supabase.functions.invoke("manage-notifications", {
-      body: { action: "create", user_id, title, description, type },
-    });
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const notifications = stored ? JSON.parse(stored) : [];
+    const newNotification = {
+      id: crypto.randomUUID(),
+      title,
+      description: description || null,
+      type,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    };
+    notifications.unshift(newNotification);
+    // Keep max 100
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications.slice(0, 100)));
     window.dispatchEvent(new Event("notifications-updated"));
-  } catch {
-    // Silent fail
-  }
+  } catch {}
 }
