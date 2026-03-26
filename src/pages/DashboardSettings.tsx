@@ -295,6 +295,16 @@ const DashboardSettings = () => {
                   onCheckedChange={(checked) => handleNotificationToggle("email", checked)}
                 />
               </div>
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border">
+                <Label className="text-foreground">Analysis Completion Alerts</Label>
+                <Switch
+                  checked={analysisAlerts}
+                  onCheckedChange={(checked) => {
+                    setAnalysisAlerts(checked);
+                    setAnalysisAlertsEnabled(checked);
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
