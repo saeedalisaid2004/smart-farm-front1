@@ -137,7 +137,7 @@ const AdminUsers = () => {
     if (uid) {
       setLoadingNotif(true);
       try {
-        const data = await getUserNotificationSettings(uid);
+        const data = await updateAdminNotificationSettings(uid, {});
         if (data.current_settings) setNotifSettings(data.current_settings);
       } catch {}
       setLoadingNotif(false);
