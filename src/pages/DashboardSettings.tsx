@@ -81,7 +81,7 @@ const DashboardSettings = () => {
     localStorage.getItem("theme") === "dark" ? "dark" : "light",
   );
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
-  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
 
