@@ -83,6 +83,7 @@ const DashboardSettings = () => {
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [notifLoading, setNotifLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
 
   useEffect(() => {
     if (!user) return;
