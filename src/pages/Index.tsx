@@ -261,7 +261,7 @@ const Index = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="gradient-primary rounded-3xl p-12 lg:p-20 text-center relative overflow-hidden"
+            className="gradient-primary rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-20 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-10 right-10 w-60 h-60 bg-white rounded-full blur-[80px]" />
