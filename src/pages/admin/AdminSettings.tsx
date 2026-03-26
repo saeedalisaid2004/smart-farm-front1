@@ -70,6 +70,7 @@ const AdminSettings = () => {
   );
   const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [saving, setSaving] = useState(false);
+  const [notifSaving, setNotifSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
