@@ -108,7 +108,7 @@ const DashboardSettings = () => {
     setNotifications(updated);
     if (userId) {
       try {
-        await updateUserNotificationSettings(userId, { [key]: value });
+        await updateFarmerNotificationSettings(userId, { [key]: value });
         toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
       } catch {
         setNotifications(notifications); // revert

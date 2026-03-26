@@ -148,7 +148,7 @@ const AdminUsers = () => {
     if (!viewUser) return;
     const uid = viewUser.id || viewUser.user_id;
     try {
-      const data = await updateUserNotificationSettings(uid, { [key]: value });
+      const data = await updateAdminNotificationSettings(uid, { [key]: value });
       if (data.current_settings) setNotifSettings(data.current_settings);
       toast({ title: t("adminUsers.notifUpdated") || "Notification settings updated" });
     } catch {
