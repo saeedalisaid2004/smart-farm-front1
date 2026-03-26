@@ -25,15 +25,15 @@ const ResetPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !otp.trim() || !newPassword) {
-      toast({ variant: "destructive", title: "Please fill all fields" });
+      toast({ variant: "destructive", title: t("reset.fillAll") });
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast({ variant: "destructive", title: "Passwords don't match" });
+      toast({ variant: "destructive", title: t("reset.noMatch") });
       return;
     }
     if (newPassword.length < 6) {
-      toast({ variant: "destructive", title: "Password must be at least 6 characters" });
+      toast({ variant: "destructive", title: t("reset.tooShort") });
       return;
     }
     setLoading(true);
@@ -43,10 +43,10 @@ const ResetPassword = () => {
         toast({ variant: "destructive", title: data.detail });
       } else {
         setSuccess(true);
-        toast({ title: "Password reset successfully!" });
+        toast({ title: t("reset.success") });
       }
     } catch {
-      toast({ variant: "destructive", title: "Something went wrong" });
+      toast({ variant: "destructive", title: t("forgot.error") });
     } finally {
       setLoading(false);
     }
@@ -68,38 +68,38 @@ const ResetPassword = () => {
           <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-5 shadow-glow">
             <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Reset Password</h1>
-          <p className="text-muted-foreground text-sm mt-1">Enter the code sent to your email</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("reset.title")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("reset.subtitle")}</p>
         </div>
 
         {!success ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">Email</Label>
+              <Label className="text-foreground font-medium text-sm">{t("reset.email")}</Label>
               <Input
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("forgot.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">OTP Code</Label>
+              <Label className="text-foreground font-medium text-sm">{t("reset.otp")}</Label>
               <Input
                 type="text"
-                placeholder="Enter the code"
+                placeholder={t("reset.otpPlaceholder")}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 text-center tracking-widest text-lg font-mono"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">New Password</Label>
+              <Label className="text-foreground font-medium text-sm">{t("reset.newPassword")}</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="New password"
+                  placeholder={t("reset.newPasswordPlaceholder")}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 pr-11"
@@ -110,17 +110,17 @@ const ResetPassword = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">Confirm Password</Label>
+              <Label className="text-foreground font-medium text-sm">{t("reset.confirmPassword")}</Label>
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Confirm password"
+                placeholder={t("reset.confirmPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4"
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-semibold shadow-primary mt-2">
-              {loading ? "Resetting..." : "Reset Password"}
+              {loading ? t("reset.submitting") : t("reset.submit")}
             </Button>
           </form>
         ) : (
@@ -128,17 +128,17 @@ const ResetPassword = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-foreground font-medium">Password reset successful!</p>
-            <p className="text-sm text-muted-foreground">You can now login with your new password</p>
+            <p className="text-foreground font-medium">{t("reset.success")}</p>
+            <p className="text-sm text-muted-foreground">{t("reset.successDesc")}</p>
             <Button onClick={() => navigate("/login")} className="w-full h-12 rounded-xl text-base font-semibold">
-              Go to Login
+              {t("reset.goToLogin")}
             </Button>
           </div>
         )}
 
         <div className="mt-6 text-center">
           <Link to="/login" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" /> Back to Login
+            <ArrowLeft className="w-4 h-4" /> {t("reset.backToLogin")}
           </Link>
         </div>
       </motion.div>
