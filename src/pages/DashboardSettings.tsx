@@ -266,7 +266,7 @@ const DashboardSettings = () => {
               <div className="flex items-center justify-between p-4 rounded-xl border border-border">
                 <Label className="text-foreground">Push Notifications</Label>
                 <Switch
-                  disabled={notifLoading}
+                  disabled={notifSaving}
                   checked={notifications.push}
                   onCheckedChange={(checked) => handleNotificationToggle("push", checked)}
                 />
