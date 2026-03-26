@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, Monitor, BarChart3, Settings, Bell, Moon, Sun,
-  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X, Trash2, CheckCheck
+  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
