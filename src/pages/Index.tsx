@@ -282,8 +282,8 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-10">
-        <div className="container mx-auto px-6 text-center">
+      <footer className="bg-card border-t border-border py-8 sm:py-10">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-9 h-9 gradient-primary rounded-lg flex items-center justify-center">
               <Leaf className="w-5 h-5 text-primary-foreground" />

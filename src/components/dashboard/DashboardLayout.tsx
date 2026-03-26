@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, FileText, Settings, Bell, Moon, Sun,
-  User, LogOut, CheckCircle, AlertCircle, Info, Trash2, CheckCheck, XCircle
+  User, LogOut, CheckCircle, AlertCircle, Info, Trash2, CheckCheck, XCircle, Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,6 +49,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -86,52 +87,92 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
     }
   };
 
+  const SidebarContent = () => (
+    <>
+      <div className={cn("p-5 flex items-center gap-3", isRTL && "flex-row-reverse")}>
+        <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+          <Leaf className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <span className="text-lg font-bold text-foreground tracking-tight">{t("app.name")}</span>
+      </div>
+
+      <nav className="flex-1 px-3 py-2 overflow-y-auto">
+        <ul className="space-y-1">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200 relative",
+                    isRTL && "flex-row-reverse text-right",
+                    isActive
+                      ? "bg-primary text-primary-foreground font-medium shadow-primary"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  <span>{t(item.labelKey)}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background flex" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside className={cn(
-        "h-screen w-64 bg-card border-border flex flex-col sticky top-0 shadow-sm",
+        "hidden md:flex h-screen w-64 bg-card border-border flex-col sticky top-0 shadow-sm",
         isRTL ? "border-l order-last" : "border-r order-first"
       )}>
-        <div className={cn("p-5 flex items-center gap-3", isRTL && "flex-row-reverse")}>
-          <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
-            <Leaf className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold text-foreground tracking-tight">{t("app.name")}</span>
-        </div>
-
-        <nav className="flex-1 px-3 py-2">
-          <ul className="space-y-1">
-            {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200 relative",
-                      isRTL && "flex-row-reverse text-right",
-                      isActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-primary"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5 shrink-0" />
-                    <span>{t(item.labelKey)}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
+        <SidebarContent />
       </aside>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: isRTL ? 280 : -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: isRTL ? 280 : -280 }}
+              transition={{ type: "spring", damping: 25 }}
+              className={cn(
+                "fixed top-0 h-screen w-64 bg-card z-50 flex flex-col md:hidden shadow-2xl",
+                isRTL ? "right-0" : "left-0"
+              )}
+            >
+              <SidebarContent />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-6 sticky top-0 z-10">
-          <h2 className="text-lg font-semibold text-foreground flex-1">{title}</h2>
-          <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+        <header className="h-14 md:h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-3 md:px-6 sticky top-0 z-10">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors mr-2"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <h2 className="text-base md:text-lg font-semibold text-foreground flex-1 truncate">{title}</h2>
+          <div className={cn("flex items-center gap-1.5 md:gap-3", isRTL && "flex-row-reverse")}>
             <button
               onClick={toggleTheme}
               className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
@@ -151,9 +192,9 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-96 p-0 rounded-2xl shadow-lg" align={isRTL ? "start" : "end"}>
-                <div className="flex items-center justify-between p-4 border-b border-border">
-                  <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
+              <PopoverContent className="w-[calc(100vw-2rem)] max-w-96 p-0 rounded-2xl shadow-lg" align={isRTL ? "start" : "end"}>
+                <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
+                  <h3 className="font-semibold text-foreground text-sm md:text-base">{t("header.notifications")}</h3>
                   <div className="flex items-center gap-2">
                     {notifications.length > 0 && (
                       <button
@@ -180,7 +221,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                     )}
                   </div>
                 </div>
-                <div className="max-h-80 overflow-y-auto">
+                <div className="max-h-72 md:max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (
                     <div className="p-8 text-center">
                       <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
@@ -197,18 +238,18 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
                             className={cn(
-                              "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
+                              "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
                             onClick={() => !n.is_read && markAsRead(n.id)}
                           >
-                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
-                              <Icon className={cn("w-5 h-5", color)} />
+                            <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
+                              <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={cn("text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                              <p className={cn("text-xs md:text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
                               {n.description && (
-                                <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.description}</p>
                               )}
                               <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
                             </div>
@@ -235,14 +276,14 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className={cn("flex items-center gap-2 cursor-pointer rounded-xl px-2 py-1.5 hover:bg-secondary transition-colors", isRTL && "flex-row-reverse")}>
-                  <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
+                <button className={cn("flex items-center gap-2 cursor-pointer rounded-xl px-1.5 md:px-2 py-1.5 hover:bg-secondary transition-colors", isRTL && "flex-row-reverse")}>
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-primary text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
+                      <span className="text-primary text-xs md:text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
                     )}
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full border-2 border-card" />
                   </div>
                 </button>
               </DropdownMenuTrigger>
@@ -264,7 +305,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
           </div>
         </header>
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0, y: 8 }}
