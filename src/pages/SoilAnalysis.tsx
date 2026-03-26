@@ -124,7 +124,11 @@ const SoilAnalysis = () => {
             const fertilityMap: Record<string, string> = { high: t("soil.fertility.high"), medium: t("soil.fertility.medium"), low: t("soil.fertility.low") };
             const soilType = soilTypeRaw ? (soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
             const fertility = fertilityRaw ? (fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
-            const fertVariant = fertilityRaw ? (fertilityRaw.toLowerCase() === 'high' ? 'primary' : fertilityRaw.toLowerCase() === 'medium' ? 'warning' : 'destructive') as const : 'default' as const;
+            let fertVariant: "primary" | "warning" | "destructive" | "default" = "default";
+            if (fertilityRaw) {
+              const fl = fertilityRaw.toLowerCase();
+              fertVariant = fl === 'high' ? 'primary' : fl === 'medium' ? 'warning' : 'destructive';
+            }
 
             return (
               <AnalysisResultCard key="res" title={t("soil.resultTitle")}>
