@@ -167,9 +167,9 @@ const Index = () => {
       </header>
 
       {/* Features */}
-      <section className="py-24 relative">
+      <section className="py-12 sm:py-24 relative">
         <div className="absolute inset-0 gradient-mesh" />
-        <div className="container mx-auto px-6 relative">
+        <div className="container mx-auto px-4 sm:px-6 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
