@@ -54,30 +54,30 @@ const Index = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative z-10 container mx-auto px-6 py-6"
+          className="relative z-10 container mx-auto px-4 sm:px-6 py-4 sm:py-6"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
-                <Leaf className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+                <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground tracking-tight">{t("index.brand")}</span>
+              <span className="text-lg sm:text-xl font-bold text-foreground tracking-tight">{t("index.brand")}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => document.documentElement.classList.toggle("dark")}
-                className="w-9 h-9 rounded-xl bg-secondary/80 backdrop-blur-sm hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-secondary/80 backdrop-blur-sm hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
               >
                 <Moon className="w-4 h-4 dark:hidden" />
                 <Sun className="w-4 h-4 hidden dark:block" />
               </button>
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-foreground font-medium rounded-full px-5">
+                <Button variant="ghost" size="sm" className="text-foreground font-medium rounded-full px-3 sm:px-5 text-xs sm:text-sm">
                   {t("index.login")}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="shadow-primary rounded-full px-5 font-medium">
+                <Button size="sm" className="shadow-primary rounded-full px-3 sm:px-5 font-medium text-xs sm:text-sm">
                   {t("index.register")}
                 </Button>
               </Link>
