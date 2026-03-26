@@ -117,6 +117,7 @@ const ResetPassword = () => {
                 placeholder={t("reset.confirmPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4"
               />
             </div>
