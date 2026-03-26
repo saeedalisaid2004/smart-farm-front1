@@ -614,6 +614,9 @@ const translations = {
     "forgot.enterCode": "إدخال الرمز",
     "forgot.notFound": "البريد الإلكتروني غير موجود",
     "forgot.error": "حدث خطأ ما",
+    "forgot.timeout": "السيرفر مش بيرد. ممكن يكون نايم — جرب تاني بعد دقيقة.",
+    "api.timeout": "السيرفر مش بيرد حالياً. جرب تاني بعد شوية.",
+    "api.connectionError": "مش قادر يتصل بالسيرفر. تأكد من اتصالك بالإنترنت.",
     "forgot.backToLogin": "العودة لتسجيل الدخول",
     // Reset Password
     "reset.title": "إعادة تعيين كلمة المرور",
