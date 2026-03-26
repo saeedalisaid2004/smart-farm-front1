@@ -91,23 +91,7 @@ const DashboardSettings = () => {
     setEmail(user.email || "owner@smartfarm.com");
   }, [user]);
 
-  // Fetch notification settings from API
-  useEffect(() => {
-    const userId = getExternalUserId();
-    if (!userId) return;
-    setNotifLoading(true);
-    getUserNotificationSettings(userId)
-      .then((data) => {
-        if (data?.push !== undefined || data?.email !== undefined) {
-          setNotifications({
-            push: data.push ?? true,
-            email: data.email ?? true,
-          });
-        }
-      })
-      .catch(() => {})
-      .finally(() => setNotifLoading(false));
-  }, []);
+  // Notification settings are synced on toggle - no initial fetch needed for farmer
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
