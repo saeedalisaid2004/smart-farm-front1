@@ -21,15 +21,13 @@ const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
 type NotificationSettings = {
-  emailNotifications: boolean;
-  analysisAlerts: boolean;
-  weeklyReport: boolean;
+  push: boolean;
+  email: boolean;
 };
 
 const defaultNotifications: NotificationSettings = {
-  emailNotifications: false,
-  analysisAlerts: true,
-  weeklyReport: true,
+  push: true,
+  email: true,
 };
 
 const getStoredSettings = (userId?: string | number) => {
