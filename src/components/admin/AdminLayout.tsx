@@ -197,9 +197,14 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                   <h3 className="font-semibold text-foreground">{t("header.notifications")}</h3>
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
-                      <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                        {unreadCount} new
-                      </span>
+                      <button onClick={markAllAsRead} className="text-xs text-primary hover:underline flex items-center gap-1">
+                        <CheckCheck className="w-3 h-3" /> Mark all read
+                      </button>
+                    )}
+                    {notifications.length > 0 && (
+                      <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                        <XCircle className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -223,7 +228,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                               "flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
-                            onClick={() => {}}
+                            onClick={() => markAsRead(n.id)}
                           >
                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
                               <Icon className={cn("w-5 h-5", color)} />
@@ -237,6 +242,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                              <button
+                                onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                              </button>
                             </div>
                           </motion.div>
                         );
