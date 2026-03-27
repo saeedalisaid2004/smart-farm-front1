@@ -74,41 +74,107 @@ const DashboardSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
   const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
 
-  useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
-  useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
+  useEffect(() => {
+    if (user) {
+      setFullName(user.name || "Farm Owner");
+      setEmail(user.email || "owner@smartfarm.com");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const userId = getExternalUserId();
+    if (!userId) return;
+
+    let cancelled = false;
+    setNotifSaving(true);
+
+    updateFarmerNotificationSettings(userId, {})
+      .then((data) => {
+        if (cancelled || !data?.current_settings) return;
+
+        const nextNotifications = {
+          push: data.current_settings.push ?? defaultNotifications.push,
+          email: data.current_settings.email ?? defaultNotifications.email,
+        };
+        const nextAnalysisAlerts = data.current_settings.analysis_alerts ?? true;
+
+        setNotifications(nextNotifications);
+        setAnalysisAlerts(nextAnalysisAlerts);
+        persistSettings(currentUserId, { notifications: nextNotifications });
+        setAnalysisAlertsEnabled(nextAnalysisAlerts);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setNotifSaving(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUserId]);
 
   const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
     const userId = getExternalUserId();
+
     if (key === "analysis_alerts") {
       const prev = analysisAlerts;
       setAnalysisAlerts(value);
       setAnalysisAlertsEnabled(value);
+
       if (userId) {
+        setNotifSaving(true);
         try {
-          await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
+          const data = await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
+          const nextAnalysisAlerts = data?.current_settings?.analysis_alerts ?? value;
+          setAnalysisAlerts(nextAnalysisAlerts);
+          setAnalysisAlertsEnabled(nextAnalysisAlerts);
           toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
         } catch {
           setAnalysisAlerts(prev);
           setAnalysisAlertsEnabled(prev);
           toast({ title: "Failed to update notifications", variant: "destructive" });
+        } finally {
+          setNotifSaving(false);
         }
       }
       return;
     }
+
     const prev = { ...notifications };
-    setNotifications({ ...notifications, [key]: value });
+    const optimisticNotifications = { ...notifications, [key]: value };
+    setNotifications(optimisticNotifications);
+    persistSettings(currentUserId, { notifications: optimisticNotifications });
+
     if (userId) {
+      setNotifSaving(true);
       try {
-        await updateFarmerNotificationSettings(userId, { [key]: value });
+        const data = await updateFarmerNotificationSettings(userId, { [key]: value });
+        const nextNotifications = data?.current_settings
+          ? {
+              push: data.current_settings.push ?? optimisticNotifications.push,
+              email: data.current_settings.email ?? optimisticNotifications.email,
+            }
+          : optimisticNotifications;
+
+        setNotifications(nextNotifications);
+        persistSettings(currentUserId, { notifications: nextNotifications });
         toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
       } catch {
         setNotifications(prev);
+        persistSettings(currentUserId, { notifications: prev });
         toast({ title: "Failed to update notifications", variant: "destructive" });
+      } finally {
+        setNotifSaving(false);
       }
     }
   };
@@ -140,7 +206,6 @@ const DashboardSettings = () => {
         </motion.div>
 
         <div className="space-y-5">
-          {/* Profile */}
           <SectionCard icon={User} title={t("settings.profile")} index={0} gradient="from-blue-500 to-cyan-500">
             <div className="space-y-4">
               {[
@@ -161,7 +226,6 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          {/* Theme */}
           <SectionCard icon={Palette} title={t("settings.theme")} index={1} gradient="from-amber-500 to-orange-500">
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -184,7 +248,6 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          {/* Language */}
           <SectionCard icon={Globe} title={t("settings.language")} index={2} gradient="from-violet-500 to-purple-500">
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -208,7 +271,6 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          {/* Notifications */}
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
@@ -229,7 +291,7 @@ const DashboardSettings = () => {
                   <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
                   <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
                 </div>
-                <Switch checked={analysisAlerts} onCheckedChange={(checked) => handleNotificationToggle("analysis_alerts", checked)} />
+                <Switch disabled={notifSaving} checked={analysisAlerts} onCheckedChange={(checked) => handleNotificationToggle("analysis_alerts", checked)} />
               </div>
             </div>
           </SectionCard>
