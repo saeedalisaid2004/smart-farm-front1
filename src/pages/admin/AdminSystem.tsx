@@ -51,7 +51,7 @@ const AdminSystem = () => {
           const isActive = (m.status || "").toLowerCase() === "active" || (m.status || "").toLowerCase() === "online";
           if (name.includes("plant")) modelStatusMap["plant_disease"] = isActive;
           if (name.includes("animal")) modelStatusMap["animal_weight"] = isActive;
-          if (name.includes("crop")) modelStatusMap["crop_recommendation"] = isActive;
+          if (name.includes("crop")) modelStatusMap["crop_rec"] = isActive;
           if (name.includes("soil")) modelStatusMap["soil_analysis"] = isActive;
           if (name.includes("fruit")) modelStatusMap["fruit_quality"] = isActive;
           if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
@@ -60,7 +60,7 @@ const AdminSystem = () => {
         setServices([
           { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
           { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
-          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: modelStatusMap["crop_recommendation"] ?? true },
+          { name: t("dashboard.cropRecommendation"), module: "crop_rec", uptime: "99.8%", online: modelStatusMap["crop_rec"] ?? true },
           { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
           { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
           { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
