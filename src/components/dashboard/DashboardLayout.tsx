@@ -291,6 +291,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          <h2 className={cn("text-base md:text-lg font-semibold text-foreground truncate", isRTL ? "mr-auto" : "ml-auto")}>{title}</h2>
         </header>
 
         <main className="flex-1 p-4 md:p-8">
