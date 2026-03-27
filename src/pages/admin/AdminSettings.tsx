@@ -226,6 +226,10 @@ const AdminSettings = () => {
               ))}
             </div>
           </SectionCard>
+
+          <SectionCard icon={Lock} title={t("settings.changePassword")} index={4} gradient="from-emerald-500 to-teal-500">
+            <ChangePasswordSection />
+          </SectionCard>
         </div>
       </div>
     </AdminLayout>
