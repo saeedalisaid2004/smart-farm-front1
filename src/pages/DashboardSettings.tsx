@@ -75,10 +75,11 @@ const DashboardSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [analysisAlerts, setAnalysisAlerts] = useState(() => isAnalysisAlertsEnabled());
+  const [analysisAlerts, setAnalysisAlerts] = useState(true);
+  const [notifLoading, setNotifLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -92,11 +93,31 @@ const DashboardSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Load settings from localStorage on mount (API doesn't return current_settings)
+  // Fetch notification settings from API on mount
   useEffect(() => {
-    const stored = getStoredSettings(currentUserId);
-    setNotifications(stored.notifications);
-    setAnalysisAlerts(isAnalysisAlertsEnabled());
+    const userId = getExternalUserId();
+    if (!userId) { setNotifLoading(false); return; }
+
+    let cancelled = false;
+    setNotifLoading(true);
+
+    updateFarmerNotificationSettings(userId, {})
+      .then((data) => {
+        if (cancelled) return;
+        if (data?.current_settings) {
+          setNotifications({
+            push: data.current_settings.push ?? defaultNotifications.push,
+            email: data.current_settings.email ?? defaultNotifications.email,
+          });
+          const alerts = data.current_settings.analysis_alerts ?? true;
+          setAnalysisAlerts(alerts);
+          setAnalysisAlertsEnabled(alerts);
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setNotifLoading(false); });
+
+    return () => { cancelled = true; };
   }, [currentUserId]);
 
   const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
