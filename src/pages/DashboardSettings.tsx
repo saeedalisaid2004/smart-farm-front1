@@ -93,7 +93,7 @@ const DashboardSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Fetch notification settings from Supabase on mount
+  // Fetch notification settings from external API on mount
   useEffect(() => {
     const userId = getExternalUserId();
     if (!userId) { setNotifLoading(false); return; }
@@ -101,12 +101,18 @@ const DashboardSettings = () => {
     let cancelled = false;
     setNotifLoading(true);
 
-    getNotificationSettings(userId, "farmer")
-      .then((settings) => {
+    updateFarmerNotificationSettings(userId, {})
+      .then((data) => {
         if (cancelled) return;
-        setNotifications({ push: settings.push, email: settings.email });
-        setAnalysisAlerts(settings.analysis_alerts);
-        setAnalysisAlertsEnabled(settings.analysis_alerts);
+        if (data?.current_settings) {
+          setNotifications({
+            push: data.current_settings.push ?? true,
+            email: data.current_settings.email ?? true,
+          });
+          const alerts = data.current_settings.analysis_alerts ?? true;
+          setAnalysisAlerts(alerts);
+          setAnalysisAlertsEnabled(alerts);
+        }
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setNotifLoading(false); });
@@ -124,9 +130,10 @@ const DashboardSettings = () => {
       setAnalysisAlertsEnabled(value);
       setNotifSaving(true);
       try {
-        const settings = await updateNotificationSettings(userId, "farmer", { analysis_alerts: value });
-        setAnalysisAlerts(settings.analysis_alerts);
-        setAnalysisAlertsEnabled(settings.analysis_alerts);
+        const data = await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
+        const next = data?.current_settings?.analysis_alerts ?? value;
+        setAnalysisAlerts(next);
+        setAnalysisAlertsEnabled(next);
         toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
       } catch {
         setAnalysisAlerts(prev);
@@ -140,8 +147,13 @@ const DashboardSettings = () => {
     setNotifications({ ...notifications, [key]: value });
     setNotifSaving(true);
     try {
-      const settings = await updateNotificationSettings(userId, "farmer", { [key]: value });
-      setNotifications({ push: settings.push, email: settings.email });
+      const data = await updateFarmerNotificationSettings(userId, { [key]: value });
+      if (data?.current_settings) {
+        setNotifications({
+          push: data.current_settings.push ?? value,
+          email: data.current_settings.email ?? notifications.email,
+        });
+      }
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
