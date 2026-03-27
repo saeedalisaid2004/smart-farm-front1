@@ -40,9 +40,14 @@ const AdminSystem = () => {
       if (Array.isArray(modelsData)) setModels(modelsData);
       else if (modelsData?.models) setModels(modelsData.models);
 
-      // Build services from models table - API is the source of truth
+      // Build services from models table + saved local overrides
+      const savedServiceOverrides = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
+      
       if (status?.services) {
-        setServices(status.services);
+        setServices(status.services.map((s: any) => ({
+          ...s,
+          online: savedServiceOverrides[s.module] !== undefined ? savedServiceOverrides[s.module] : s.online,
+        })));
       } else {
         const modelsList = Array.isArray(modelsData) ? modelsData : (modelsData?.models || []);
         const modelStatusMap: Record<string, boolean> = {};
@@ -56,14 +61,17 @@ const AdminSystem = () => {
           if (name.includes("fruit")) modelStatusMap["fruit_quality"] = isActive;
           if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
         });
+
+        const applyOverride = (module: string, apiStatus: boolean) =>
+          savedServiceOverrides[module] !== undefined ? savedServiceOverrides[module] : apiStatus;
         
         setServices([
-          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
-          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
-          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: modelStatusMap["crop_recommendation"] ?? true },
-          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
-          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
-          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
+          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: applyOverride("plant_disease", modelStatusMap["plant_disease"] ?? true) },
+          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: applyOverride("animal_weight", modelStatusMap["animal_weight"] ?? true) },
+          { name: t("dashboard.cropRecommendation"), module: "crop_recommendation", uptime: "99.8%", online: applyOverride("crop_recommendation", modelStatusMap["crop_recommendation"] ?? true) },
+          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: applyOverride("soil_analysis", modelStatusMap["soil_analysis"] ?? true) },
+          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: applyOverride("fruit_quality", modelStatusMap["fruit_quality"] ?? true) },
+          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: applyOverride("chatbot", modelStatusMap["chatbot"] ?? true) },
         ]);
       }
     }).finally(() => setLoading(false));
