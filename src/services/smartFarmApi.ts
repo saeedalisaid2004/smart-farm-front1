@@ -344,6 +344,25 @@ export const updateFarmerNotificationSettings = async (
   return res.json();
 };
 
+// ============ Change Password ============
+
+export const changePassword = async (
+  userId: number,
+  currentPassword: string,
+  newPassword: string
+) => {
+  const res = await fetchWithTimeout(`${API_BASE}/change-password/${userId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || data.message || "Failed to change password");
+  }
+  return res.json();
+};
+
 // ============ Alternative Farmer Report ============
 
 export const generateFarmerReportAlt = async (userId: number) => {
