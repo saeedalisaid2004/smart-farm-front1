@@ -210,8 +210,8 @@ const DashboardSettings = () => {
               ))}
               <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
                 <div>
-                  <Label className="text-foreground font-medium">Analysis Completion Alerts</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">Notify when analysis finishes</p>
+                  <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
                 </div>
                 <Switch checked={analysisAlerts} onCheckedChange={(checked) => { setAnalysisAlerts(checked); setAnalysisAlertsEnabled(checked); }} />
               </div>
