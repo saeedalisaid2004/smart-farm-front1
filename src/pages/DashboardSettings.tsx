@@ -196,8 +196,8 @@ const DashboardSettings = () => {
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
-                { key: "push" as const, label: "Push Notifications", desc: "Get notified in your browser", checked: notifications.push },
-                { key: "email" as const, label: "Email Alerts", desc: "Receive updates via email", checked: notifications.email },
+                { key: "push" as const, label: t("settings.pushNotifications"), desc: t("settings.pushDesc"), checked: notifications.push },
+                { key: "email" as const, label: t("settings.emailAlerts"), desc: t("settings.emailDesc"), checked: notifications.email },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
                   <div>
@@ -210,8 +210,8 @@ const DashboardSettings = () => {
               ))}
               <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
                 <div>
-                  <Label className="text-foreground font-medium">Analysis Completion Alerts</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">Notify when analysis finishes</p>
+                  <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
                 </div>
                 <Switch checked={analysisAlerts} onCheckedChange={(checked) => { setAnalysisAlerts(checked); setAnalysisAlertsEnabled(checked); }} />
               </div>
