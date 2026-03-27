@@ -162,7 +162,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className={cn("h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-4 md:px-6 sticky top-0 z-30", isRTL && "flex-row-reverse")}>
+        <header className="h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-4 md:px-6 sticky top-0 z-30">
           <button
             onClick={() => setMobileOpen(true)}
             className={cn("md:hidden w-9 h-9 rounded-xl bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors", isRTL ? "ml-3" : "mr-3")}
