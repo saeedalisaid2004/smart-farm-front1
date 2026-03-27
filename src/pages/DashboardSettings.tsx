@@ -229,7 +229,7 @@ const DashboardSettings = () => {
                   <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
                   <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
                 </div>
-                <Switch checked={analysisAlerts} onCheckedChange={(checked) => { setAnalysisAlerts(checked); setAnalysisAlertsEnabled(checked); }} />
+                <Switch checked={analysisAlerts} onCheckedChange={(checked) => handleNotificationToggle("analysis_alerts", checked)} />
               </div>
             </div>
           </SectionCard>
