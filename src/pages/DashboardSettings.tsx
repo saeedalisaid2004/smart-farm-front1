@@ -229,8 +229,8 @@ const DashboardSettings = () => {
           <SectionCard icon={Palette} title={t("settings.theme")} index={1} gradient="from-amber-500 to-orange-500">
             <div className="grid grid-cols-2 gap-3">
               {[
-                { value: "light" as const, label: t("settings.lightMode"), icon: Sun, desc: "Clean & bright" },
-                { value: "dark" as const, label: t("settings.darkMode"), icon: Moon, desc: "Easy on eyes" },
+                { value: "light" as const, label: t("settings.lightMode"), icon: Sun, desc: t("settings.lightDesc") },
+                { value: "dark" as const, label: t("settings.darkMode"), icon: Moon, desc: t("settings.darkDesc") },
               ].map((opt) => (
                 <button key={opt.value} onClick={() => setTheme(opt.value)}
                   className={`relative flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer

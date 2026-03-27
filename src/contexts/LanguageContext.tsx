@@ -438,6 +438,8 @@ const translations = {
     "settings.theme": "تفضيل المظهر",
     "settings.lightMode": "الوضع الفاتح",
     "settings.darkMode": "الوضع الداكن",
+    "settings.lightDesc": "نظيف ومشرق",
+    "settings.darkDesc": "مريح للعين",
     "settings.language": "اختيار اللغة",
     "settings.notifications": "تفضيلات الإشعارات",
     "settings.emailNotifications": "إشعارات البريد الإلكتروني",
