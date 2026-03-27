@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getUserNotifications, getExternalUserId } from "@/services/smartFarmApi";
+// Merged: API + local analysis notifications
 
 export interface Notification {
   id: string;
