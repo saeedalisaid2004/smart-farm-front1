@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      notification_settings: {
+        Row: {
+          analysis_alerts: boolean
+          email: boolean
+          external_user_id: string
+          id: string
+          push: boolean
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          analysis_alerts?: boolean
+          email?: boolean
+          external_user_id: string
+          id?: string
+          push?: boolean
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          analysis_alerts?: boolean
+          email?: boolean
+          external_user_id?: string
+          id?: string
+          push?: boolean
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string

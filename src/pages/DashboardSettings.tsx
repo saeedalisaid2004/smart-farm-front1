@@ -8,8 +8,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
-import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
+import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { setAnalysisAlertsEnabled } from "@/services/notificationService";
+import { getNotificationSettings, updateNotificationSettings } from "@/services/notificationSettingsService";
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
@@ -93,7 +94,7 @@ const DashboardSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Fetch notification settings from API on mount
+  // Fetch notification settings from Supabase on mount
   useEffect(() => {
     const userId = getExternalUserId();
     if (!userId) { setNotifLoading(false); return; }
@@ -101,18 +102,12 @@ const DashboardSettings = () => {
     let cancelled = false;
     setNotifLoading(true);
 
-    updateFarmerNotificationSettings(userId, {})
-      .then((data) => {
+    getNotificationSettings(userId, "farmer")
+      .then((settings) => {
         if (cancelled) return;
-        if (data?.current_settings) {
-          setNotifications({
-            push: data.current_settings.push ?? defaultNotifications.push,
-            email: data.current_settings.email ?? defaultNotifications.email,
-          });
-          const alerts = data.current_settings.analysis_alerts ?? true;
-          setAnalysisAlerts(alerts);
-          setAnalysisAlertsEnabled(alerts);
-        }
+        setNotifications({ push: settings.push, email: settings.email });
+        setAnalysisAlerts(settings.analysis_alerts);
+        setAnalysisAlertsEnabled(settings.analysis_alerts);
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setNotifLoading(false); });
@@ -122,55 +117,38 @@ const DashboardSettings = () => {
 
   const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
     const userId = getExternalUserId();
+    if (!userId) return;
 
     if (key === "analysis_alerts") {
       const prev = analysisAlerts;
       setAnalysisAlerts(value);
       setAnalysisAlertsEnabled(value);
-
-      if (userId) {
-        setNotifSaving(true);
-        try {
-          const data = await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
-          const nextAnalysisAlerts = data?.current_settings?.analysis_alerts ?? value;
-          setAnalysisAlerts(nextAnalysisAlerts);
-          setAnalysisAlertsEnabled(nextAnalysisAlerts);
-          toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
-        } catch {
-          setAnalysisAlerts(prev);
-          setAnalysisAlertsEnabled(prev);
-          toast({ title: "Failed to update notifications", variant: "destructive" });
-        } finally {
-          setNotifSaving(false);
-        }
-      }
+      setNotifSaving(true);
+      try {
+        const settings = await updateNotificationSettings(userId, "farmer", { analysis_alerts: value });
+        setAnalysisAlerts(settings.analysis_alerts);
+        setAnalysisAlertsEnabled(settings.analysis_alerts);
+        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+      } catch {
+        setAnalysisAlerts(prev);
+        setAnalysisAlertsEnabled(prev);
+        toast({ title: "Failed to update notifications", variant: "destructive" });
+      } finally { setNotifSaving(false); }
       return;
     }
 
     const prev = { ...notifications };
-    const optimisticNotifications = { ...notifications, [key]: value };
-    setNotifications(optimisticNotifications);
-
-    if (userId) {
-      setNotifSaving(true);
-      try {
-        const data = await updateFarmerNotificationSettings(userId, { [key]: value });
-        if (data?.current_settings) {
-          setNotifications({
-            push: data.current_settings.push ?? optimisticNotifications.push,
-            email: data.current_settings.email ?? optimisticNotifications.email,
-          });
-        }
-        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
-      } catch {
-        setNotifications(prev);
-        toast({ title: "Failed to update notifications", variant: "destructive" });
-      } finally {
-        setNotifSaving(false);
-      }
-    }
+    setNotifications({ ...notifications, [key]: value });
+    setNotifSaving(true);
+    try {
+      const settings = await updateNotificationSettings(userId, "farmer", { [key]: value });
+      setNotifications({ push: settings.push, email: settings.email });
+      toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+    } catch {
+      setNotifications(prev);
+      toast({ title: "Failed to update notifications", variant: "destructive" });
+    } finally { setNotifSaving(false); }
   };
-
   const handleSave = async () => {
     const userId = getExternalUserId();
     setSaving(true);
