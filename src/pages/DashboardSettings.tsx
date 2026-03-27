@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
 import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
 import { motion } from "framer-motion";
+import ChangePasswordSection from "@/components/ChangePasswordSection";
 
 const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";

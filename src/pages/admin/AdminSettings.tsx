@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
+import ChangePasswordSection from "@/components/ChangePasswordSection";
 
 const getSettingsKey = (userId?: string | number) =>
   userId ? `admin_settings_${userId}` : "admin_settings";
