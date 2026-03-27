@@ -83,7 +83,7 @@ const AdminSettings = () => {
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
-  // Fetch notification settings from API on mount
+  // Fetch notification settings from Supabase on mount
   useEffect(() => {
     const userId = getExternalUserId();
     if (!userId) { setNotifLoading(false); return; }
@@ -91,15 +91,13 @@ const AdminSettings = () => {
     let cancelled = false;
     setNotifLoading(true);
 
-    updateAdminNotificationSettings(userId, {})
-      .then((data) => {
+    getNotificationSettings(userId, "admin")
+      .then((settings) => {
         if (cancelled) return;
-        if (data?.current_settings) {
-          setNotifications({
-            pushNotifications: data.current_settings.push ?? defaultNotifications.pushNotifications,
-            emailAlerts: data.current_settings.email ?? defaultNotifications.emailAlerts,
-          });
-        }
+        setNotifications({
+          pushNotifications: settings.push,
+          emailAlerts: settings.email,
+        });
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setNotifLoading(false); });
@@ -109,26 +107,22 @@ const AdminSettings = () => {
 
   const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {
     const userId = getExternalUserId();
+    if (!userId) return;
     const prev = { ...notifications };
-    const optimistic = { ...notifications, [key]: checked };
-    setNotifications(optimistic);
-    if (userId) {
-      setNotifSaving(true);
-      try {
-        const apiKey = key === "pushNotifications" ? "push" : "email";
-        const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
-        if (data?.current_settings) {
-          setNotifications({
-            pushNotifications: data.current_settings.push ?? optimistic.pushNotifications,
-            emailAlerts: data.current_settings.email ?? optimistic.emailAlerts,
-          });
-        }
-        toast({ title: t("settings.settingsSaved") });
-      } catch {
-        setNotifications(prev);
-        toast({ title: "Failed to update notifications", variant: "destructive" });
-      } finally { setNotifSaving(false); }
-    }
+    setNotifications({ ...notifications, [key]: checked });
+    setNotifSaving(true);
+    try {
+      const apiKey = key === "pushNotifications" ? "push" : "email";
+      const settings = await updateNotificationSettings(userId, "admin", { [apiKey]: checked });
+      setNotifications({
+        pushNotifications: settings.push,
+        emailAlerts: settings.email,
+      });
+      toast({ title: t("settings.settingsSaved") });
+    } catch {
+      setNotifications(prev);
+      toast({ title: "Failed to update notifications", variant: "destructive" });
+    } finally { setNotifSaving(false); }
   };
 
   const handleSave = async () => {
