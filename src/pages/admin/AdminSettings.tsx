@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
+import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
