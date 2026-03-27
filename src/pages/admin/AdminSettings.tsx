@@ -3,13 +3,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
+import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
+import ChangePasswordSection from "@/components/ChangePasswordSection";
 
 const getSettingsKey = (userId?: string | number) =>
   userId ? `admin_settings_${userId}` : "admin_settings";
@@ -224,6 +225,10 @@ const AdminSettings = () => {
                 </div>
               ))}
             </div>
+          </SectionCard>
+
+          <SectionCard icon={Lock} title={t("settings.changePassword")} index={4} gradient="from-emerald-500 to-teal-500">
+            <ChangePasswordSection />
           </SectionCard>
         </div>
       </div>
