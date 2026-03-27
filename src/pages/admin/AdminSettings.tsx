@@ -74,17 +74,36 @@ const AdminSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => getStoredSettings(currentUserId).notifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [saving, setSaving] = useState(false);
   const [notifSaving, setNotifSaving] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(true);
 
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
-  // Load settings from localStorage on mount (API doesn't return current_settings)
+  // Fetch notification settings from API on mount
   useEffect(() => {
-    const stored = getStoredSettings(currentUserId);
-    setNotifications(stored.notifications);
+    const userId = getExternalUserId();
+    if (!userId) { setNotifLoading(false); return; }
+
+    let cancelled = false;
+    setNotifLoading(true);
+
+    updateAdminNotificationSettings(userId, {})
+      .then((data) => {
+        if (cancelled) return;
+        if (data?.current_settings) {
+          setNotifications({
+            pushNotifications: data.current_settings.push ?? defaultNotifications.pushNotifications,
+            emailAlerts: data.current_settings.email ?? defaultNotifications.emailAlerts,
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setNotifLoading(false); });
+
+    return () => { cancelled = true; };
   }, [currentUserId]);
 
   const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {

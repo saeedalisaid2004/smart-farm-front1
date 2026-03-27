@@ -150,25 +150,20 @@ const DashboardSettings = () => {
     const prev = { ...notifications };
     const optimisticNotifications = { ...notifications, [key]: value };
     setNotifications(optimisticNotifications);
-    persistSettings(currentUserId, { notifications: optimisticNotifications });
 
     if (userId) {
       setNotifSaving(true);
       try {
         const data = await updateFarmerNotificationSettings(userId, { [key]: value });
-        const nextNotifications = data?.current_settings
-          ? {
-              push: data.current_settings.push ?? optimisticNotifications.push,
-              email: data.current_settings.email ?? optimisticNotifications.email,
-            }
-          : optimisticNotifications;
-
-        setNotifications(nextNotifications);
-        persistSettings(currentUserId, { notifications: nextNotifications });
+        if (data?.current_settings) {
+          setNotifications({
+            push: data.current_settings.push ?? optimisticNotifications.push,
+            email: data.current_settings.email ?? optimisticNotifications.email,
+          });
+        }
         toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
       } catch {
         setNotifications(prev);
-        persistSettings(currentUserId, { notifications: prev });
         toast({ title: "Failed to update notifications", variant: "destructive" });
       } finally {
         setNotifSaving(false);
