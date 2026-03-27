@@ -88,8 +88,15 @@ const AdminSystem = () => {
         description: `${svc.name} has been turned ${newOnline ? "on" : "off"}`,
         type: newOnline ? "success" : "warning",
       });
+      // Save override locally
+      const saved = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
+      saved[svc.module || svc.name] = newOnline;
+      localStorage.setItem("serviceOverrides", JSON.stringify(saved));
     } catch {
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
+      const saved = JSON.parse(localStorage.getItem("serviceOverrides") || "{}");
+      saved[svc.module || svc.name] = newOnline;
+      localStorage.setItem("serviceOverrides", JSON.stringify(saved));
     }
   };
 
