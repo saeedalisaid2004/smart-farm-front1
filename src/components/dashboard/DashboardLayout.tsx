@@ -60,8 +60,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
     navigate("/login");
   };
 
-  const rawName = user?.name || "John Farmer";
-  const userName = isRTL && rawName.toLowerCase() === "farmer" ? "مزارع" : rawName;
+  const userName = user?.name || "John Farmer";
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar_url || null);
 
   useEffect(() => {
