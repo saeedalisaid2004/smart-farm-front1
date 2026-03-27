@@ -100,9 +100,6 @@ const AdminSystem = () => {
       description: `${current?.name || settingKey} has been ${newEnabled ? "enabled" : "disabled"}`,
       type: "info",
     });
-    const savedOverrides = JSON.parse(localStorage.getItem("settingOverrides") || "{}");
-    savedOverrides[settingKey] = newEnabled;
-    localStorage.setItem("settingOverrides", JSON.stringify(savedOverrides));
   };
 
   const defaultSettings = [
