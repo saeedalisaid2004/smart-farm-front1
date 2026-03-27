@@ -10,9 +10,27 @@ export interface Notification {
   created_at: string;
 }
 
+const READ_IDS_KEY = "notifications_read_ids";
+const DELETED_IDS_KEY = "notifications_deleted_ids";
+
+function getStoredSet(key: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function storeSet(key: string, set: Set<string>) {
+  localStorage.setItem(key, JSON.stringify([...set]));
+}
+
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readIds, setReadIds] = useState<Set<string>>(getStoredSet(READ_IDS_KEY));
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(getStoredSet(DELETED_IDS_KEY));
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -51,12 +69,57 @@ export function useNotifications() {
     return () => window.removeEventListener("notifications-updated", handler);
   }, [fetchNotifications]);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  // Apply local overrides
+  const visibleNotifications = notifications
+    .filter((n) => !deletedIds.has(n.id))
+    .map((n) => (readIds.has(n.id) ? { ...n, is_read: true } : n));
+
+  const unreadCount = visibleNotifications.filter((n) => !n.is_read).length;
+
+  const markAsRead = useCallback((id: string) => {
+    setReadIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      storeSet(READ_IDS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setReadIds((prev) => {
+      const next = new Set(prev);
+      notifications.forEach((n) => next.add(n.id));
+      storeSet(READ_IDS_KEY, next);
+      return next;
+    });
+  }, [notifications]);
+
+  const deleteNotification = useCallback((id: string) => {
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      storeSet(DELETED_IDS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      notifications.forEach((n) => next.add(n.id));
+      storeSet(DELETED_IDS_KEY, next);
+      return next;
+    });
+  }, [notifications]);
 
   return {
-    notifications,
+    notifications: visibleNotifications,
     unreadCount,
     loading,
     refetch: fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
   };
 }
