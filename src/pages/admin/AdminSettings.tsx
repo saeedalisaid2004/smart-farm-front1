@@ -80,16 +80,49 @@ const AdminSettings = () => {
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
+  // Load current notification settings from API on mount
+  useEffect(() => {
+    const userId = getExternalUserId();
+    if (!userId) return;
+
+    let cancelled = false;
+    setNotifSaving(true);
+
+    updateAdminNotificationSettings(userId, {})
+      .then((data) => {
+        if (cancelled || !data?.current_settings) return;
+        const next: NotificationSettings = {
+          pushNotifications: data.current_settings.push ?? defaultNotifications.pushNotifications,
+          emailAlerts: data.current_settings.email ?? defaultNotifications.emailAlerts,
+        };
+        setNotifications(next);
+        persistSettings(currentUserId, { notifications: next });
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setNotifSaving(false); });
+
+    return () => { cancelled = true; };
+  }, [currentUserId]);
+
   const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {
     const userId = getExternalUserId();
     const prev = { ...notifications };
-    setNotifications((p) => ({ ...p, [key]: checked }));
-    persistSettings(currentUserId, { notifications: { ...notifications, [key]: checked } });
+    const optimistic = { ...notifications, [key]: checked };
+    setNotifications(optimistic);
+    persistSettings(currentUserId, { notifications: optimistic });
     if (userId) {
       setNotifSaving(true);
       try {
         const apiKey = key === "pushNotifications" ? "push" : "email";
-        await updateAdminNotificationSettings(userId, { [apiKey]: checked });
+        const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
+        if (data?.current_settings) {
+          const next: NotificationSettings = {
+            pushNotifications: data.current_settings.push ?? optimistic.pushNotifications,
+            emailAlerts: data.current_settings.email ?? optimistic.emailAlerts,
+          };
+          setNotifications(next);
+          persistSettings(currentUserId, { notifications: next });
+        }
         toast({ title: t("settings.settingsSaved") });
       } catch {
         setNotifications(prev);
@@ -196,8 +229,8 @@ const AdminSettings = () => {
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
-                { key: "pushNotifications" as const, label: t("settings.pushNotifications"), desc: "Get notified in your browser", checked: notifications.pushNotifications },
-                { key: "emailAlerts" as const, label: t("settings.emailAlerts"), desc: "Receive updates via email", checked: notifications.emailAlerts },
+                { key: "pushNotifications" as const, label: t("settings.pushNotifications"), desc: t("settings.pushDesc"), checked: notifications.pushNotifications },
+                { key: "emailAlerts" as const, label: t("settings.emailAlerts"), desc: t("settings.emailDesc"), checked: notifications.emailAlerts },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
                   <div>
