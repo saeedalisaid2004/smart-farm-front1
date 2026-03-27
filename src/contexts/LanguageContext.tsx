@@ -31,6 +31,8 @@ const translations = {
     "settings.theme": "Theme Preference",
     "settings.lightMode": "Light Mode",
     "settings.darkMode": "Dark Mode",
+    "settings.lightDesc": "Clean & bright",
+    "settings.darkDesc": "Easy on eyes",
     "settings.language": "Language Selection",
     "settings.notifications": "Notification Preferences",
     "settings.emailNotifications": "Email Notifications",
