@@ -235,7 +235,7 @@ const AdminSettings = () => {
                     <Label className="text-foreground font-medium">{item.label}</Label>
                     <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                   </div>
-                  <Switch disabled={notifSaving} checked={item.checked}
+                  <Switch disabled={notifSaving || notifLoading} checked={item.checked}
                     onCheckedChange={(checked) => handleNotifToggle(item.key, checked)} />
                 </div>
               ))}
