@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, FileText, Settings, Bell, Moon, Sun,
-  User, LogOut, CheckCircle, AlertCircle, Info, Menu
+  User, LogOut, CheckCircle, AlertCircle, Info, Menu, Trash2, CheckCheck, XCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -48,7 +48,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
-  const { notifications, unreadCount } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleTheme = () => {
@@ -197,9 +197,14 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                   <h3 className="font-semibold text-foreground text-sm md:text-base">{t("header.notifications")}</h3>
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
-                      <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                        {unreadCount} {t("header.new")}
-                      </span>
+                      <button onClick={markAllAsRead} className="text-xs text-primary hover:underline flex items-center gap-1">
+                        <CheckCheck className="w-3 h-3" /> {t("header.new")}
+                      </button>
+                    )}
+                    {notifications.length > 0 && (
+                      <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                        <XCircle className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -223,7 +228,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                               "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
                               !n.is_read && "bg-primary/5"
                             )}
-                            onClick={() => {}}
+                            onClick={() => markAsRead(n.id)}
                           >
                             <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
                               <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
@@ -237,6 +242,12 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                              <button
+                                onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                              </button>
                             </div>
                           </motion.div>
                         );
