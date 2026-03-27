@@ -162,17 +162,17 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-4 md:px-6 sticky top-0 z-30">
+        <header className={cn("h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-4 md:px-6 sticky top-0 z-30", isRTL && "flex-row-reverse")}>
           <button
             onClick={() => setMobileOpen(true)}
-            className="md:hidden w-9 h-9 rounded-xl bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors mr-3"
+            className={cn("md:hidden w-9 h-9 rounded-xl bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors", isRTL ? "ml-3" : "mr-3")}
           >
             <Menu className="w-5 h-5" />
           </button>
 
           <h2 className="text-lg font-semibold text-foreground flex-1">{title}</h2>
 
-          <div className={cn("flex items-center gap-2 md:gap-3", isRTL && "flex-row-reverse")}>
+          <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={toggleTheme}
               className="w-9 h-9 rounded-xl bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all hover:bg-secondary"
