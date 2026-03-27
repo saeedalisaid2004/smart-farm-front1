@@ -8,8 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
-import { getNotificationSettings, updateNotificationSettings } from "@/services/notificationSettingsService";
+import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
@@ -83,7 +82,7 @@ const AdminSettings = () => {
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
-  // Fetch notification settings from Supabase on mount
+  // Fetch notification settings from external API on mount
   useEffect(() => {
     const userId = getExternalUserId();
     if (!userId) { setNotifLoading(false); return; }
@@ -91,13 +90,15 @@ const AdminSettings = () => {
     let cancelled = false;
     setNotifLoading(true);
 
-    getNotificationSettings(userId, "admin")
-      .then((settings) => {
+    updateAdminNotificationSettings(userId, {})
+      .then((data) => {
         if (cancelled) return;
-        setNotifications({
-          pushNotifications: settings.push,
-          emailAlerts: settings.email,
-        });
+        if (data?.current_settings) {
+          setNotifications({
+            pushNotifications: data.current_settings.push ?? true,
+            emailAlerts: data.current_settings.email ?? true,
+          });
+        }
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setNotifLoading(false); });
@@ -113,11 +114,13 @@ const AdminSettings = () => {
     setNotifSaving(true);
     try {
       const apiKey = key === "pushNotifications" ? "push" : "email";
-      const settings = await updateNotificationSettings(userId, "admin", { [apiKey]: checked });
-      setNotifications({
-        pushNotifications: settings.push,
-        emailAlerts: settings.email,
-      });
+      const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
+      if (data?.current_settings) {
+        setNotifications({
+          pushNotifications: data.current_settings.push ?? checked,
+          emailAlerts: data.current_settings.email ?? notifications.emailAlerts,
+        });
+      }
       toast({ title: t("settings.settingsSaved") });
     } catch {
       setNotifications(prev);
