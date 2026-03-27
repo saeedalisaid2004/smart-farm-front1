@@ -91,36 +91,11 @@ const DashboardSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  // Load settings from localStorage on mount (API doesn't return current_settings)
   useEffect(() => {
-    const userId = getExternalUserId();
-    if (!userId) return;
-
-    let cancelled = false;
-    setNotifSaving(true);
-
-    updateFarmerNotificationSettings(userId, {})
-      .then((data) => {
-        if (cancelled || !data?.current_settings) return;
-
-        const nextNotifications = {
-          push: data.current_settings.push ?? defaultNotifications.push,
-          email: data.current_settings.email ?? defaultNotifications.email,
-        };
-        const nextAnalysisAlerts = data.current_settings.analysis_alerts ?? true;
-
-        setNotifications(nextNotifications);
-        setAnalysisAlerts(nextAnalysisAlerts);
-        persistSettings(currentUserId, { notifications: nextNotifications });
-        setAnalysisAlertsEnabled(nextAnalysisAlerts);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setNotifSaving(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
+    const stored = getStoredSettings(currentUserId);
+    setNotifications(stored.notifications);
+    setAnalysisAlerts(isAnalysisAlertsEnabled());
   }, [currentUserId]);
 
   const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {

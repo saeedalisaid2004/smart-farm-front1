@@ -80,28 +80,10 @@ const AdminSettings = () => {
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
-  // Load current notification settings from API on mount
+  // Load settings from localStorage on mount (API doesn't return current_settings)
   useEffect(() => {
-    const userId = getExternalUserId();
-    if (!userId) return;
-
-    let cancelled = false;
-    setNotifSaving(true);
-
-    updateAdminNotificationSettings(userId, {})
-      .then((data) => {
-        if (cancelled || !data?.current_settings) return;
-        const next: NotificationSettings = {
-          pushNotifications: data.current_settings.push ?? defaultNotifications.pushNotifications,
-          emailAlerts: data.current_settings.email ?? defaultNotifications.emailAlerts,
-        };
-        setNotifications(next);
-        persistSettings(currentUserId, { notifications: next });
-      })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setNotifSaving(false); });
-
-    return () => { cancelled = true; };
+    const stored = getStoredSettings(currentUserId);
+    setNotifications(stored.notifications);
   }, [currentUserId]);
 
   const handleNotifToggle = async (key: "pushNotifications" | "emailAlerts", checked: boolean) => {
