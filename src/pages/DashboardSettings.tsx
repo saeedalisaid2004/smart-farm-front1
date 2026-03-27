@@ -82,8 +82,24 @@ const DashboardSettings = () => {
   useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
-  const handleNotificationToggle = async (key: "push" | "email", value: boolean) => {
+  const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
     const userId = getExternalUserId();
+    if (key === "analysis_alerts") {
+      const prev = analysisAlerts;
+      setAnalysisAlerts(value);
+      setAnalysisAlertsEnabled(value);
+      if (userId) {
+        try {
+          await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
+          toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
+        } catch {
+          setAnalysisAlerts(prev);
+          setAnalysisAlertsEnabled(prev);
+          toast({ title: "Failed to update notifications", variant: "destructive" });
+        }
+      }
+      return;
+    }
     const prev = { ...notifications };
     setNotifications({ ...notifications, [key]: value });
     if (userId) {
