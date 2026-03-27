@@ -164,134 +164,269 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 md:h-16 bg-card/80 backdrop-blur-xl border-b border-border flex items-center px-3 md:px-6 sticky top-0 z-10">
-          <div className={cn("flex items-center gap-1.5 md:gap-3", isRTL && "flex-row-reverse")}>
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="md:hidden w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
-            >
-              <Moon className="w-4 h-4 dark:hidden" />
-              <Sun className="w-4 h-4 hidden dark:block" />
-            </button>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all relative">
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground rounded-full text-[10px] font-bold flex items-center justify-center px-1">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
+          {isRTL ? (
+            <>
+              <div className="flex items-center gap-1.5 md:gap-3 flex-row-reverse">
+                <button
+                  onClick={() => setMobileOpen(true)}
+                  className="md:hidden w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Menu className="w-5 h-5" />
                 </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[calc(100vw-2rem)] max-w-96 p-0 rounded-2xl shadow-lg" align={isRTL ? "start" : "end"}>
-                <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
-                  <h3 className="font-semibold text-foreground text-sm md:text-base">{t("header.notifications")}</h3>
-                  <div className="flex items-center gap-2">
-                    {unreadCount > 0 && (
-                      <button onClick={markAllAsRead} className="text-xs text-primary hover:underline flex items-center gap-1">
-                        <CheckCheck className="w-3 h-3" /> {t("header.new")}
-                      </button>
-                    )}
-                    {notifications.length > 0 && (
-                      <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
-                        <XCircle className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="max-h-72 md:max-h-80 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">No notifications yet</p>
+                <button
+                  onClick={toggleTheme}
+                  className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+                >
+                  <Moon className="w-4 h-4 dark:hidden" />
+                  <Sun className="w-4 h-4 hidden dark:block" />
+                </button>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all relative">
+                      <Bell className="w-4 h-4" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground rounded-full text-[10px] font-bold flex items-center justify-center px-1">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-96 p-0 rounded-2xl shadow-lg" align="start">
+                    <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
+                      <h3 className="font-semibold text-foreground text-sm md:text-base">{t("header.notifications")}</h3>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button onClick={markAllAsRead} className="text-xs text-primary hover:underline flex items-center gap-1">
+                            <CheckCheck className="w-3 h-3" /> {t("header.new")}
+                          </button>
+                        )}
+                        {notifications.length > 0 && (
+                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                            <XCircle className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <AnimatePresence>
-                      {notifications.map((n) => {
-                        const { icon: Icon, color, bg } = getNotificationIcon(n.type);
-                        return (
-                          <motion.div
-                            key={n.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 10 }}
-                            className={cn(
-                              "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
-                              !n.is_read && "bg-primary/5"
-                            )}
-                            onClick={() => markAsRead(n.id)}
-                          >
-                            <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
-                              <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={cn("text-xs md:text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
-                              {n.description && (
-                                <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.description}</p>
-                              )}
-                              <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                              {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                    <div className="max-h-72 md:max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                          <p className="text-sm text-muted-foreground">No notifications yet</p>
+                        </div>
+                      ) : (
+                        <AnimatePresence>
+                          {notifications.map((n) => {
+                            const { icon: Icon, color, bg } = getNotificationIcon(n.type);
+                            return (
+                              <motion.div
+                                key={n.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className={cn(
+                                  "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
+                                  !n.is_read && "bg-primary/5"
+                                )}
+                                onClick={() => markAsRead(n.id)}
                               >
-                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                              </button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </AnimatePresence>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
+                                <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
+                                  <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className={cn("text-xs md:text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                                  {n.description && (
+                                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.description}</p>
+                                  )}
+                                  <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                  {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                                  </button>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </AnimatePresence>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className={cn("flex items-center gap-2 cursor-pointer rounded-xl px-1.5 md:px-2 py-1.5 hover:bg-secondary transition-colors", isRTL && "flex-row-reverse")}>
-                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-primary text-xs md:text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
-                    )}
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full border-2 border-card" />
-                  </div>
-                  <div className="hidden md:flex flex-col items-start">
-                    <span className="text-sm font-semibold text-foreground leading-tight">{userName}</span>
-                    <span className="text-xs text-muted-foreground leading-tight capitalize">
-                      {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
-                    </span>
-                  </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 cursor-pointer rounded-xl px-1.5 md:px-2 py-1.5 hover:bg-secondary transition-colors flex-row-reverse">
+                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-primary text-xs md:text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
+                        )}
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full border-2 border-card" />
+                      </div>
+                      <div className="hidden md:flex flex-col items-start">
+                        <span className="text-sm font-semibold text-foreground leading-tight">{userName}</span>
+                        <span className="text-xs text-muted-foreground leading-tight capitalize">
+                          {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
+                        </span>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48 rounded-xl">
+                    <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard/profile")} className="cursor-pointer rounded-lg">
+                      <User className="w-4 h-4 mr-2" /> {t("header.profile")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer rounded-lg">
+                      <Settings className="w-4 h-4 mr-2" /> {t("dashboard.settings")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-lg text-destructive">
+                      <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <h2 className="text-base md:text-lg font-semibold text-foreground truncate mr-auto">{title}</h2>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="md:hidden w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors mr-2"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h2 className="text-base md:text-lg font-semibold text-foreground flex-1 truncate">{title}</h2>
+              <div className="flex items-center gap-1.5 md:gap-3">
+                <button
+                  onClick={toggleTheme}
+                  className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+                >
+                  <Moon className="w-4 h-4 dark:hidden" />
+                  <Sun className="w-4 h-4 hidden dark:block" />
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48 rounded-xl">
-                <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard/profile")} className="cursor-pointer rounded-lg">
-                  <User className="w-4 h-4 mr-2" /> {t("header.profile")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer rounded-lg">
-                  <Settings className="w-4 h-4 mr-2" /> {t("dashboard.settings")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-lg text-destructive">
-                  <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <h2 className={cn("text-base md:text-lg font-semibold text-foreground truncate", isRTL ? "mr-auto" : "ml-auto")}>{title}</h2>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all relative">
+                      <Bell className="w-4 h-4" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground rounded-full text-[10px] font-bold flex items-center justify-center px-1">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-96 p-0 rounded-2xl shadow-lg" align="end">
+                    <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
+                      <h3 className="font-semibold text-foreground text-sm md:text-base">{t("header.notifications")}</h3>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button onClick={markAllAsRead} className="text-xs text-primary hover:underline flex items-center gap-1">
+                            <CheckCheck className="w-3 h-3" /> {t("header.new")}
+                          </button>
+                        )}
+                        {notifications.length > 0 && (
+                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                            <XCircle className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="max-h-72 md:max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                          <p className="text-sm text-muted-foreground">No notifications yet</p>
+                        </div>
+                      ) : (
+                        <AnimatePresence>
+                          {notifications.map((n) => {
+                            const { icon: Icon, color, bg } = getNotificationIcon(n.type);
+                            return (
+                              <motion.div
+                                key={n.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className={cn(
+                                  "flex items-start gap-2.5 md:gap-3 p-3 md:p-4 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors cursor-pointer group",
+                                  !n.is_read && "bg-primary/5"
+                                )}
+                                onClick={() => markAsRead(n.id)}
+                              >
+                                <div className={cn("w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0", bg)}>
+                                  <Icon className={cn("w-4 h-4 md:w-5 md:h-5", color)} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className={cn("text-xs md:text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                                  {n.description && (
+                                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.description}</p>
+                                  )}
+                                  <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                  {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                                  </button>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </AnimatePresence>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 cursor-pointer rounded-xl px-1.5 md:px-2 py-1.5 hover:bg-secondary transition-colors">
+                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center relative overflow-hidden">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-primary text-xs md:text-sm font-semibold">{userName.charAt(0).toUpperCase()}</span>
+                        )}
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full border-2 border-card" />
+                      </div>
+                      <div className="hidden md:flex flex-col items-start">
+                        <span className="text-sm font-semibold text-foreground leading-tight">{userName}</span>
+                        <span className="text-xs text-muted-foreground leading-tight capitalize">
+                          {user?.role === "admin" ? t("common.admin") : t("common.farmer")}
+                        </span>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                    <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard/profile")} className="cursor-pointer rounded-lg">
+                      <User className="w-4 h-4 mr-2" /> {t("header.profile")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer rounded-lg">
+                      <Settings className="w-4 h-4 mr-2" /> {t("dashboard.settings")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-lg text-destructive">
+                      <LogOut className="w-4 h-4 mr-2" /> {t("header.logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </>
+          )}
         </header>
 
         <main className="flex-1 p-4 md:p-8">
