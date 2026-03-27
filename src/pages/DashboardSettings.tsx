@@ -8,8 +8,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
-import { isAnalysisAlertsEnabled, setAnalysisAlertsEnabled } from "@/services/notificationService";
+import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
+import { setAnalysisAlertsEnabled } from "@/services/notificationService";
+import { getNotificationSettings, updateNotificationSettings } from "@/services/notificationSettingsService";
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
