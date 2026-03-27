@@ -172,7 +172,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
           </button>
 
           <h2 className="text-base md:text-lg font-semibold text-foreground flex-1 truncate">{title}</h2>
-          <div className="flex items-center gap-1.5 md:gap-3">
+          <div className={cn("flex items-center gap-1.5 md:gap-3", isRTL && "flex-row-reverse")}>
             <button
               onClick={toggleTheme}
               className="w-9 h-9 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
