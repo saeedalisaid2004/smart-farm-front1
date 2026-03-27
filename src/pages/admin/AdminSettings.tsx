@@ -111,24 +111,20 @@ const AdminSettings = () => {
     const prev = { ...notifications };
     const optimistic = { ...notifications, [key]: checked };
     setNotifications(optimistic);
-    persistSettings(currentUserId, { notifications: optimistic });
     if (userId) {
       setNotifSaving(true);
       try {
         const apiKey = key === "pushNotifications" ? "push" : "email";
         const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
         if (data?.current_settings) {
-          const next: NotificationSettings = {
+          setNotifications({
             pushNotifications: data.current_settings.push ?? optimistic.pushNotifications,
             emailAlerts: data.current_settings.email ?? optimistic.emailAlerts,
-          };
-          setNotifications(next);
-          persistSettings(currentUserId, { notifications: next });
+          });
         }
         toast({ title: t("settings.settingsSaved") });
       } catch {
         setNotifications(prev);
-        persistSettings(currentUserId, { notifications: prev });
         toast({ title: "Failed to update notifications", variant: "destructive" });
       } finally { setNotifSaving(false); }
     }
