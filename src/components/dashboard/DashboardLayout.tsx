@@ -171,7 +171,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
             <Menu className="w-5 h-5" />
           </button>
 
-          <h2 className="text-base md:text-lg font-semibold text-foreground flex-1 truncate">{title}</h2>
+          <h2 className={cn("text-base md:text-lg font-semibold text-foreground flex-1 truncate", isRTL && "text-right")}>{title}</h2>
           <div className={cn("flex items-center gap-1.5 md:gap-3", isRTL && "flex-row-reverse")}>
             <button
               onClick={toggleTheme}
