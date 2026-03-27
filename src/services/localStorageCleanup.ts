@@ -9,6 +9,7 @@ const LEGACY_SHARED_KEYS = [
   "analysis_daily",
   "smart_farm_notifications",
   "settingOverrides",
+  "serviceOverrides",
   "avatar_cache",
 ];
 
