@@ -329,11 +329,14 @@ export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/admin-settings/${userId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(settings),
-  });
+  const params = new URLSearchParams();
+  if (settings.push !== undefined) params.append("push", String(settings.push));
+  if (settings.email !== undefined) params.append("email", String(settings.email));
+
+  const query = params.toString();
+  const url = `${API_BASE}/notifications/notifications/admin-settings/${userId}${query ? `?${query}` : ""}`;
+
+  const res = await fetchWithTimeout(url, { method: "PATCH" });
   if (!res.ok) throw new Error("Failed to update admin notification settings");
   return res.json();
 };
