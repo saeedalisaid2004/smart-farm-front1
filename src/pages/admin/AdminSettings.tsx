@@ -46,7 +46,7 @@ const AdminSettings = () => {
   const currentUserId = getExternalUserId() || user?.id;
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
+  const [phone, setPhone] = useState("");
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [saving, setSaving] = useState(false);
