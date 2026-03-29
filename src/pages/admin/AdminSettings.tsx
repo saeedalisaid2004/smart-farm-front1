@@ -95,10 +95,14 @@ const AdminSettings = () => {
       const apiKey = key === "pushNotifications" ? "push" : "email";
       const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
       if (data?.current_settings) {
-        setNotifications({
+        const next = {
           pushNotifications: data.current_settings.push ?? checked,
           emailAlerts: data.current_settings.email ?? notifications.emailAlerts,
-        });
+        };
+        setNotifications(next);
+        localStorage.setItem(`admin_notif_${currentUserId}`, JSON.stringify(next));
+      } else {
+        localStorage.setItem(`admin_notif_${currentUserId}`, JSON.stringify({ ...notifications, [key]: checked }));
       }
       toast({ title: t("settings.settingsSaved") });
     } catch {

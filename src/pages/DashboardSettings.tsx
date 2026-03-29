@@ -165,6 +165,7 @@ const DashboardSettings = () => {
       const serverSettings = extractNotificationSettings(data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
+      localStorage.setItem(`farmer_notif_${currentUserId}`, JSON.stringify(nextSettings));
       setAnalysisAlertsEnabled(nextSettings.analysis_alerts);
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
