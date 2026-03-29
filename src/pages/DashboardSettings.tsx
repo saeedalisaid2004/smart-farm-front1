@@ -103,13 +103,14 @@ const DashboardSettings = () => {
     updateFarmerNotificationSettings(userId, {})
       .then((data) => {
         if (cancelled) return;
-        if (data?.current_settings) {
+        const s = data?.current_settings || data;
+        if (s) {
           setNotifications({
-            email: data.current_settings.email ?? true,
-            analysis_alerts: data.current_settings.analysis_alerts ?? true,
-            weekly_report: data.current_settings.weekly_report ?? true,
+            email: s.email_notifications_farmer ?? s.email ?? true,
+            analysis_alerts: s.analysis_completion_alerts ?? s.analysis_alerts ?? true,
+            weekly_report: s.weekly_report_summary ?? s.weekly_report ?? true,
           });
-          setAnalysisAlertsEnabled(data.current_settings.analysis_alerts ?? true);
+          setAnalysisAlertsEnabled(s.analysis_completion_alerts ?? s.analysis_alerts ?? true);
         }
       })
       .catch(() => {})
