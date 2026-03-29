@@ -329,11 +329,14 @@ export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/admin-settings/${userId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(settings),
-  });
+  const params = new URLSearchParams();
+  if (settings.push !== undefined) params.append("push", String(settings.push));
+  if (settings.email !== undefined) params.append("email", String(settings.email));
+
+  const query = params.toString();
+  const url = `${API_BASE}/notifications/notifications/admin-settings/${userId}${query ? `?${query}` : ""}`;
+
+  const res = await fetchWithTimeout(url, { method: "PATCH" });
   if (!res.ok) throw new Error("Failed to update admin notification settings");
   return res.json();
 };
@@ -342,11 +345,15 @@ export const updateFarmerNotificationSettings = async (
   userId: number,
   settings: { email?: boolean; analysis_alerts?: boolean; weekly_report?: boolean }
 ) => {
-  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/farmer-settings/${userId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(settings),
-  });
+  const params = new URLSearchParams();
+  if (settings.email !== undefined) params.append("email_notif", String(settings.email));
+  if (settings.analysis_alerts !== undefined) params.append("analysis_alt", String(settings.analysis_alerts));
+  if (settings.weekly_report !== undefined) params.append("weekly_alt", String(settings.weekly_report));
+
+  const query = params.toString();
+  const url = `${API_BASE}/notifications/notifications/farmer-settings/${userId}${query ? `?${query}` : ""}`;
+
+  const res = await fetchWithTimeout(url, { method: "PATCH" });
   if (!res.ok) throw new Error("Failed to update farmer notification settings");
   return res.json();
 };
