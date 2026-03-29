@@ -75,7 +75,12 @@ const DashboardSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => {
+    try {
+      const cached = localStorage.getItem(`farmer_notif_${currentUserId}`);
+      return cached ? JSON.parse(cached) : defaultNotifications;
+    } catch { return defaultNotifications; }
+  });
   const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
@@ -160,6 +165,7 @@ const DashboardSettings = () => {
       const serverSettings = extractNotificationSettings(data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
+      localStorage.setItem(`farmer_notif_${currentUserId}`, JSON.stringify(nextSettings));
       setAnalysisAlertsEnabled(nextSettings.analysis_alerts);
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
