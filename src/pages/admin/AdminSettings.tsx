@@ -48,12 +48,7 @@ const AdminSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState("");
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => {
-    try {
-      const cached = localStorage.getItem(`admin_notif_${currentUserId}`);
-      return cached ? JSON.parse(cached) : defaultNotifications;
-    } catch { return defaultNotifications; }
-  });
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [saving, setSaving] = useState(false);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
