@@ -95,9 +95,6 @@ const AdminSettings = () => {
           emailAlerts: data.current_settings.email ?? notifications.emailAlerts,
         };
         setNotifications(next);
-      } else {
-        // No current_settings returned, keep optimistic state
-      }
       }
       toast({ title: t("settings.settingsSaved") });
     } catch {
