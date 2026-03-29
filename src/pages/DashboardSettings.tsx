@@ -119,6 +119,12 @@ const DashboardSettings = () => {
     return () => { cancelled = true; };
   }, [currentUserId]);
 
+  const apiKeyMap: Record<keyof NotificationSettings, string> = {
+    email: "email",
+    analysis_alerts: "analysis_alerts",
+    weekly_report: "weekly_report",
+  };
+
   const handleNotificationToggle = async (key: keyof NotificationSettings, value: boolean) => {
     const userId = getExternalUserId();
     if (!userId) return;
@@ -128,7 +134,7 @@ const DashboardSettings = () => {
     if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
     setNotifSaving(true);
     try {
-      const data = await updateFarmerNotificationSettings(userId, { [key]: value });
+      const data = await updateFarmerNotificationSettings(userId, { [apiKeyMap[key]]: value });
       const s = data?.current_settings || data;
       if (s) {
         const updated = {
