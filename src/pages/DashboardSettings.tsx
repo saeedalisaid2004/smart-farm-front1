@@ -16,9 +16,9 @@ import ChangePasswordSection from "@/components/ChangePasswordSection";
 const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
-type NotificationSettings = { push: boolean; email: boolean };
+type NotificationSettings = { email: boolean; analysis_alerts: boolean; weekly_report: boolean };
 
-const defaultNotifications: NotificationSettings = { push: true, email: true };
+const defaultNotifications: NotificationSettings = { email: true, analysis_alerts: true, weekly_report: true };
 
 const getStoredSettings = (userId?: string | number) => {
   try {

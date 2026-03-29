@@ -333,7 +333,7 @@ export const updateAdminNotificationSettings = async (
 
 export const updateFarmerNotificationSettings = async (
   userId: number,
-  settings: { push?: boolean; email?: boolean; analysis_alerts?: boolean }
+  settings: { email?: boolean; analysis_alerts?: boolean; weekly_report?: boolean }
 ) => {
   const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/farmer-settings/${userId}`, {
     method: "PATCH",
