@@ -239,25 +239,16 @@ const DashboardSettings = () => {
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
-                { key: "push" as const, label: t("settings.pushNotifications"), desc: t("settings.pushDesc"), checked: notifications.push },
-                { key: "email" as const, label: t("settings.emailAlerts"), desc: t("settings.emailDesc"), checked: notifications.email },
+                { key: "email" as const, label: t("settings.emailAlerts"), checked: notifications.email },
+                { key: "analysis_alerts" as const, label: t("settings.analysisAlerts"), checked: notifications.analysis_alerts },
+                { key: "weekly_report" as const, label: t("settings.weeklyReport") || "Weekly Report Summary", checked: notifications.weekly_report },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
-                  <div>
-                    <Label className="text-foreground font-medium">{item.label}</Label>
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
-                  </div>
+                  <Label className="text-foreground font-medium">{item.label}</Label>
                   <Switch disabled={notifSaving || notifLoading} checked={item.checked}
                     onCheckedChange={(checked) => handleNotificationToggle(item.key, checked)} />
                 </div>
               ))}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
-                <div>
-                  <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
-                </div>
-                <Switch disabled={notifSaving || notifLoading} checked={analysisAlerts} onCheckedChange={(checked) => handleNotificationToggle("analysis_alerts", checked)} />
-              </div>
             </div>
           </SectionCard>
 
