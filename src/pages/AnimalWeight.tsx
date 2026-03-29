@@ -55,8 +55,8 @@ const AnimalWeight = () => {
 
         <AnimatePresence mode="wait">
           {result && (() => {
-            if (result.detail || result.status === "Rejected")
-              return <ErrorResult key="err" title="Analysis Error" message={result.detail || result.message || "Request rejected"} />;
+            if (result.detail || result.status === "Rejected" || result.status === "Not Supported")
+              return <ErrorResult key="err" title={result.status === "Not Supported" ? "Not Supported" : "Analysis Error"} message={result.message || result.detail || "Request rejected"} />;
 
             const animalName = isRTL
               ? result.animal_name_ar || result.animal_type || result.animal || result.class_name || result.label || result.animal_name_en
