@@ -66,7 +66,10 @@ export function useNotifications() {
 
   // Listen for local notification updates
   useEffect(() => {
-    const handler = () => fetchNotifications();
+    const handler = () => {
+      // Defer to avoid React state update conflicts
+      setTimeout(() => fetchNotifications(), 50);
+    };
     window.addEventListener("notifications-updated", handler);
     return () => window.removeEventListener("notifications-updated", handler);
   }, [fetchNotifications]);
