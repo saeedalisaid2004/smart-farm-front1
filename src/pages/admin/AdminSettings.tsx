@@ -12,35 +12,9 @@ import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } f
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
-const getSettingsKey = (userId?: string | number) =>
-  userId ? `admin_settings_${userId}` : "admin_settings";
-
 type NotificationSettings = { pushNotifications: boolean; emailAlerts: boolean };
 
 const defaultNotifications: NotificationSettings = { pushNotifications: true, emailAlerts: true };
-
-const getStoredSettings = (userId?: string | number) => {
-  if (!userId) return { phone: "", notifications: defaultNotifications };
-  try {
-    const stored = localStorage.getItem(getSettingsKey(userId));
-    const parsed = stored ? JSON.parse(stored) : {};
-    return {
-      phone: parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "",
-      notifications: { ...defaultNotifications, ...(parsed.notifications || {}) },
-    };
-  } catch {
-    return { phone: "", notifications: defaultNotifications };
-  }
-};
-
-const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings(userId);
-  const key = getSettingsKey(userId);
-  localStorage.setItem(key, JSON.stringify({
-    ...current, ...updates,
-    notifications: { ...current.notifications, ...(updates.notifications || {}) },
-  }));
-};
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
