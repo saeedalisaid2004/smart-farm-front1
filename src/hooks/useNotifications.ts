@@ -10,17 +10,6 @@ export interface Notification {
   created_at: string;
 }
 
-const LOCAL_STORAGE_KEY = "app_notifications";
-
-function getLocalNotifications(): Notification[] {
-  try {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +18,6 @@ export function useNotifications() {
     const userId = getExternalUserId();
     setLoading(true);
     try {
-      // Fetch from API
       let apiList: Notification[] = [];
       if (userId) {
         const data = await getUserNotifications(userId);
@@ -43,18 +31,9 @@ export function useNotifications() {
           created_at: n.created_at ?? n.date ?? new Date().toISOString(),
         }));
       }
-
-      // Merge with local notifications
-      const localList = getLocalNotifications();
-
-      // Combine: API first, then local (deduplicate by id)
-      const idSet = new Set(apiList.map((n) => n.id));
-      const merged = [...apiList, ...localList.filter((n) => !idSet.has(n.id))];
-
-      setNotifications(merged);
+      setNotifications(apiList);
     } catch {
-      // Fallback to local only
-      setNotifications(getLocalNotifications());
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -64,11 +43,10 @@ export function useNotifications() {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // Listen for local notification updates
+  // Listen for new analysis notifications to refetch from API
   useEffect(() => {
     const handler = () => {
-      // Defer to avoid React state update conflicts
-      setTimeout(() => fetchNotifications(), 50);
+      setTimeout(() => fetchNotifications(), 500);
     };
     window.addEventListener("notifications-updated", handler);
     return () => window.removeEventListener("notifications-updated", handler);
@@ -84,14 +62,6 @@ export function useNotifications() {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
-    // Update localStorage too
-    try {
-      const local = getLocalNotifications();
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify(local.map((n) => (n.id === id ? { ...n, is_read: true } : n)))
-      );
-    } catch {}
     try {
       await markNotificationAsRead(id);
     } catch {}
@@ -99,29 +69,17 @@ export function useNotifications() {
 
   const markAllAsRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    try {
-      const local = getLocalNotifications();
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify(local.map((n) => ({ ...n, is_read: true })))
-      );
-    } catch {}
-    for (const n of sorted.filter((n) => !n.is_read)) {
+    for (const n of notifications.filter((n) => !n.is_read)) {
       try { await markNotificationAsRead(n.id); } catch {}
     }
-  }, [sorted]);
+  }, [notifications]);
 
   const deleteNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-    try {
-      const local = getLocalNotifications();
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local.filter((n) => n.id !== id)));
-    } catch {}
   }, []);
 
   const clearAll = useCallback(() => {
     setNotifications([]);
-    try { localStorage.setItem(LOCAL_STORAGE_KEY, "[]"); } catch {}
   }, []);
 
   return {
