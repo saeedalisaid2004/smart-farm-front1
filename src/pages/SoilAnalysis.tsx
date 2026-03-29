@@ -117,7 +117,7 @@ const SoilAnalysis = () => {
 
             const nested = result["Analysis Result"] || result.result || result;
             const soilTypeRaw = nested["Soil Type"] || nested.detected_soil_type || result.soil_type || result.predicted_class || result.prediction;
-            const fertilityRaw = nested["Fertility Level"] || nested.fertility_level || result.fertility_level || result.fertility;
+            const fertilityRaw = nested["Fertility Level"] || nested["Fertility"] || nested.fertility_level || result.fertility_level || result.fertility;
             const recommendation = nested["Recommendation"] || result.recommendation || result.description || nested.message;
 
             const soilTypeMap: Record<string, string> = { loamy: t("soil.types.loamy"), sandy: t("soil.types.sandy"), clay: t("soil.types.clay"), silty: t("soil.types.silty"), peaty: t("soil.types.peaty"), chalky: t("soil.types.chalky"), saline: t("soil.types.saline") };
