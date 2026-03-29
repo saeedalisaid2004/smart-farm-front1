@@ -125,26 +125,42 @@ const DashboardSettings = () => {
     weekly_report: "weekly_report",
   };
 
+  const extractNotificationSettings = (source: any): NotificationSettings | null => {
+    if (!source || typeof source !== "object") return null;
+
+    const hasSettingsFields = [
+      "email_notifications_farmer",
+      "email",
+      "analysis_completion_alerts",
+      "analysis_alerts",
+      "weekly_report_summary",
+      "weekly_report",
+    ].some((field) => field in source);
+
+    if (!hasSettingsFields) return null;
+
+    return {
+      email: source.email_notifications_farmer ?? source.email ?? notifications.email,
+      analysis_alerts: source.analysis_completion_alerts ?? source.analysis_alerts ?? notifications.analysis_alerts,
+      weekly_report: source.weekly_report_summary ?? source.weekly_report ?? notifications.weekly_report,
+    };
+  };
+
   const handleNotificationToggle = async (key: keyof NotificationSettings, value: boolean) => {
     const userId = getExternalUserId();
     if (!userId) return;
 
     const prev = { ...notifications };
-    setNotifications({ ...notifications, [key]: value });
+    const optimistic = { ...notifications, [key]: value };
+    setNotifications(optimistic);
     if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [apiKeyMap[key]]: value });
-      const s = data?.current_settings || data;
-      if (s) {
-        const updated = {
-          email: s.email_notifications_farmer ?? s.email ?? notifications.email,
-          analysis_alerts: s.analysis_completion_alerts ?? s.analysis_alerts ?? notifications.analysis_alerts,
-          weekly_report: s.weekly_report_summary ?? s.weekly_report ?? notifications.weekly_report,
-        };
-        setNotifications(updated);
-        setAnalysisAlertsEnabled(updated.analysis_alerts);
-      }
+      const serverSettings = extractNotificationSettings(data?.current_settings || data);
+      const nextSettings = serverSettings ?? optimistic;
+      setNotifications(nextSettings);
+      setAnalysisAlertsEnabled(nextSettings.analysis_alerts);
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
@@ -152,6 +168,7 @@ const DashboardSettings = () => {
       toast({ title: "Failed to update notifications", variant: "destructive" });
     } finally { setNotifSaving(false); }
   };
+
   const handleSave = async () => {
     const userId = getExternalUserId();
     setSaving(true);
