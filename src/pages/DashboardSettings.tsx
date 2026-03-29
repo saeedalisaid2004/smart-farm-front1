@@ -129,11 +129,12 @@ const DashboardSettings = () => {
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [key]: value });
-      if (data?.current_settings) {
+      const s = data?.current_settings || data;
+      if (s) {
         const updated = {
-          email: data.current_settings.email ?? notifications.email,
-          analysis_alerts: data.current_settings.analysis_alerts ?? notifications.analysis_alerts,
-          weekly_report: data.current_settings.weekly_report ?? notifications.weekly_report,
+          email: s.email_notifications_farmer ?? s.email ?? notifications.email,
+          analysis_alerts: s.analysis_completion_alerts ?? s.analysis_alerts ?? notifications.analysis_alerts,
+          weekly_report: s.weekly_report_summary ?? s.weekly_report ?? notifications.weekly_report,
         };
         setNotifications(updated);
         setAnalysisAlertsEnabled(updated.analysis_alerts);
