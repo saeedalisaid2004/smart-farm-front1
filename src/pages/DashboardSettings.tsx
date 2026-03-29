@@ -105,12 +105,11 @@ const DashboardSettings = () => {
         if (cancelled) return;
         if (data?.current_settings) {
           setNotifications({
-            push: data.current_settings.push ?? true,
             email: data.current_settings.email ?? true,
+            analysis_alerts: data.current_settings.analysis_alerts ?? true,
+            weekly_report: data.current_settings.weekly_report ?? true,
           });
-          const alerts = data.current_settings.analysis_alerts ?? true;
-          setAnalysisAlerts(alerts);
-          setAnalysisAlertsEnabled(alerts);
+          setAnalysisAlertsEnabled(data.current_settings.analysis_alerts ?? true);
         }
       })
       .catch(() => {})
@@ -119,43 +118,29 @@ const DashboardSettings = () => {
     return () => { cancelled = true; };
   }, [currentUserId]);
 
-  const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
+  const handleNotificationToggle = async (key: keyof NotificationSettings, value: boolean) => {
     const userId = getExternalUserId();
     if (!userId) return;
 
-    if (key === "analysis_alerts") {
-      const prev = analysisAlerts;
-      setAnalysisAlerts(value);
-      setAnalysisAlertsEnabled(value);
-      setNotifSaving(true);
-      try {
-        const data = await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
-        const next = data?.current_settings?.analysis_alerts ?? value;
-        setAnalysisAlerts(next);
-        setAnalysisAlertsEnabled(next);
-        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
-      } catch {
-        setAnalysisAlerts(prev);
-        setAnalysisAlertsEnabled(prev);
-        toast({ title: "Failed to update notifications", variant: "destructive" });
-      } finally { setNotifSaving(false); }
-      return;
-    }
-
     const prev = { ...notifications };
     setNotifications({ ...notifications, [key]: value });
+    if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [key]: value });
       if (data?.current_settings) {
-        setNotifications({
-          push: data.current_settings.push ?? value,
+        const updated = {
           email: data.current_settings.email ?? notifications.email,
-        });
+          analysis_alerts: data.current_settings.analysis_alerts ?? notifications.analysis_alerts,
+          weekly_report: data.current_settings.weekly_report ?? notifications.weekly_report,
+        };
+        setNotifications(updated);
+        setAnalysisAlertsEnabled(updated.analysis_alerts);
       }
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
+      if (key === "analysis_alerts") setAnalysisAlertsEnabled(prev.analysis_alerts);
       toast({ title: "Failed to update notifications", variant: "destructive" });
     } finally { setNotifSaving(false); }
   };
