@@ -95,9 +95,9 @@ const AdminSettings = () => {
           emailAlerts: data.current_settings.email ?? notifications.emailAlerts,
         };
         setNotifications(next);
-        localStorage.setItem(`admin_notif_${currentUserId}`, JSON.stringify(next));
       } else {
-        localStorage.setItem(`admin_notif_${currentUserId}`, JSON.stringify({ ...notifications, [key]: checked }));
+        // No current_settings returned, keep optimistic state
+      }
       }
       toast({ title: t("settings.settingsSaved") });
     } catch {
