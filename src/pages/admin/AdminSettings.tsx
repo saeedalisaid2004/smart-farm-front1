@@ -108,7 +108,7 @@ const AdminSettings = () => {
     try {
       if (userId) await apiSaveSettings(userId, { full_name: fullName, email, phone });
       if (user) setUser({ ...user, name: fullName, email });
-      persistSettings(currentUserId, { phone });
+      
       toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
