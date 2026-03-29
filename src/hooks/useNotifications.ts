@@ -10,33 +10,51 @@ export interface Notification {
   created_at: string;
 }
 
+const LOCAL_STORAGE_KEY = "app_notifications";
+
+function getLocalNotifications(): Notification[] {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchNotifications = useCallback(async () => {
     const userId = getExternalUserId();
-    if (!userId) {
-      setNotifications([]);
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
     try {
-      setLoading(true);
-      const data = await getUserNotifications(userId);
-      const list = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-      setNotifications(
-        list.map((n: any) => ({
+      // Fetch from API
+      let apiList: Notification[] = [];
+      if (userId) {
+        const data = await getUserNotifications(userId);
+        const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
+        apiList = raw.map((n: any) => ({
           id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
           title: n.title ?? "Notification",
           description: n.description ?? n.message ?? null,
           type: n.type ?? "info",
           is_read: n.is_read ?? n.read ?? false,
           created_at: n.created_at ?? n.date ?? new Date().toISOString(),
-        }))
-      );
+        }));
+      }
+
+      // Merge with local notifications
+      const localList = getLocalNotifications();
+
+      // Combine: API first, then local (deduplicate by id)
+      const idSet = new Set(apiList.map((n) => n.id));
+      const merged = [...apiList, ...localList.filter((n) => !idSet.has(n.id))];
+
+      setNotifications(merged);
     } catch {
-      setNotifications([]);
+      // Fallback to local only
+      setNotifications(getLocalNotifications());
     } finally {
       setLoading(false);
     }
@@ -44,6 +62,13 @@ export function useNotifications() {
 
   useEffect(() => {
     fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Listen for local notification updates
+  useEffect(() => {
+    const handler = () => fetchNotifications();
+    window.addEventListener("notifications-updated", handler);
+    return () => window.removeEventListener("notifications-updated", handler);
   }, [fetchNotifications]);
 
   const sorted = [...notifications].sort(
@@ -56,32 +81,44 @@ export function useNotifications() {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+    // Update localStorage too
+    try {
+      const local = getLocalNotifications();
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(local.map((n) => (n.id === id ? { ...n, is_read: true } : n)))
+      );
+    } catch {}
     try {
       await markNotificationAsRead(id);
-    } catch {
-      // Optimistic update stays
-    }
+    } catch {}
   }, []);
 
   const markAllAsRead = useCallback(async () => {
-    const unread = sorted.filter((n) => !n.is_read);
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    for (const n of unread) {
-      try {
-        await markNotificationAsRead(n.id);
-      } catch {
-        // continue
-      }
+    try {
+      const local = getLocalNotifications();
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(local.map((n) => ({ ...n, is_read: true })))
+      );
+    } catch {}
+    for (const n of sorted.filter((n) => !n.is_read)) {
+      try { await markNotificationAsRead(n.id); } catch {}
     }
   }, [sorted]);
 
-  const deleteNotification = useCallback((_id: string) => {
-    // No delete endpoint available - hide locally
-    setNotifications((prev) => prev.filter((n) => n.id !== _id));
+  const deleteNotification = useCallback((id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    try {
+      const local = getLocalNotifications();
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local.filter((n) => n.id !== id)));
+    } catch {}
   }, []);
 
   const clearAll = useCallback(() => {
     setNotifications([]);
+    try { localStorage.setItem(LOCAL_STORAGE_KEY, "[]"); } catch {}
   }, []);
 
   return {
