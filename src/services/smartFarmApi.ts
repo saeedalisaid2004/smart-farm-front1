@@ -353,8 +353,8 @@ export const changePassword = async (
 ) => {
   const res = await fetchWithTimeout(`${API_BASE}/change-password/${userId}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: toUrlEncoded({ old_password: currentPassword, new_password: newPassword }),
   });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
