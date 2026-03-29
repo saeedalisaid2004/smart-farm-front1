@@ -314,7 +314,14 @@ export const generatePremiumReport = async () => {
 // ============ Notification Settings ============
 
 export const getUserNotifications = async (userId: number) => {
-  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/my-notifications/${userId}`);
+  return res.json();
+};
+
+export const markNotificationAsRead = async (notifId: number | string) => {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/read/${notifId}`, {
+    method: "PATCH",
+  });
   return res.json();
 };
 
