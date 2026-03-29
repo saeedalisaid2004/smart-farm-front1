@@ -16,9 +16,9 @@ import ChangePasswordSection from "@/components/ChangePasswordSection";
 const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
 
-type NotificationSettings = { push: boolean; email: boolean };
+type NotificationSettings = { email: boolean; analysis_alerts: boolean; weekly_report: boolean };
 
-const defaultNotifications: NotificationSettings = { push: true, email: true };
+const defaultNotifications: NotificationSettings = { email: true, analysis_alerts: true, weekly_report: true };
 
 const getStoredSettings = (userId?: string | number) => {
   try {
@@ -78,7 +78,6 @@ const DashboardSettings = () => {
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [analysisAlerts, setAnalysisAlerts] = useState(true);
   const [notifLoading, setNotifLoading] = useState(true);
 
   useEffect(() => {
@@ -106,12 +105,11 @@ const DashboardSettings = () => {
         if (cancelled) return;
         if (data?.current_settings) {
           setNotifications({
-            push: data.current_settings.push ?? true,
             email: data.current_settings.email ?? true,
+            analysis_alerts: data.current_settings.analysis_alerts ?? true,
+            weekly_report: data.current_settings.weekly_report ?? true,
           });
-          const alerts = data.current_settings.analysis_alerts ?? true;
-          setAnalysisAlerts(alerts);
-          setAnalysisAlertsEnabled(alerts);
+          setAnalysisAlertsEnabled(data.current_settings.analysis_alerts ?? true);
         }
       })
       .catch(() => {})
@@ -120,43 +118,29 @@ const DashboardSettings = () => {
     return () => { cancelled = true; };
   }, [currentUserId]);
 
-  const handleNotificationToggle = async (key: "push" | "email" | "analysis_alerts", value: boolean) => {
+  const handleNotificationToggle = async (key: keyof NotificationSettings, value: boolean) => {
     const userId = getExternalUserId();
     if (!userId) return;
 
-    if (key === "analysis_alerts") {
-      const prev = analysisAlerts;
-      setAnalysisAlerts(value);
-      setAnalysisAlertsEnabled(value);
-      setNotifSaving(true);
-      try {
-        const data = await updateFarmerNotificationSettings(userId, { analysis_alerts: value });
-        const next = data?.current_settings?.analysis_alerts ?? value;
-        setAnalysisAlerts(next);
-        setAnalysisAlertsEnabled(next);
-        toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
-      } catch {
-        setAnalysisAlerts(prev);
-        setAnalysisAlertsEnabled(prev);
-        toast({ title: "Failed to update notifications", variant: "destructive" });
-      } finally { setNotifSaving(false); }
-      return;
-    }
-
     const prev = { ...notifications };
     setNotifications({ ...notifications, [key]: value });
+    if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [key]: value });
       if (data?.current_settings) {
-        setNotifications({
-          push: data.current_settings.push ?? value,
+        const updated = {
           email: data.current_settings.email ?? notifications.email,
-        });
+          analysis_alerts: data.current_settings.analysis_alerts ?? notifications.analysis_alerts,
+          weekly_report: data.current_settings.weekly_report ?? notifications.weekly_report,
+        };
+        setNotifications(updated);
+        setAnalysisAlertsEnabled(updated.analysis_alerts);
       }
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
+      if (key === "analysis_alerts") setAnalysisAlertsEnabled(prev.analysis_alerts);
       toast({ title: "Failed to update notifications", variant: "destructive" });
     } finally { setNotifSaving(false); }
   };
@@ -255,25 +239,16 @@ const DashboardSettings = () => {
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
-                { key: "push" as const, label: t("settings.pushNotifications"), desc: t("settings.pushDesc"), checked: notifications.push },
-                { key: "email" as const, label: t("settings.emailAlerts"), desc: t("settings.emailDesc"), checked: notifications.email },
+                { key: "email" as const, label: t("settings.emailAlerts"), checked: notifications.email },
+                { key: "analysis_alerts" as const, label: t("settings.analysisAlerts"), checked: notifications.analysis_alerts },
+                { key: "weekly_report" as const, label: t("settings.weeklyReport") || "Weekly Report Summary", checked: notifications.weekly_report },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
-                  <div>
-                    <Label className="text-foreground font-medium">{item.label}</Label>
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
-                  </div>
+                  <Label className="text-foreground font-medium">{item.label}</Label>
                   <Switch disabled={notifSaving || notifLoading} checked={item.checked}
                     onCheckedChange={(checked) => handleNotificationToggle(item.key, checked)} />
                 </div>
               ))}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
-                <div>
-                  <Label className="text-foreground font-medium">{t("settings.analysisAlerts")}</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t("settings.analysisDesc")}</p>
-                </div>
-                <Switch disabled={notifSaving || notifLoading} checked={analysisAlerts} onCheckedChange={(checked) => handleNotificationToggle("analysis_alerts", checked)} />
-              </div>
             </div>
           </SectionCard>
 
