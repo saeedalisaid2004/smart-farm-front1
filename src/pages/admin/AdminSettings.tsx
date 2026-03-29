@@ -12,35 +12,9 @@ import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } f
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
-const getSettingsKey = (userId?: string | number) =>
-  userId ? `admin_settings_${userId}` : "admin_settings";
-
 type NotificationSettings = { pushNotifications: boolean; emailAlerts: boolean };
 
 const defaultNotifications: NotificationSettings = { pushNotifications: true, emailAlerts: true };
-
-const getStoredSettings = (userId?: string | number) => {
-  if (!userId) return { phone: "", notifications: defaultNotifications };
-  try {
-    const stored = localStorage.getItem(getSettingsKey(userId));
-    const parsed = stored ? JSON.parse(stored) : {};
-    return {
-      phone: parsed.phone && parsed.phone !== "+1234567890" ? parsed.phone : "",
-      notifications: { ...defaultNotifications, ...(parsed.notifications || {}) },
-    };
-  } catch {
-    return { phone: "", notifications: defaultNotifications };
-  }
-};
-
-const persistSettings = (userId: string | number | undefined, updates: Partial<{ phone: string; notifications: NotificationSettings }>) => {
-  const current = getStoredSettings(userId);
-  const key = getSettingsKey(userId);
-  localStorage.setItem(key, JSON.stringify({
-    ...current, ...updates,
-    notifications: { ...current.notifications, ...(updates.notifications || {}) },
-  }));
-};
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -72,7 +46,7 @@ const AdminSettings = () => {
   const currentUserId = getExternalUserId() || user?.id;
   const [fullName, setFullName] = useState(user?.name || "Farm Owner");
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
+  const [phone, setPhone] = useState("");
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [saving, setSaving] = useState(false);
@@ -134,7 +108,7 @@ const AdminSettings = () => {
     try {
       if (userId) await apiSaveSettings(userId, { full_name: fullName, email, phone });
       if (user) setUser({ ...user, name: fullName, email });
-      persistSettings(currentUserId, { phone });
+      
       toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
