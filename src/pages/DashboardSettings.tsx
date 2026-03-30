@@ -75,7 +75,7 @@ const DashboardSettings = () => {
   const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
   const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
-  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [notifications, setNotifications] = useState<NotificationSettings | null>(null);
   const [notifSaving, setNotifSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
@@ -92,10 +92,12 @@ const DashboardSettings = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Fetch notification settings from external API on mount
   useEffect(() => {
-    const userId = getExternalUserId();
-    if (!userId) { setNotifLoading(false); return; }
+    const userId = currentUserId;
+    if (!userId) {
+      setNotifLoading(false);
+      return;
+    }
 
     let cancelled = false;
     setNotifLoading(true);
@@ -104,19 +106,26 @@ const DashboardSettings = () => {
       .then((data) => {
         if (cancelled) return;
         const s = data?.settings || data?.current_settings || data;
-        if (s) {
-          setNotifications({
-            email: s.email_notifications_farmer ?? s.email ?? true,
-            analysis_alerts: s.analysis_completion_alerts ?? s.analysis_alerts ?? true,
-            weekly_report: s.weekly_report_summary ?? s.weekly_report ?? true,
-          });
-          setAnalysisAlertsEnabled(s.analysis_completion_alerts ?? s.analysis_alerts ?? true);
-        }
-      })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setNotifLoading(false); });
+        const nextNotifications: NotificationSettings = {
+          email: s?.email_notifications_farmer ?? s?.email ?? defaultNotifications.email,
+          analysis_alerts: s?.analysis_completion_alerts ?? s?.analysis_alerts ?? defaultNotifications.analysis_alerts,
+          weekly_report: s?.weekly_report_summary ?? s?.weekly_report ?? defaultNotifications.weekly_report,
+        };
 
-    return () => { cancelled = true; };
+        setNotifications(nextNotifications);
+        setAnalysisAlertsEnabled(nextNotifications.analysis_alerts);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setNotifications(defaultNotifications);
+      })
+      .finally(() => {
+        if (!cancelled) setNotifLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentUserId]);
 
   const apiKeyMap: Record<keyof NotificationSettings, string> = {
@@ -140,38 +149,40 @@ const DashboardSettings = () => {
     if (!hasSettingsFields) return null;
 
     return {
-      email: source.email_notifications_farmer ?? source.email ?? notifications.email,
-      analysis_alerts: source.analysis_completion_alerts ?? source.analysis_alerts ?? notifications.analysis_alerts,
-      weekly_report: source.weekly_report_summary ?? source.weekly_report ?? notifications.weekly_report,
+      email: source.email_notifications_farmer ?? source.email ?? notifications?.email ?? defaultNotifications.email,
+      analysis_alerts: source.analysis_completion_alerts ?? source.analysis_alerts ?? notifications?.analysis_alerts ?? defaultNotifications.analysis_alerts,
+      weekly_report: source.weekly_report_summary ?? source.weekly_report ?? notifications?.weekly_report ?? defaultNotifications.weekly_report,
     };
   };
 
   const handleNotificationToggle = async (key: keyof NotificationSettings, value: boolean) => {
-    const userId = getExternalUserId();
-    if (!userId) return;
+    const userId = currentUserId;
+    if (!userId || !notifications) return;
 
     const prev = { ...notifications };
     const optimistic = { ...notifications, [key]: value };
     setNotifications(optimistic);
     if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
     setNotifSaving(true);
+
     try {
       const data = await updateFarmerNotificationSettings(userId, { [apiKeyMap[key]]: value });
       const serverSettings = extractNotificationSettings(data?.settings || data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
-      
       setAnalysisAlertsEnabled(nextSettings.analysis_alerts);
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
       if (key === "analysis_alerts") setAnalysisAlertsEnabled(prev.analysis_alerts);
       toast({ title: "Failed to update notifications", variant: "destructive" });
-    } finally { setNotifSaving(false); }
+    } finally {
+      setNotifSaving(false);
+    }
   };
 
   const handleSave = async () => {
-    const userId = getExternalUserId();
+    const userId = currentUserId;
     setSaving(true);
     try {
       if (userId) await apiSaveSettings(userId, { full_name: fullName, email, phone });
@@ -180,8 +191,12 @@ const DashboardSettings = () => {
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const notificationValues = notifications ?? defaultNotifications;
 
   return (
     <DashboardLayout title={t("settings.title")}>
@@ -265,14 +280,17 @@ const DashboardSettings = () => {
           <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
-                { key: "email" as const, label: t("settings.emailAlerts"), checked: notifications.email },
-                { key: "analysis_alerts" as const, label: t("settings.analysisAlerts"), checked: notifications.analysis_alerts },
-                { key: "weekly_report" as const, label: t("settings.weeklyReport") || "Weekly Report Summary", checked: notifications.weekly_report },
+                { key: "email" as const, label: t("settings.emailAlerts"), checked: notificationValues.email },
+                { key: "analysis_alerts" as const, label: t("settings.analysisAlerts"), checked: notificationValues.analysis_alerts },
+                { key: "weekly_report" as const, label: t("settings.weeklyReport") || "Weekly Report Summary", checked: notificationValues.weekly_report },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/30 hover:bg-secondary/50 transition-colors">
                   <Label className="text-foreground font-medium">{item.label}</Label>
-                  <Switch disabled={notifSaving || notifLoading} checked={item.checked}
-                    onCheckedChange={(checked) => handleNotificationToggle(item.key, checked)} />
+                  <Switch
+                    disabled={notifSaving || notifLoading || !notifications}
+                    checked={item.checked}
+                    onCheckedChange={(checked) => handleNotificationToggle(item.key, checked)}
+                  />
                 </div>
               ))}
             </div>
