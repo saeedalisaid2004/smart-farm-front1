@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 const API_BASE = "https://mahmoud123mahmoud-smartfarm-api.hf.space";
 
 const TIMEOUT_MS = 15000;
