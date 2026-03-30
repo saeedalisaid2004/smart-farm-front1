@@ -111,7 +111,7 @@ const AdminReports = () => {
   const statsCards = [
     { icon: TrendingUp, label: t("adminReports.totalAnalyses"), value: data?.total_analyses ?? "8,456", change: `+23% ${t("adminReports.fromLastMonth")}`, gradient: "from-emerald-500 to-green-600" },
     { icon: Users, label: t("adminReports.activeUsers"), value: data?.active_users ?? "1,247", change: `+12% ${t("adminReports.fromLastMonth")}`, gradient: "from-blue-500 to-indigo-600" },
-    { icon: Globe, label: t("adminReports.aiServices"), value: data?.ai_services_count ?? "6 Active", change: t("adminReports.uptimePercent"), gradient: "from-purple-500 to-violet-600" },
+    { icon: Globe, label: t("adminReports.aiServices"), value: data?.ai_services_count ? String(data.ai_services_count).replace(/\s*of\s*/i, " / ").replace(/\s*Active\s*/i, "").trim() : "6 / 6", change: t("adminReports.uptimePercent"), gradient: "from-purple-500 to-violet-600" },
     { icon: Activity, label: t("adminReports.avgResponse"), value: data?.avg_response_time ?? "145ms", change: `-8% ${t("adminReports.fromLastMonth")}`, gradient: "from-orange-500 to-amber-600" },
   ];
 
