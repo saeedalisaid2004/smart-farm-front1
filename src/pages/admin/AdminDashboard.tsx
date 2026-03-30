@@ -54,7 +54,7 @@ const AdminDashboard = () => {
   const statsCards = [
     { icon: Users, label: t("adminDash.totalUsers"), value: summary?.total_users ?? "—", sub: t("adminDash.registered"), change: "+12%", gradient: "from-blue-500 to-indigo-600", bgGlow: "bg-blue-500/10" },
     { icon: Activity, label: t("adminDash.totalAnalyses"), value: summary?.total_analyses ?? "—", sub: t("adminDash.thisMonth"), change: "+23%", gradient: "from-emerald-500 to-green-600", bgGlow: "bg-emerald-500/10" },
-    { icon: Cpu, label: t("adminDash.aiServices"), value: summary?.active_services ?? "6 of 6", sub: t("adminDash.active"), badge: t("adminDash.allOnline"), gradient: "from-purple-500 to-violet-600", bgGlow: "bg-purple-500/10" },
+    { icon: Cpu, label: t("adminDash.aiServices"), { icon: Cpu, label: t("adminDash.aiServices"), value: summary?.active_services ?? "6 / 6", sub: t("adminDash.active"), badge: t("adminDash.allOnline"), gradient: "from-purple-500 to-violet-600", bgGlow: "bg-purple-500/10" },, sub: t("adminDash.active"), badge: t("adminDash.allOnline"), gradient: "from-purple-500 to-violet-600", bgGlow: "bg-purple-500/10" },
     { icon: TrendingUp, label: t("adminDash.mostUsed"), value: summary?.top_service ?? t("adminDash.plantDisease"), sub: t("adminDash.detection"), badge: t("adminDash.top"), gradient: "from-orange-500 to-amber-600", bgGlow: "bg-orange-500/10" },
   ];
 
