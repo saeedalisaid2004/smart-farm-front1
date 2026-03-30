@@ -362,7 +362,7 @@ const translations = {
     "adminSys.connections": "Connections",
     "adminSys.connectionsActive": "active",
     "adminSys.aiModels": "AI Models",
-    "adminSys.activeModels": "6 of 6 Active",
+    "adminSys.activeModels": "6 / 6 Active",
     "adminSys.avgAccuracy": "Avg Accuracy",
     "adminSys.totalRequests": "Total Requests",
     "adminSys.servicesControl": "AI Services Control",
