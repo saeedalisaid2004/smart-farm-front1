@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { apiResetPassword, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
@@ -19,21 +18,20 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
-  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !otp.trim() || !newPassword) {
-      toast({ variant: "destructive", title: t("reset.fillAll") });
+      toast({ variant: "destructive", title: "Please fill all fields" });
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast({ variant: "destructive", title: t("reset.noMatch") });
+      toast({ variant: "destructive", title: "Passwords do not match" });
       return;
     }
     if (newPassword.length < 6) {
-      toast({ variant: "destructive", title: t("reset.tooShort") });
+      toast({ variant: "destructive", title: "Password must be at least 6 characters" });
       return;
     }
     setLoading(true);
@@ -43,17 +41,22 @@ const ResetPassword = () => {
         toast({ variant: "destructive", title: data.detail });
       } else {
         setSuccess(true);
-        toast({ title: t("reset.success") });
+        toast({ title: "Password reset successfully!" });
       }
     } catch (err) {
-      toast({ variant: "destructive", title: isTimeoutError(err) ? t("api.timeout") : t("forgot.error") });
+      toast({
+        variant: "destructive",
+        title: isTimeoutError(err)
+          ? "The server is not responding. Please try again shortly."
+          : "Something went wrong. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden" dir="ltr">
       <div className="absolute inset-0 gradient-hero" />
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-primary/6 rounded-full blur-[100px]" />
@@ -68,38 +71,38 @@ const ResetPassword = () => {
           <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-5 shadow-glow">
             <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">{t("reset.title")}</h1>
-          <p className="text-muted-foreground text-sm mt-1">{t("reset.subtitle")}</p>
+          <h1 className="text-2xl font-bold text-foreground">Reset Password</h1>
+          <p className="text-muted-foreground text-sm mt-1">Enter the code sent to your email</p>
         </div>
 
         {!success ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">{t("reset.email")}</Label>
+              <Label className="text-foreground font-medium text-sm">Email</Label>
               <Input
                 type="email"
-                placeholder={t("forgot.emailPlaceholder")}
+                placeholder="example@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">{t("reset.otp")}</Label>
+              <Label className="text-foreground font-medium text-sm">Verification Code</Label>
               <Input
                 type="text"
-                placeholder={t("reset.otpPlaceholder")}
+                placeholder="Enter code"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 text-center tracking-widest text-lg font-mono"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">{t("reset.newPassword")}</Label>
+              <Label className="text-foreground font-medium text-sm">New Password</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder={t("reset.newPasswordPlaceholder")}
+                  placeholder="Enter new password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoComplete="new-password"
@@ -111,10 +114,10 @@ const ResetPassword = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium text-sm">{t("reset.confirmPassword")}</Label>
+              <Label className="text-foreground font-medium text-sm">Confirm Password</Label>
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder={t("reset.confirmPlaceholder")}
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
@@ -122,7 +125,7 @@ const ResetPassword = () => {
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-semibold shadow-primary mt-2">
-              {loading ? t("reset.submitting") : t("reset.submit")}
+              {loading ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
         ) : (
@@ -130,17 +133,17 @@ const ResetPassword = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-foreground font-medium">{t("reset.success")}</p>
-            <p className="text-sm text-muted-foreground">{t("reset.successDesc")}</p>
+            <p className="text-foreground font-medium">Password reset successfully!</p>
+            <p className="text-sm text-muted-foreground">You can now sign in with your new password</p>
             <Button onClick={() => navigate("/login")} className="w-full h-12 rounded-xl text-base font-semibold">
-              {t("reset.goToLogin")}
+              Go to Sign In
             </Button>
           </div>
         )}
 
         <div className="mt-6 text-center">
           <Link to="/login" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" /> {t("reset.backToLogin")}
+            <ArrowLeft className="w-4 h-4" /> Back to Sign In
           </Link>
         </div>
       </motion.div>
