@@ -67,10 +67,11 @@ const AdminSettings = () => {
     updateAdminNotificationSettings(userId, {})
       .then((data) => {
         if (cancelled) return;
-        if (data?.current_settings) {
+        const s = data?.settings || data?.current_settings || data;
+        if (s) {
           setNotifications({
-            pushNotifications: data.current_settings.push ?? true,
-            emailAlerts: data.current_settings.email ?? true,
+            pushNotifications: s.push_notifications_admin ?? s.push ?? defaultNotifications.pushNotifications,
+            emailAlerts: s.email_alerts_admin ?? s.email ?? defaultNotifications.emailAlerts,
           });
         }
       })
