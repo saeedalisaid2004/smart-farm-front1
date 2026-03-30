@@ -90,10 +90,11 @@ const AdminSettings = () => {
     try {
       const apiKey = key === "pushNotifications" ? "push" : "email";
       const data = await updateAdminNotificationSettings(userId, { [apiKey]: checked });
-      if (data?.current_settings) {
+      const s = data?.settings || data?.current_settings || data;
+      if (s) {
         const next = {
-          pushNotifications: data.current_settings.push ?? checked,
-          emailAlerts: data.current_settings.email ?? notifications.emailAlerts,
+          pushNotifications: s.push_notifications_admin ?? s.push ?? checked,
+          emailAlerts: s.email_alerts_admin ?? s.email ?? notifications.emailAlerts,
         };
         setNotifications(next);
       }
