@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { apiRegister, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
@@ -18,7 +17,6 @@ const Register = () => {
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t, isRTL } = useLanguage();
 
   const validate = () => {
     const errs: { name?: string; email?: string; password?: string } = {};
@@ -41,17 +39,23 @@ const Register = () => {
       if (data.detail) {
         toast({ title: "Error", description: data.detail, variant: "destructive" });
       } else {
-        toast({ title: "✅", description: "تم إنشاء الحساب بنجاح! سجل دخولك الآن." });
+        toast({ title: "✅", description: "Account created successfully! Please sign in." });
         navigate("/login");
       }
     } catch (err) {
-      toast({ title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError"), variant: "destructive" });
+      toast({
+        title: "Error",
+        description: isTimeoutError(err)
+          ? "The server is not responding. Please try again shortly."
+          : "Could not connect to the server. Please check your internet connection.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-screen flex" dir="ltr">
       <div className="flex-1 flex items-center justify-center p-8 lg:p-12 relative">
         <div className="absolute inset-0 gradient-hero opacity-50" />
         <div className="absolute inset-0 bg-grid opacity-15" />
@@ -63,37 +67,37 @@ const Register = () => {
           className="w-full max-w-md relative z-10"
         >
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
-            <ArrowLeft className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
-            <span>{t("register.backHome")}</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Home</span>
           </Link>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">{t("register.title")}</h1>
-            <p className="text-muted-foreground">{t("register.subtitle")}</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Create New Account</h1>
+            <p className="text-muted-foreground">Register now to access all features</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground font-medium text-sm">{t("register.fullName")}</Label>
+              <Label htmlFor="name" className="text-foreground font-medium text-sm">Full Name</Label>
               <div className="relative">
-                <User className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-                <Input id="name" type="text" placeholder={t("register.fullNamePlaceholder")} value={name} onChange={(e) => { setName(e.target.value); setErrors(p => ({ ...p, name: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"} ${errors.name ? "border-destructive" : ""}`} />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input id="name" type="text" placeholder="Enter your full name" value={name} onChange={(e) => { setName(e.target.value); setErrors(p => ({ ...p, name: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors pl-12 ${errors.name ? "border-destructive" : ""}`} />
                 {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground font-medium text-sm">{t("register.email")}</Label>
+              <Label htmlFor="email" className="text-foreground font-medium text-sm">Email</Label>
               <div className="relative">
-                <Mail className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-                <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12" : "pl-12"} ${errors.email ? "border-destructive" : ""}`} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors pl-12 ${errors.email ? "border-destructive" : ""}`} />
                 {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground font-medium text-sm">{t("register.password")}</Label>
+              <Label htmlFor="password" className="text-foreground font-medium text-sm">Password</Label>
               <div className="relative">
-                <Lock className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setErrors(p => ({ ...p, password: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors ${isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} ${errors.password ? "border-destructive" : ""}`} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setErrors(p => ({ ...p, password: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary transition-colors pl-12 pr-12 ${errors.password ? "border-destructive" : ""}`} />
                 {errors.password && <p className="text-xs text-destructive mt-1">{errors.password}</p>}
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className={`absolute ${isRTL ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors`}>
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
@@ -101,16 +105,16 @@ const Register = () => {
             <div className="flex items-center gap-2">
               <input type="checkbox" id="terms" className="w-4 h-4 rounded border-input accent-primary" required />
               <label htmlFor="terms" className="text-sm text-muted-foreground">
-                {t("register.agree")}{" "}
-                <Link to="#" className="text-primary hover:underline">{t("register.terms")}</Link>
+                I agree to the{" "}
+                <Link to="#" className="text-primary hover:underline">Terms & Conditions</Link>
               </label>
             </div>
             <Button type="submit" size="lg" disabled={loading} className="w-full h-12 rounded-xl font-semibold shadow-primary">
-              {loading ? t("register.creating") : t("register.createAccount")}
+              {loading ? "Creating account..." : "Create Account"}
             </Button>
             <p className="text-center text-muted-foreground text-sm">
-              {t("register.hasAccount")}{" "}
-              <Link to="/login" className="text-primary font-medium hover:underline">{t("register.signIn")}</Link>
+              Already have an account?{" "}
+              <Link to="/login" className="text-primary font-medium hover:underline">Sign In</Link>
             </p>
           </form>
         </motion.div>
@@ -131,8 +135,8 @@ const Register = () => {
           <div className="w-20 h-20 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 animate-float">
             <Leaf className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">{t("register.joinTitle")}</h2>
-          <p className="text-primary-foreground/80 text-lg leading-relaxed">{t("register.joinSubtitle")}</p>
+          <h2 className="text-3xl font-bold mb-4">Join us today</h2>
+          <p className="text-primary-foreground/80 text-lg leading-relaxed">Start your journey with us and enjoy an integrated management experience</p>
         </motion.div>
       </div>
     </div>
