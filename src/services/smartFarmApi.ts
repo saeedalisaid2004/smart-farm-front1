@@ -330,8 +330,8 @@ export const updateAdminNotificationSettings = async (
   settings: { push?: boolean; email?: boolean }
 ) => {
   const params = new URLSearchParams();
-  if (settings.push !== undefined) params.append("push", String(settings.push));
-  if (settings.email !== undefined) params.append("email", String(settings.email));
+  if (settings.push !== undefined) params.append("push_notifications_admin", String(settings.push));
+  if (settings.email !== undefined) params.append("email_alerts_admin", String(settings.email));
 
   const query = params.toString();
   const url = `${API_BASE}/notifications/notifications/admin-settings/${userId}${query ? `?${query}` : ""}`;
