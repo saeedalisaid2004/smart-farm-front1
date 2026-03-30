@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { apiLogin, buildProfileImageUrl, isTimeoutError } from "@/services/smartFarmApi";
 import { saveAvatarUrlFromApi } from "@/services/avatarService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,7 +18,6 @@ const Login = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
   const { setUser } = useAuth();
 
   const validate = () => {
@@ -54,17 +52,23 @@ const Login = () => {
           navigate("/dashboard");
         }
       } else {
-        toast({ variant: "destructive", title: "Error", description: data.detail || "بيانات الدخول غير صحيحة" });
+        toast({ variant: "destructive", title: "Error", description: data.detail || "Invalid credentials" });
       }
     } catch (err) {
-      toast({ variant: "destructive", title: "Error", description: isTimeoutError(err) ? t("api.timeout") : t("api.connectionError") });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: isTimeoutError(err)
+          ? "The server is not responding. Please try again shortly."
+          : "Could not connect to the server. Please check your internet connection.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden" dir="ltr">
       {/* Background */}
       <div className="absolute inset-0 gradient-hero" />
       <div className="absolute inset-0 bg-grid opacity-20" />
@@ -81,20 +85,20 @@ const Login = () => {
           <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-5 shadow-glow">
             <Leaf className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">{t("login.title")}</h1>
-          <p className="text-muted-foreground text-sm mt-1">{t("login.subtitle")}</p>
+          <h1 className="text-2xl font-bold text-foreground">Sign In</h1>
+          <p className="text-muted-foreground text-sm mt-1">Welcome back! Please sign in to continue</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground font-medium text-sm">{t("login.email")}</Label>
-            <Input id="email" type="email" placeholder={t("login.emailPlaceholder")} value={email} onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 transition-colors ${errors.email ? "border-destructive" : ""}`} />
+            <Label htmlFor="email" className="text-foreground font-medium text-sm">Email</Label>
+            <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 transition-colors ${errors.email ? "border-destructive" : ""}`} />
             {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground font-medium text-sm">{t("login.password")}</Label>
+            <Label htmlFor="password" className="text-foreground font-medium text-sm">Password</Label>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("login.passwordPlaceholder")} value={password} onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({ ...prev, password: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 pr-11 transition-colors ${errors.password ? "border-destructive" : ""}`} />
+              <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({ ...prev, password: undefined })); }} className={`h-12 rounded-xl bg-secondary/50 border-border focus:border-primary px-4 pr-11 transition-colors ${errors.password ? "border-destructive" : ""}`} />
               {errors.password && <p className="text-xs text-destructive mt-1">{errors.password}</p>}
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -102,16 +106,16 @@ const Login = () => {
             </div>
           </div>
           <div className="flex justify-end mt-2">
-            <Link to="/forgot-password" className="text-sm text-primary hover:underline">{t("login.forgotPassword")}</Link>
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot Password?</Link>
           </div>
           <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-semibold mt-2 shadow-primary">
-            {loading ? t("login.signingIn") : t("login.signIn")}
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          {t("login.noAccount")}{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">{t("login.signUp")}</Link>
+          Don't have an account?{" "}
+          <Link to="/register" className="text-primary font-medium hover:underline">Sign Up</Link>
         </p>
       </motion.div>
     </div>
