@@ -103,7 +103,7 @@ const DashboardSettings = () => {
     updateFarmerNotificationSettings(userId, {})
       .then((data) => {
         if (cancelled) return;
-        const s = data?.current_settings || data;
+        const s = data?.settings || data?.current_settings || data;
         if (s) {
           setNotifications({
             email: s.email_notifications_farmer ?? s.email ?? true,
@@ -157,7 +157,7 @@ const DashboardSettings = () => {
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [apiKeyMap[key]]: value });
-      const serverSettings = extractNotificationSettings(data?.current_settings || data);
+      const serverSettings = extractNotificationSettings(data?.settings || data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
       
