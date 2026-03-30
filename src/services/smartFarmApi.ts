@@ -331,16 +331,39 @@ export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const params = new URLSearchParams();
-  if (settings.push !== undefined) params.append("push_notifications_admin", String(settings.push));
-  if (settings.email !== undefined) params.append("email_alerts_admin", String(settings.email));
+  const hasUpdates = settings.push !== undefined || settings.email !== undefined;
 
-  const query = params.toString();
-  const url = `${API_BASE}/notifications/notifications/admin-settings/${userId}${query ? `?${query}` : ""}`;
+  const payload = hasUpdates
+    ? {
+        action: "update",
+        user_id: String(userId),
+        role: "admin",
+        settings: {
+          ...(settings.push !== undefined ? { push: settings.push } : {}),
+          ...(settings.email !== undefined ? { email: settings.email } : {}),
+        },
+      }
+    : {
+        action: "get",
+        user_id: String(userId),
+        role: "admin",
+      };
 
-  const res = await fetchWithTimeout(url, { method: "PATCH" });
-  if (!res.ok) throw new Error("Failed to update admin notification settings");
-  return res.json();
+  const { data, error } = await supabase.functions.invoke("notification-settings", {
+    body: payload,
+  });
+
+  if (error) throw new Error(error.message || "Failed to update admin notification settings");
+
+  const current = data?.current_settings || data?.settings || data;
+  return {
+    status: "success",
+    settings: {
+      push_notifications_admin: current?.push ?? true,
+      email_alerts_admin: current?.email ?? true,
+    },
+    current_settings: current,
+  };
 };
 
 export const updateFarmerNotificationSettings = async (
