@@ -157,7 +157,7 @@ const DashboardSettings = () => {
     setNotifSaving(true);
     try {
       const data = await updateFarmerNotificationSettings(userId, { [apiKeyMap[key]]: value });
-      const serverSettings = extractNotificationSettings(data?.current_settings || data);
+      const serverSettings = extractNotificationSettings(data?.settings || data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
       
