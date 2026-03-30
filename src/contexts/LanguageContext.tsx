@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { commonTranslations } from "@/i18n/commonTranslations";
 import { farmerTranslations } from "@/i18n/farmerTranslations";
 import { adminTranslations } from "@/i18n/adminTranslations";
 
 export type Language = "en" | "ar";
 
-// Merge all translation modules into one object per language
 const translations = {
   en: {
     ...commonTranslations.en,
@@ -30,15 +30,30 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    return (localStorage.getItem("language") as Language) || "en";
-  });
+const ADMIN_LANG_KEY = "language_admin";
+const FARMER_LANG_KEY = "language_farmer";
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem("language", lang);
-  };
+const getStoredLang = (key: string): Language =>
+  (localStorage.getItem(key) as Language) || "en";
+
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  const [adminLang, setAdminLangState] = useState<Language>(() => getStoredLang(ADMIN_LANG_KEY));
+  const [farmerLang, setFarmerLangState] = useState<Language>(() => getStoredLang(FARMER_LANG_KEY));
+
+  const language = isAdminRoute ? adminLang : farmerLang;
+
+  const setLanguage = useCallback((lang: Language) => {
+    if (isAdminRoute) {
+      setAdminLangState(lang);
+      localStorage.setItem(ADMIN_LANG_KEY, lang);
+    } else {
+      setFarmerLangState(lang);
+      localStorage.setItem(FARMER_LANG_KEY, lang);
+    }
+  }, [isAdminRoute]);
 
   const isRTL = language === "ar";
 
@@ -47,9 +62,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.lang = language;
   }, [language, isRTL]);
 
-  const t = (key: TranslationKey): string => {
+  const t = useCallback((key: TranslationKey): string => {
     return translations[language][key] || key;
-  };
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
