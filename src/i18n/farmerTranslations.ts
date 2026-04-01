@@ -9,6 +9,7 @@ export const farmerTranslations = {
     "dashboard.fruitQuality": "Fruit Quality Analysis",
     "dashboard.chatbot": "Smart Farm Chatbot",
     "dashboard.reports": "Reports",
+    "dashboard.messages": "Messages",
     "dashboard.settings": "Settings",
     // Dashboard main
     "dashboard.welcomeUser": "Welcome",
