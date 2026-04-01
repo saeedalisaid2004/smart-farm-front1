@@ -26,6 +26,7 @@ const menuItems = [
   { icon: Apple, labelKey: "dashboard.fruitQuality" as const, path: "/dashboard/fruit-quality" },
   { icon: MessageCircle, labelKey: "dashboard.chatbot" as const, path: "/dashboard/chatbot" },
   { icon: FileText, labelKey: "dashboard.reports" as const, path: "/dashboard/reports" },
+  { icon: Mail, labelKey: "dashboard.messages" as const, path: "/dashboard/messages" },
   { icon: Settings, labelKey: "dashboard.settings" as const, path: "/dashboard/settings" },
 ];
 
