@@ -446,3 +446,13 @@ export const adminReplyMessage = async (messageId: number, replyContent: string)
   const res = await fetchWithTimeout(`${API_BASE}/messages/admin/reply`, { method: "POST", body: fd });
   return res.json();
 };
+
+export const deleteUserMessage = async (messageId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/messages/delete/${messageId}`, { method: "DELETE" });
+  return res.json();
+};
+
+export const adminDeleteMessage = async (messageId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/messages/admin/delete/${messageId}`, { method: "DELETE" });
+  return res.json();
+};
