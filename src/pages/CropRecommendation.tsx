@@ -141,12 +141,12 @@ const CropRecommendation = () => {
                   </AnalysisResultCard>
                 )}
 
-                {result.general_warning && (
+                {(result.general_warning || result.general_status) && (
                   <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card border border-border rounded-3xl p-4 flex items-center gap-3 shadow-card">
                     <CloudSun className="w-5 h-5 text-primary shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground">{t("crop.generalWarning")}</p>
-                      <p className="text-sm font-semibold text-foreground" dir="auto">{result.general_warning}</p>
+                      <p className="text-sm font-semibold text-foreground" dir="auto">{result.general_warning || result.general_status}</p>
                     </div>
                   </motion.div>
                 )}
