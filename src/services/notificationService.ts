@@ -1,3 +1,6 @@
+import { supabase } from "@/integrations/supabase/client";
+import { getExternalUserId } from "@/services/smartFarmApi";
+
 type NotificationType = "success" | "warning" | "error" | "info";
 
 interface SendNotificationParams {
@@ -18,8 +21,14 @@ export function setAnalysisAlertsEnabled(enabled: boolean) {
   localStorage.setItem("analysis_alerts_enabled", enabled ? "true" : "false");
 }
 
-export function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
+export async function sendNotification({ title, description, type = "info" }: SendNotificationParams) {
   if (!isAnalysisAlertsEnabled()) return;
-  // Just trigger a refetch from the API - the backend creates the notification
+  const userId = getExternalUserId();
+  if (!userId) return;
+  try {
+    await supabase.functions.invoke("manage-notifications", {
+      body: { action: "create", user_id: String(userId), title, description, type },
+    });
+  } catch {}
   window.dispatchEvent(new Event("notifications-updated"));
 }
