@@ -61,6 +61,21 @@ const Messages = () => {
     try {
       await sendMessage(userId, subject, content);
       toast({ title: language === "ar" ? "تم إرسال الرسالة بنجاح ✉️" : "Message sent successfully ✉️" });
+
+      // Notify admin (user_id = 2) about new message
+      const userName = JSON.parse(localStorage.getItem("smart_farm_user") || "{}").name || "مزارع";
+      supabase.functions.invoke("manage-notifications", {
+        body: {
+          action: "create",
+          user_id: "2",
+          title: language === "ar" ? "رسالة جديدة 📩" : "New Message 📩",
+          description: language === "ar"
+            ? `رسالة جديدة من ${userName}: "${subject}"`
+            : `New message from ${userName}: "${subject}"`,
+          type: "info",
+        },
+      }).catch(() => {});
+
       setSubject("");
       setContent("");
       setShowForm(false);
