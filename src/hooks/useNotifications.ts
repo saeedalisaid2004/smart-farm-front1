@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getUserNotifications, markNotificationAsRead, getExternalUserId } from "@/services/smartFarmApi";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
   id: string;
@@ -19,19 +20,41 @@ export function useNotifications() {
     setLoading(true);
     try {
       let apiList: Notification[] = [];
+      let supaList: Notification[] = [];
+
       if (userId) {
-        const data = await getUserNotifications(userId);
-        const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-        apiList = raw.map((n: any) => ({
-          id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
-          title: n.title ?? "Notification",
-          description: n.description ?? n.message ?? null,
-          type: n.type ?? "info",
-          is_read: n.is_read ?? n.read ?? false,
-          created_at: n.created_at ?? n.date ?? new Date().toISOString(),
-        }));
+        // Fetch from external API
+        try {
+          const data = await getUserNotifications(userId);
+          const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
+          apiList = raw.map((n: any) => ({
+            id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
+            title: n.title ?? "Notification",
+            description: n.description ?? n.message ?? null,
+            type: n.type ?? "info",
+            is_read: n.is_read ?? n.read ?? false,
+            created_at: n.created_at ?? n.date ?? new Date().toISOString(),
+          }));
+        } catch {}
+
+        // Fetch from Supabase (analysis notifications)
+        try {
+          const { data } = await supabase.functions.invoke("manage-notifications", {
+            body: { action: "list", user_id: String(userId) },
+          });
+          const raw = Array.isArray(data) ? data : [];
+          supaList = raw.map((n: any) => ({
+            id: `supa-${n.id}`,
+            title: n.title ?? "Notification",
+            description: n.description ?? null,
+            type: n.type ?? "info",
+            is_read: n.is_read ?? false,
+            created_at: n.created_at ?? new Date().toISOString(),
+          }));
+        } catch {}
       }
-      setNotifications(apiList);
+
+      setNotifications([...apiList, ...supaList]);
     } catch {
       setNotifications([]);
     } finally {
