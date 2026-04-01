@@ -294,8 +294,11 @@ export const getModelsTable = async () => {
   return res.json();
 };
 
-export const getAdminReportStats = async () => {
-  const res = await fetchWithTimeout(`${API_BASE}/admin/reports/admin/reports/dashboard-stats`);
+export const getAdminReportStats = async (days?: number) => {
+  const url = days
+    ? `${API_BASE}/admin/reports/admin/reports/dashboard-stats?days=${days}`
+    : `${API_BASE}/admin/reports/admin/reports/dashboard-stats`;
+  const res = await fetchWithTimeout(url);
   return res.json();
 };
 

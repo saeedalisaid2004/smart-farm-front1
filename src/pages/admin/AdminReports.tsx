@@ -29,13 +29,19 @@ const AdminReports = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [dateRange, setDateRange] = useState("30");
 
-  useEffect(() => {
-    getAdminReportStats()
+  const fetchData = (days: string) => {
+    setLoading(true);
+    getAdminReportStats(Number(days))
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchData(dateRange);
+  }, [dateRange]);
 
   const handleGenerateReport = async () => {
     setGeneratingPdf(true);
@@ -148,7 +154,7 @@ const AdminReports = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
-            <Select defaultValue="30">
+            <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-64 h-11 rounded-xl">
                 <SelectValue placeholder={t("adminReports.dateRange")} />
               </SelectTrigger>
