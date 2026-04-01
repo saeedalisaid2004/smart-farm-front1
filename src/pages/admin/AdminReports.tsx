@@ -154,7 +154,7 @@ const AdminReports = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground mb-1.5">{t("adminReports.dateRange")}</p>
-            <Select defaultValue="30">
+            <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-64 h-11 rounded-xl">
                 <SelectValue placeholder={t("adminReports.dateRange")} />
               </SelectTrigger>
