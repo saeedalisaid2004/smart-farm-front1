@@ -29,11 +29,13 @@ const AdminReports = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [dateRange, setDateRange] = useState("30");
+  const [dateRange, setDateRange] = useState("all");
 
-  const fetchData = (days: string) => {
+  const rangeToDays: Record<string, number> = { weekly: 7, monthly: 30, all: 365 };
+
+  const fetchData = (range: string) => {
     setLoading(true);
-    getAdminReportStats(Number(days))
+    getAdminReportStats(rangeToDays[range] ?? 365)
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -159,10 +161,9 @@ const AdminReports = () => {
                 <SelectValue placeholder={t("adminReports.dateRange")} />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="7">{t("adminReports.last7")}</SelectItem>
-                <SelectItem value="30">{t("adminReports.last30")}</SelectItem>
-                <SelectItem value="90">{t("adminReports.last90")}</SelectItem>
-                <SelectItem value="365">{t("adminReports.lastYear")}</SelectItem>
+                <SelectItem value="weekly">{t("reports.lastWeek")}</SelectItem>
+                <SelectItem value="monthly">{t("reports.lastMonth")}</SelectItem>
+                <SelectItem value="all">{t("reports.allTime")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
