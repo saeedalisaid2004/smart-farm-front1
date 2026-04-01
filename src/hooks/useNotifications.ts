@@ -14,45 +14,73 @@ export interface Notification {
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+
+  // Check push setting from notification_settings table
+  const checkPushSetting = useCallback(async (userId: number) => {
+    try {
+      const { data } = await supabase
+        .from("notification_settings")
+        .select("push")
+        .eq("external_user_id", String(userId))
+        .maybeSingle();
+      // If no settings row exists, default to enabled
+      return data?.push !== false;
+    } catch {
+      return true;
+    }
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     const userId = getExternalUserId();
     setLoading(true);
     try {
+      if (!userId) {
+        setNotifications([]);
+        return;
+      }
+
+      // Check if push notifications are enabled
+      const isEnabled = await checkPushSetting(userId);
+      setPushEnabled(isEnabled);
+
+      if (!isEnabled) {
+        setNotifications([]);
+        return;
+      }
+
       let apiList: Notification[] = [];
       let supaList: Notification[] = [];
 
-      if (userId) {
-        // Fetch from external API
-        try {
-          const data = await getUserNotifications(userId);
-          const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-          apiList = raw.map((n: any) => ({
-            id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
-            title: n.title ?? "Notification",
-            description: n.description ?? n.message ?? null,
-            type: n.type ?? "info",
-            is_read: n.is_read ?? n.read ?? false,
-            created_at: n.created_at ?? n.date ?? new Date().toISOString(),
-          }));
-        } catch {}
+      // Fetch from external API
+      try {
+        const data = await getUserNotifications(userId);
+        const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
+        apiList = raw.map((n: any) => ({
+          id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
+          title: n.title ?? "Notification",
+          description: n.description ?? n.message ?? null,
+          type: n.type ?? "info",
+          is_read: n.is_read ?? n.read ?? false,
+          created_at: n.created_at ?? n.date ?? new Date().toISOString(),
+        }));
+      } catch {}
 
-        // Fetch from Supabase (analysis notifications)
-        try {
-          const { data } = await supabase.functions.invoke("manage-notifications", {
-            body: { action: "list", user_id: String(userId) },
-          });
-          const raw = Array.isArray(data) ? data : [];
-          supaList = raw.map((n: any) => ({
-            id: `supa-${n.id}`,
-            title: n.title ?? "Notification",
-            description: n.description ?? null,
-            type: n.type ?? "info",
-            is_read: n.is_read ?? false,
-            created_at: n.created_at ?? new Date().toISOString(),
-          }));
-        } catch {}
-      }
+      // Fetch from Supabase (analysis notifications)
+      try {
+        const { data } = await supabase.functions.invoke("manage-notifications", {
+          body: { action: "list", user_id: String(userId) },
+        });
+        const raw = Array.isArray(data) ? data : [];
+        supaList = raw.map((n: any) => ({
+          id: `supa-${n.id}`,
+          title: n.title ?? "Notification",
+          description: n.description ?? null,
+          type: n.type ?? "info",
+          is_read: n.is_read ?? false,
+          created_at: n.created_at ?? new Date().toISOString(),
+        }));
+      } catch {}
 
       setNotifications([...apiList, ...supaList]);
     } catch {
@@ -60,7 +88,7 @@ export function useNotifications() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [checkPushSetting]);
 
   useEffect(() => {
     fetchNotifications();
