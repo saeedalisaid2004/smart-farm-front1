@@ -130,6 +130,7 @@ export const farmerTranslations = {
     "dashboard.fruitQuality": "تحليل جودة الفاكهة",
     "dashboard.chatbot": "مساعد المزرعة الذكي",
     "dashboard.reports": "التقارير",
+    "dashboard.messages": "الرسائل",
     "dashboard.settings": "الإعدادات",
     // Dashboard main
     "dashboard.welcomeUser": "مرحباً",
