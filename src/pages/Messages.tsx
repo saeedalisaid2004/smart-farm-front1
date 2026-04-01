@@ -76,7 +76,8 @@ const Messages = () => {
 
   const formatTime = (dateStr: string) => {
     try {
-      return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: isRTL ? ar : enUS });
+      const normalized = dateStr.includes("+") || dateStr.includes("Z") ? dateStr : dateStr.replace(" ", "T") + "+02:00";
+      return formatDistanceToNow(new Date(normalized), { addSuffix: true, locale: isRTL ? ar : enUS });
     } catch { return dateStr; }
   };
 
