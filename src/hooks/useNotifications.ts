@@ -86,23 +86,52 @@ export function useNotifications() {
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
     try {
-      await markNotificationAsRead(id);
+      if (id.startsWith("supa-")) {
+        const userId = getExternalUserId();
+        await supabase.functions.invoke("manage-notifications", {
+          body: { action: "mark_read", user_id: String(userId), notification_id: id.replace("supa-", "") },
+        });
+      } else {
+        await markNotificationAsRead(id);
+      }
     } catch {}
   }, []);
 
   const markAllAsRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    for (const n of notifications.filter((n) => !n.is_read)) {
+    const userId = getExternalUserId();
+    // Mark external API notifications
+    for (const n of notifications.filter((n) => !n.is_read && !n.id.startsWith("supa-"))) {
       try { await markNotificationAsRead(n.id); } catch {}
+    }
+    // Mark Supabase notifications
+    if (userId) {
+      try {
+        await supabase.functions.invoke("manage-notifications", {
+          body: { action: "mark_all_read", user_id: String(userId) },
+        });
+      } catch {}
     }
   }, [notifications]);
 
   const deleteNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    if (id.startsWith("supa-")) {
+      const userId = getExternalUserId();
+      supabase.functions.invoke("manage-notifications", {
+        body: { action: "delete", user_id: String(userId), notification_id: id.replace("supa-", "") },
+      }).catch(() => {});
+    }
   }, []);
 
   const clearAll = useCallback(() => {
+    const userId = getExternalUserId();
     setNotifications([]);
+    if (userId) {
+      supabase.functions.invoke("manage-notifications", {
+        body: { action: "clear_all", user_id: String(userId) },
+      }).catch(() => {});
+    }
   }, []);
 
   return {
