@@ -232,7 +232,9 @@ const Messages = () => {
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
                       <Mail className="w-4 h-4 text-white" />
                     </div>
-                    <h4 className="font-semibold text-foreground truncate" dir="auto">{msg.subject}</h4>
+                    <Badge variant="outline" className="text-sm font-bold px-3 py-1 bg-primary/10 text-primary border-primary/30">
+                      {msg.subject}
+                    </Badge>
                   </div>
                   {getStatusBadge(msg.status)}
                 </div>
