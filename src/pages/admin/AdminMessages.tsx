@@ -99,13 +99,21 @@ const AdminMessages = () => {
   const formatTime = (dateStr: string) => {
     try {
       const normalized = dateStr.includes("+") || dateStr.includes("Z") ? dateStr : dateStr.replace(" ", "T") + "+02:00";
-      return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date(normalized));
+      const now = Date.now();
+      const diff = now - new Date(normalized).getTime();
+      const mins = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      if (language === "ar") {
+        if (mins < 1) return "الآن";
+        if (mins < 60) return `منذ ${mins} د`;
+        if (hours < 24) return `منذ ${hours} س`;
+        return `منذ ${days} يوم`;
+      }
+      if (mins < 1) return "Just now";
+      if (mins < 60) return `${mins} min ago`;
+      if (hours < 24) return `${hours} hr ago`;
+      return `${days} day ago`;
     } catch {
       return dateStr;
     }
