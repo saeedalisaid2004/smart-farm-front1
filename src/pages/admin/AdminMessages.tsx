@@ -29,6 +29,7 @@ const AdminMessages = () => {
   const [selectedMsg, setSelectedMsg] = useState<AdminMessage | null>(null);
   const [replyText, setReplyText] = useState("");
   const [replying, setReplying] = useState(false);
+  const emailToIdMap = useRef<Record<string, number>>({});
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -42,7 +43,18 @@ const AdminMessages = () => {
     }
   };
 
-  useEffect(() => { fetchMessages(); }, []);
+  useEffect(() => {
+    fetchMessages();
+    // Build email → userId map for notifications
+    getUserManagementData()
+      .then((data: any) => {
+        const users = data?.users || data?.all_users || [];
+        const map: Record<string, number> = {};
+        users.forEach((u: any) => { if (u.email && u.id) map[u.email] = u.id; });
+        emailToIdMap.current = map;
+      })
+      .catch(() => {});
+  }, []);
 
   const handleReply = async (msgId: number) => {
     if (!replyText.trim()) {
@@ -53,6 +65,26 @@ const AdminMessages = () => {
     try {
       await adminReplyMessage(msgId, replyText);
       toast({ title: language === "ar" ? "تم إرسال الرد ✅" : "Reply sent ✅" });
+
+      // Create notification for the farmer
+      const msg = messages.find(m => m.id === msgId);
+      if (msg) {
+        const farmerId = emailToIdMap.current[msg.sender_email];
+        if (farmerId) {
+          supabase.functions.invoke("manage-notifications", {
+            body: {
+              action: "create",
+              user_id: String(farmerId),
+              title: language === "ar" ? "رد من الإدارة 💬" : "Admin Reply 💬",
+              description: language === "ar"
+                ? `تم الرد على رسالتك "${msg.subject}": ${replyText.slice(0, 100)}`
+                : `Reply to "${msg.subject}": ${replyText.slice(0, 100)}`,
+              type: "info",
+            },
+          }).catch(() => {});
+        }
+      }
+
       setReplyText("");
       setSelectedMsg(null);
       fetchMessages();
