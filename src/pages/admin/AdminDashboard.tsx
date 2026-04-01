@@ -239,7 +239,7 @@ const AdminDashboard = () => {
             ).map((item: any, idx: number) => {
               const timeStr = item.time || "";
               const date = timeStr ? parseApiTime(timeStr) : null;
-              const ago = date ? getTimeAgo(date) : "";
+              const ago = date ? formatExactTime(date) : "";
 
               return (
                 <div key={idx} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
