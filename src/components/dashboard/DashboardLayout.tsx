@@ -14,6 +14,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNotifications, type Notification } from "@/hooks/useNotifications";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { formatDistanceToNow } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 
@@ -51,6 +52,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const { t, isRTL } = useLanguage();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const unreadMsgCount = useUnreadMessages("farmer");
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -115,7 +117,12 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                   )}
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
-                  <span>{t(item.labelKey)}</span>
+                  <span className="flex-1">{t(item.labelKey)}</span>
+                  {item.path === "/dashboard/messages" && unreadMsgCount > 0 && (
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+                      {unreadMsgCount}
+                    </span>
+                  )}
                 </Link>
               </li>
             );

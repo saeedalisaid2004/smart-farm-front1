@@ -66,6 +66,7 @@ const Messages = () => {
       setContent("");
       setShowForm(false);
       fetchMessages();
+      window.dispatchEvent(new Event("messages-updated"));
     } catch {
       toast({ variant: "destructive", title: language === "ar" ? "فشل إرسال الرسالة" : "Failed to send message" });
     } finally {

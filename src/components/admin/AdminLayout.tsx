@@ -14,6 +14,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { formatDistanceToNow } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 
@@ -47,6 +48,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const unreadMsgCount = useUnreadMessages("admin");
 
   const formatTime = (dateStr: string) => {
     try {
@@ -109,7 +111,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                   )}>
                     <item.icon className="w-4.5 h-4.5 shrink-0" />
                   </div>
-                  <span>{t(item.labelKey)}</span>
+                  <span className="flex-1">{t(item.labelKey)}</span>
+                  {item.path === "/admin/messages" && unreadMsgCount > 0 && (
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center animate-pulse">
+                      {unreadMsgCount}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
