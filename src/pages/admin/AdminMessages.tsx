@@ -29,7 +29,23 @@ const AdminMessages = () => {
   const [selectedMsg, setSelectedMsg] = useState<AdminMessage | null>(null);
   const [replyText, setReplyText] = useState("");
   const [replying, setReplying] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const emailToIdMap = useRef<Record<string, number>>({});
+
+  const handleDelete = async (msgId: number) => {
+    setDeleting(msgId);
+    try {
+      await adminDeleteMessage(msgId);
+      toast({ title: language === "ar" ? "تم حذف الرسالة ✅" : "Message deleted ✅" });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (selectedMsg?.id === msgId) setSelectedMsg(null);
+      window.dispatchEvent(new Event("messages-updated"));
+    } catch {
+      toast({ variant: "destructive", title: language === "ar" ? "فشل حذف الرسالة" : "Failed to delete message" });
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const fetchMessages = async () => {
     setLoading(true);
