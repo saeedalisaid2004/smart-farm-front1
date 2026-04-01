@@ -205,7 +205,7 @@ const Messages = () => {
 
                 {/* Expanded: Show reply */}
                 <AnimatePresence>
-                  {selectedMsg?.id === msg.id && msg.reply && (
+                  {selectedMsg?.id === msg.id && (msg.reply || msg.admin_reply) && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -217,8 +217,9 @@ const Messages = () => {
                           <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                         </div>
                         <span className="text-xs font-medium text-primary">{language === "ar" ? "رد الإدارة" : "Admin Reply"}</span>
+                        {msg.reply_date && <span className="text-xs text-muted-foreground/50">{formatTime(msg.reply_date)}</span>}
                       </div>
-                      <p className="text-sm text-foreground bg-primary/5 rounded-xl p-3" dir="auto">{msg.reply}</p>
+                      <p className="text-sm text-foreground bg-primary/5 rounded-xl p-3" dir="auto">{msg.admin_reply || msg.reply}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
