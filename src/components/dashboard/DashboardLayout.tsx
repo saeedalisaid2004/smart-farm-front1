@@ -119,7 +119,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                   <item.icon className="w-5 h-5 shrink-0" />
                   <span className="flex-1">{t(item.labelKey)}</span>
                   {item.path === "/dashboard/messages" && unreadMsgCount > 0 && (
-                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center animate-pulse">
                       {unreadMsgCount}
                     </span>
                   )}
