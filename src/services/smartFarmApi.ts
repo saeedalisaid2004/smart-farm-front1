@@ -414,3 +414,32 @@ export const generateFarmerReportAlt = async (userId: number) => {
   }
   return data;
 };
+
+// ============ Messages ============
+
+export const sendMessage = async (userId: number, subject: string, content: string) => {
+  const fd = new FormData();
+  fd.append("user_id", String(userId));
+  fd.append("subject", subject);
+  fd.append("content", content);
+  const res = await fetchWithTimeout(`${API_BASE}/messages/send`, { method: "POST", body: fd });
+  return res.json();
+};
+
+export const getMyMessages = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/messages/my-messages/${userId}`);
+  return res.json();
+};
+
+export const getAllMessages = async () => {
+  const res = await fetchWithTimeout(`${API_BASE}/messages/admin/all-messages`);
+  return res.json();
+};
+
+export const adminReplyMessage = async (messageId: number, replyContent: string) => {
+  const fd = new FormData();
+  fd.append("message_id", String(messageId));
+  fd.append("reply_content", replyContent);
+  const res = await fetchWithTimeout(`${API_BASE}/messages/admin/reply`, { method: "POST", body: fd });
+  return res.json();
+};
