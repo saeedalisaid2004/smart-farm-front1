@@ -1,8 +1,8 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, Plus } from "lucide-react";
+import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { sendMessage, getMyMessages, getExternalUserId } from "@/services/smartFarmApi";
+import { sendMessage, getMyMessages, getExternalUserId, deleteUserMessage } from "@/services/smartFarmApi";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
