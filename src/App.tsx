@@ -78,6 +78,7 @@ const App = () => (
             <Route path="/admin/reports" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminReports /></Suspense></AdminRoute>} />
             <Route path="/admin/profile" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminProfile /></Suspense></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
+            <Route path="/admin/messages" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminMessages /></Suspense></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </LanguageProvider>
