@@ -111,7 +111,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                   )}>
                     <item.icon className="w-4.5 h-4.5 shrink-0" />
                   </div>
-                  <span>{t(item.labelKey)}</span>
+                  <span className="flex-1">{t(item.labelKey)}</span>
+                  {item.path === "/admin/messages" && unreadMsgCount > 0 && (
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center animate-pulse">
+                      {unreadMsgCount}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
