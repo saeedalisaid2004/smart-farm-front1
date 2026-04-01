@@ -111,7 +111,7 @@ const AdminReports = () => {
   const statsCards = [
     { icon: TrendingUp, label: t("adminReports.totalAnalyses"), value: data?.total_analyses ?? "—", change: `${data?.analyses_growth ?? "+0%"} ${t("adminReports.fromLastMonth")}`, gradient: "from-emerald-500 to-green-600" },
     { icon: Users, label: t("adminReports.activeUsers"), value: data?.active_users ?? "—", change: `${data?.users_growth ?? "+0%"} ${t("adminReports.fromLastMonth")}`, gradient: "from-blue-500 to-indigo-600" },
-    { icon: Globe, label: t("adminReports.aiServices"), value: data?.ai_services_count ? String(data.ai_services_count).replace(/\s*of\s*/i, " / ").replace(/\s*Active\s*/i, "").trim() : "6 / 6", change: t("adminReports.uptimePercent"), gradient: "from-purple-500 to-violet-600" },
+    { icon: Globe, label: t("adminReports.aiServices"), value: data?.ai_services_count ? String(data.ai_services_count).replace(/\s*of\s*/i, " / ") : "6 / 6", change: t("adminReports.uptimePercent"), gradient: "from-purple-500 to-violet-600" },
     { icon: Activity, label: t("adminReports.avgResponse"), value: data?.avg_response_time ?? "—", change: data?.response_time_growth ? `${data.response_time_growth} ${t("adminReports.fromLastMonth")}` : t("adminReports.fromLastMonth"), gradient: "from-orange-500 to-amber-600" },
   ];
 
