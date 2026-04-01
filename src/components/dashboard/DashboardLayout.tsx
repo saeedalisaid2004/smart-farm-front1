@@ -52,6 +52,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const { t, isRTL } = useLanguage();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const unreadMsgCount = useUnreadMessages("farmer");
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
