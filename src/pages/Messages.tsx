@@ -252,7 +252,18 @@ const Messages = () => {
                       {msg.subject}
                     </Badge>
                   </div>
-                  {getStatusBadge(msg.status)}
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(msg.status)}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                      onClick={(e) => { e.stopPropagation(); handleDelete(msg.id); }}
+                      disabled={deleting === msg.id}
+                    >
+                      {deleting === msg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    </Button>
+                  </div>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2 mb-2" dir="auto">{msg.content}</p>
                 <p className="text-xs text-muted-foreground/60">{formatTime(msg.date)}</p>

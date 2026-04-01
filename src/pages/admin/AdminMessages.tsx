@@ -206,7 +206,18 @@ const AdminMessages = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {getStatusBadge(msg.status)}
+                        <div className="flex items-center gap-1">
+                          {getStatusBadge(msg.status)}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(msg.id); }}
+                            disabled={deleting === msg.id}
+                          >
+                            {deleting === msg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </Button>
+                        </div>
                         <span className="text-xs text-muted-foreground/60">{formatTime(msg.date)}</span>
                       </div>
                     </div>
