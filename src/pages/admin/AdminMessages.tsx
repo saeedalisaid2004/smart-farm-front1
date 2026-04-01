@@ -195,7 +195,9 @@ const AdminMessages = () => {
                       </div>
                     </div>
                     <div className="bg-secondary/30 rounded-xl p-4">
-                      <p className="text-xs font-medium text-primary mb-1" dir="auto">{msg.subject}</p>
+                      <Badge variant="outline" className="text-sm font-bold px-3 py-1 mb-2 bg-primary/10 text-primary border-primary/30">
+                        {msg.subject}
+                      </Badge>
                       <p className="text-sm text-foreground" dir="auto">{msg.content}</p>
                     </div>
                   </div>
