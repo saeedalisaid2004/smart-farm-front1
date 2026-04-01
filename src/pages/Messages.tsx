@@ -33,6 +33,22 @@ const Messages = () => {
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const [selectedMsg, setSelectedMsg] = useState<Message | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
+
+  const handleDelete = async (msgId: number) => {
+    setDeleting(msgId);
+    try {
+      await deleteUserMessage(msgId);
+      toast({ title: language === "ar" ? "تم حذف الرسالة ✅" : "Message deleted ✅" });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (selectedMsg?.id === msgId) setSelectedMsg(null);
+      window.dispatchEvent(new Event("messages-updated"));
+    } catch {
+      toast({ variant: "destructive", title: language === "ar" ? "فشل حذف الرسالة" : "Failed to delete message" });
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const fetchMessages = async () => {
     const userId = getExternalUserId();
