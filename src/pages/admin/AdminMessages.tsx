@@ -1,8 +1,8 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, User, Reply } from "lucide-react";
+import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, User, Reply, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getAllMessages, adminReplyMessage, getUserManagementData } from "@/services/smartFarmApi";
+import { getAllMessages, adminReplyMessage, getUserManagementData, adminDeleteMessage } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,23 @@ const AdminMessages = () => {
   const [selectedMsg, setSelectedMsg] = useState<AdminMessage | null>(null);
   const [replyText, setReplyText] = useState("");
   const [replying, setReplying] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const emailToIdMap = useRef<Record<string, number>>({});
+
+  const handleDelete = async (msgId: number) => {
+    setDeleting(msgId);
+    try {
+      await adminDeleteMessage(msgId);
+      toast({ title: language === "ar" ? "تم حذف الرسالة ✅" : "Message deleted ✅" });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (selectedMsg?.id === msgId) setSelectedMsg(null);
+      window.dispatchEvent(new Event("messages-updated"));
+    } catch {
+      toast({ variant: "destructive", title: language === "ar" ? "فشل حذف الرسالة" : "Failed to delete message" });
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -190,7 +206,18 @@ const AdminMessages = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {getStatusBadge(msg.status)}
+                        <div className="flex items-center gap-1">
+                          {getStatusBadge(msg.status)}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(msg.id); }}
+                            disabled={deleting === msg.id}
+                          >
+                            {deleting === msg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </Button>
+                        </div>
                         <span className="text-xs text-muted-foreground/60">{formatTime(msg.date)}</span>
                       </div>
                     </div>
