@@ -172,9 +172,6 @@ const Messages = () => {
                       <SelectItem value={language === "ar" ? "استفسار" : "Inquiry"}>
                         {language === "ar" ? "استفسار" : "Inquiry"}
                       </SelectItem>
-                      <SelectItem value={language === "ar" ? "طلب دعم فني" : "Technical Support"}>
-                        {language === "ar" ? "طلب دعم فني" : "Technical Support"}
-                      </SelectItem>
                       <SelectItem value={language === "ar" ? "أخرى" : "Other"}>
                         {language === "ar" ? "أخرى" : "Other"}
                       </SelectItem>
