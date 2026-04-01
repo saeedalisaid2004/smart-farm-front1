@@ -17,7 +17,8 @@ const COLORS = [
 
 /** Parse API time string to Date */
 const parseApiTime = (timeStr: string): Date => {
-  const isoStr = timeStr.replace(" ", "T") + "+02:00";
+  if (timeStr.includes("+") || timeStr.includes("Z")) return new Date(timeStr);
+  const isoStr = timeStr.replace(" ", "T") + "Z";
   return new Date(isoStr);
 };
 
