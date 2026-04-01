@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, FileText, Settings, Bell, Moon, Sun,
-  User, LogOut, CheckCircle, AlertCircle, Info, Menu, Trash2, CheckCheck, XCircle
+  User, LogOut, CheckCircle, AlertCircle, Info, Menu, Trash2, CheckCheck, XCircle, Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
