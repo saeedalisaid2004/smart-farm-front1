@@ -29,7 +29,7 @@ const AdminReports = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [dateRange, setDateRange] = useState("30");
+  const [dateRange, setDateRange] = useState("all");
 
   const fetchData = (days: string) => {
     setLoading(true);
