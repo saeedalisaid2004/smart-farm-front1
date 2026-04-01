@@ -20,14 +20,13 @@ const parseApiTime = (timeStr: string): Date => {
   return new Date(isoStr);
 };
 
-const getTimeAgo = (date: Date) => {
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (diff < 0) return "just now";
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
+const formatExactTime = (date: Date) => {
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit",
+    }).format(date);
+  } catch { return ""; }
 };
 
 const cardVariants = {
@@ -240,7 +239,7 @@ const AdminDashboard = () => {
             ).map((item: any, idx: number) => {
               const timeStr = item.time || "";
               const date = timeStr ? parseApiTime(timeStr) : null;
-              const ago = date ? getTimeAgo(date) : "";
+              const ago = date ? formatExactTime(date) : "";
 
               return (
                 <div key={idx} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
