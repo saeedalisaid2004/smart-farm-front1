@@ -145,6 +145,7 @@ export const adminTranslations = {
     "admin.system": "إدارة النظام",
     "admin.reports": "تقارير النظام",
     "admin.settings": "الإعدادات",
+    "admin.messages": "الرسائل",
     // Admin Dashboard
     "adminDash.title": "لوحة تحكم المسؤول",
     "adminDash.subtitle": "نظرة عامة على النظام وتحليلات منصة المزرعة الذكية",
