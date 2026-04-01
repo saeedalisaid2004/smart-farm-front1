@@ -15,6 +15,7 @@ const COLORS = [
   "hsl(47, 96%, 53%)",
 ];
 
+/** Parse API time string to Date */
 const parseApiTime = (timeStr: string): Date => {
   const isoStr = timeStr.replace(" ", "T") + "+02:00";
   return new Date(isoStr);
