@@ -19,7 +19,9 @@ interface Message {
   content: string;
   status: string;
   reply?: string;
+  admin_reply?: string;
   date: string;
+  reply_date?: string;
 }
 
 const Messages = () => {
