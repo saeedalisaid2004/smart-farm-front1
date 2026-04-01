@@ -48,6 +48,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
   const { t, isRTL } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const unreadMsgCount = useUnreadMessages("admin");
 
   const formatTime = (dateStr: string) => {
     try {
