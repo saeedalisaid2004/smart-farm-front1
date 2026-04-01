@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, Monitor, BarChart3, Settings, Bell, Moon, Sun,
-  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X, Trash2, CheckCheck, XCircle
+  Leaf, User, LogOut, CheckCircle, AlertCircle, Info, Menu, X, Trash2, CheckCheck, XCircle, Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +32,7 @@ const adminMenuItems = [
   { icon: Monitor, labelKey: "admin.system" as const, path: "/admin/system", gradient: "from-orange-500 to-amber-600" },
   { icon: BarChart3, labelKey: "admin.reports" as const, path: "/admin/reports", gradient: "from-purple-500 to-violet-600" },
   { icon: Settings, labelKey: "admin.settings" as const, path: "/admin/settings", gradient: "from-slate-500 to-gray-600" },
+  { icon: Mail, labelKey: "admin.messages" as const, path: "/admin/messages", gradient: "from-blue-500 to-indigo-600" },
 ];
 
 interface AdminLayoutProps {

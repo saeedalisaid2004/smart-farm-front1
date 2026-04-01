@@ -36,6 +36,8 @@ const AdminSystem = lazy(() => import("./pages/admin/AdminSystem"));
 const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
+const Messages = lazy(() => import("./pages/Messages"));
+const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 
 const queryClient = new QueryClient();
 
@@ -69,12 +71,14 @@ const App = () => (
             <Route path="/dashboard/reports" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><DashboardReports /></Suspense></ProtectedRoute>} />
             <Route path="/dashboard/settings" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><DashboardSettings /></Suspense></ProtectedRoute>} />
             <Route path="/dashboard/profile" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><Profile /></Suspense></ProtectedRoute>} />
+            <Route path="/dashboard/messages" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><Messages /></Suspense></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<AdminRoute><Suspense fallback={<PageLoader skeleton="dashboard" />}><AdminDashboard /></Suspense></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminUsers /></Suspense></AdminRoute>} />
             <Route path="/admin/system" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSystem /></Suspense></AdminRoute>} />
             <Route path="/admin/reports" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminReports /></Suspense></AdminRoute>} />
             <Route path="/admin/profile" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminProfile /></Suspense></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
+            <Route path="/admin/messages" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminMessages /></Suspense></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </LanguageProvider>

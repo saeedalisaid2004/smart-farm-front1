@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, FileText, Settings, Bell, Moon, Sun,
-  User, LogOut, CheckCircle, AlertCircle, Info, Menu, Trash2, CheckCheck, XCircle
+  User, LogOut, CheckCircle, AlertCircle, Info, Menu, Trash2, CheckCheck, XCircle, Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +26,7 @@ const menuItems = [
   { icon: Apple, labelKey: "dashboard.fruitQuality" as const, path: "/dashboard/fruit-quality" },
   { icon: MessageCircle, labelKey: "dashboard.chatbot" as const, path: "/dashboard/chatbot" },
   { icon: FileText, labelKey: "dashboard.reports" as const, path: "/dashboard/reports" },
+  { icon: Mail, labelKey: "dashboard.messages" as const, path: "/dashboard/messages" },
   { icon: Settings, labelKey: "dashboard.settings" as const, path: "/dashboard/settings" },
 ];
 
