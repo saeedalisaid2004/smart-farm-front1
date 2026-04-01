@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, AlertCircle, Plus } from "lucide-react";
+import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { sendMessage, getMyMessages, getExternalUserId } from "@/services/smartFarmApi";
@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "date-fns";
-import { ar, enUS } from "date-fns/locale";
 
 interface Message {
   id: number;
@@ -77,8 +75,16 @@ const Messages = () => {
   const formatTime = (dateStr: string) => {
     try {
       const normalized = dateStr.includes("+") || dateStr.includes("Z") ? dateStr : dateStr.replace(" ", "T") + "+02:00";
-      return formatDistanceToNow(new Date(normalized), { addSuffix: true, locale: isRTL ? ar : enUS });
-    } catch { return dateStr; }
+      return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(normalized));
+    } catch {
+      return dateStr;
+    }
   };
 
   const getStatusBadge = (status: string) => {

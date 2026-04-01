@@ -8,8 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "date-fns";
-import { ar, enUS } from "date-fns/locale";
 
 interface AdminMessage {
   id: number;
@@ -68,8 +66,16 @@ const AdminMessages = () => {
   const formatTime = (dateStr: string) => {
     try {
       const normalized = dateStr.includes("+") || dateStr.includes("Z") ? dateStr : dateStr.replace(" ", "T") + "+02:00";
-      return formatDistanceToNow(new Date(normalized), { addSuffix: true, locale: isRTL ? ar : enUS });
-    } catch { return dateStr; }
+      return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(normalized));
+    } catch {
+      return dateStr;
+    }
   };
 
   const getStatusBadge = (status: string) => {
