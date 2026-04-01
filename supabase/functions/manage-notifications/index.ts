@@ -41,6 +41,19 @@ Deno.serve(async (req) => {
       }
 
       case "create": {
+        // Check if user has push notifications enabled
+        const { data: settings } = await supabase
+          .from("notification_settings")
+          .select("push")
+          .eq("external_user_id", String(user_id))
+          .maybeSingle();
+
+        // If settings exist and push is explicitly false, skip creating notification
+        if (settings && settings.push === false) {
+          result = { skipped: true, reason: "push_disabled" };
+          break;
+        }
+
         const { data, error } = await supabase
           .from("notifications")
           .insert({ user_id: String(user_id), title, description: description || null, type: type || "info" })
