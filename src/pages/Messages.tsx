@@ -157,13 +157,29 @@ const Messages = () => {
                   <h3 className="font-semibold text-foreground">{language === "ar" ? "إرسال رسالة جديدة" : "Send New Message"}</h3>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground mb-2 block">{language === "ar" ? "الموضوع" : "Subject"}</Label>
-                  <Input
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    placeholder={language === "ar" ? "اكتب موضوع الرسالة..." : "Enter message subject..."}
-                    className="rounded-xl h-12 bg-secondary/50 border-border"
-                  />
+                  <Label className="text-sm font-medium text-foreground mb-2 block">{language === "ar" ? "نوع الرسالة" : "Message Type"}</Label>
+                  <Select value={subject} onValueChange={setSubject}>
+                    <SelectTrigger className="rounded-xl h-12 bg-secondary/50 border-border">
+                      <SelectValue placeholder={language === "ar" ? "اختر نوع الرسالة..." : "Select message type..."} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={language === "ar" ? "شكوى" : "Complaint"}>
+                        {language === "ar" ? "شكوى" : "Complaint"}
+                      </SelectItem>
+                      <SelectItem value={language === "ar" ? "اقتراح" : "Suggestion"}>
+                        {language === "ar" ? "اقتراح" : "Suggestion"}
+                      </SelectItem>
+                      <SelectItem value={language === "ar" ? "استفسار" : "Inquiry"}>
+                        {language === "ar" ? "استفسار" : "Inquiry"}
+                      </SelectItem>
+                      <SelectItem value={language === "ar" ? "طلب دعم فني" : "Technical Support"}>
+                        {language === "ar" ? "طلب دعم فني" : "Technical Support"}
+                      </SelectItem>
+                      <SelectItem value={language === "ar" ? "أخرى" : "Other"}>
+                        {language === "ar" ? "أخرى" : "Other"}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-foreground mb-2 block">{language === "ar" ? "المحتوى" : "Content"}</Label>
