@@ -23,10 +23,15 @@ const parseApiTime = (timeStr: string): Date => {
 
 const formatExactTime = (date: Date) => {
   try {
-    return new Intl.DateTimeFormat("en-GB", {
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit",
-    }).format(date);
+    const now = Date.now();
+    const diff = now - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins} min ago`;
+    if (hours < 24) return `${hours} hr ago`;
+    return `${days} day ago`;
   } catch { return ""; }
 };
 
