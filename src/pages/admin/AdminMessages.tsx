@@ -57,6 +57,7 @@ const AdminMessages = () => {
       setReplyText("");
       setSelectedMsg(null);
       fetchMessages();
+      window.dispatchEvent(new Event("messages-updated"));
     } catch {
       toast({ variant: "destructive", title: language === "ar" ? "فشل إرسال الرد" : "Failed to send reply" });
     } finally {
