@@ -6,6 +6,7 @@ export const adminTranslations = {
     "admin.system": "System Management",
     "admin.reports": "System Reports",
     "admin.settings": "Settings",
+    "admin.messages": "Messages",
     // Admin Dashboard
     "adminDash.title": "Admin Dashboard",
     "adminDash.subtitle": "System-wide overview and analytics for Smart Farm AI platform",
