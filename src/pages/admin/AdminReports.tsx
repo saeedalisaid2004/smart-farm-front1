@@ -31,9 +31,11 @@ const AdminReports = () => {
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [dateRange, setDateRange] = useState("all");
 
-  const fetchData = (days: string) => {
+  const rangeToDays: Record<string, number> = { weekly: 7, monthly: 30, all: 365 };
+
+  const fetchData = (range: string) => {
     setLoading(true);
-    getAdminReportStats(Number(days))
+    getAdminReportStats(rangeToDays[range] ?? 365)
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
