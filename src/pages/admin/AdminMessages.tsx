@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Mail, Send, Loader2, MessageSquare, CheckCircle2, Clock, User, Reply } from "lucide-react";
+import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, User, Reply } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getAllMessages, adminReplyMessage, getUserManagementData } from "@/services/smartFarmApi";
@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AdminMessage {
@@ -18,7 +19,6 @@ interface AdminMessage {
   status: string;
   reply?: string;
   date: string;
-  reply_date?: string;
 }
 
 const AdminMessages = () => {
@@ -30,7 +30,6 @@ const AdminMessages = () => {
   const [replyText, setReplyText] = useState("");
   const [replying, setReplying] = useState(false);
   const emailToIdMap = useRef<Record<string, number>>({});
-  const bottomRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -55,10 +54,6 @@ const AdminMessages = () => {
       })
       .catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (!loading) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
 
   const handleReply = async (msgId: number) => {
     if (!replyText.trim()) {
@@ -103,6 +98,7 @@ const AdminMessages = () => {
     try {
       const normalized = dateStr.includes("+") || dateStr.includes("Z") ? dateStr : dateStr.replace(" ", "T") + "+02:00";
       return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
@@ -113,54 +109,40 @@ const AdminMessages = () => {
     }
   };
 
-  // Build chat bubbles from all messages
-  const chatBubbles = messages.flatMap((msg) => {
-    const bubbles: { type: "received" | "sent"; msgId: number; sender: string; subject: string; text: string; time: string; status: string; original: AdminMessage }[] = [];
-    // Farmer message = received by admin
-    bubbles.push({
-      type: "received",
-      msgId: msg.id,
-      sender: msg.sender_name,
-      subject: msg.subject,
-      text: msg.content,
-      time: formatTime(msg.date),
-      status: msg.status,
-      original: msg,
-    });
-    // Admin reply = sent by admin
-    if (msg.reply) {
-      bubbles.push({
-        type: "sent",
-        msgId: msg.id,
-        sender: language === "ar" ? "أنت" : "You",
-        subject: language === "ar" ? "ردك" : "Your Reply",
-        text: msg.reply,
-        time: msg.reply_date ? formatTime(msg.reply_date) : "",
-        status: "replied",
-        original: msg,
-      });
-    }
-    return bubbles;
-  });
+  const getStatusBadge = (status: string) => {
+    const isReplied = status?.toLowerCase() === "replied";
+    return (
+      <Badge variant={isReplied ? "default" : "secondary"} className={`text-xs ${isReplied ? "bg-primary/10 text-primary border-primary/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"}`}>
+        {isReplied ? (
+          <><CheckCircle2 className="w-3 h-3 mr-1" />{language === "ar" ? "تم الرد" : "Replied"}</>
+        ) : (
+          <><Clock className="w-3 h-3 mr-1" />{language === "ar" ? "بانتظار الرد" : "Pending"}</>
+        )}
+      </Badge>
+    );
+  };
 
   const pendingCount = messages.filter(m => m.status?.toLowerCase() !== "replied").length;
 
   return (
     <AdminLayout title={language === "ar" ? "الرسائل" : "Messages"}>
-      <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-180px)]" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="max-w-4xl mx-auto space-y-6" dir={isRTL ? "rtl" : "ltr"}>
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between pb-4 border-b border-border mb-4 flex-shrink-0"
+          className="flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-              <Mail className="w-5 h-5 text-primary-foreground" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl blur-xl opacity-30 animate-pulse" />
+              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">{language === "ar" ? "رسائل المزارعين" : "Farmer Messages"}</h2>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {messages.length} {language === "ar" ? "رسالة" : "messages"}
                 {pendingCount > 0 && (
                   <span className="text-amber-600 font-medium"> · {pendingCount} {language === "ar" ? "بانتظار الرد" : "pending"}</span>
@@ -170,107 +152,94 @@ const AdminMessages = () => {
           </div>
         </motion.div>
 
-        {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto rounded-2xl bg-secondary/20 border border-border p-4 space-y-3">
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-7 h-7 animate-spin text-primary" />
-            </div>
-          ) : chatBubbles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <MessageSquare className="w-14 h-14 text-muted-foreground/20 mb-3" />
-              <p className="text-muted-foreground text-sm font-medium">
-                {language === "ar" ? "لا توجد رسائل" : "No messages yet"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {chatBubbles.map((bubble, i) => {
-                const isSent = bubble.type === "sent";
-                const isSelectedForReply = selectedMsg?.id === bubble.msgId && !isSent;
-                return (
-                  <motion.div
-                    key={`${bubble.msgId}-${bubble.type}-${i}`}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.03 }}
-                  >
-                    <div className={`flex ${isSent ? (isRTL ? "justify-start" : "justify-end") : (isRTL ? "justify-end" : "justify-start")}`}>
-                      <div
-                        className={`max-w-[75%] ${isSent
-                          ? "bg-primary text-primary-foreground rounded-2xl rounded-br-md"
-                          : "bg-card border border-border text-foreground rounded-2xl rounded-bl-md cursor-pointer hover:shadow-md transition-shadow"
-                        } px-4 py-3 shadow-sm`}
-                        onClick={() => {
-                          if (!isSent && bubble.original.status?.toLowerCase() !== "replied") {
-                            setSelectedMsg(isSelectedForReply ? null : bubble.original);
-                            setReplyText("");
-                          }
-                        }}
-                      >
-                        {/* Sender & Subject */}
-                        <div className="flex items-center gap-1.5 mb-1">
-                          {!isSent && <User className="w-3 h-3 text-muted-foreground/60" />}
-                          <span className={`text-[11px] font-semibold ${isSent ? "text-primary-foreground/70" : "text-muted-foreground/70"}`}>
-                            {bubble.sender}
-                          </span>
+        {/* Messages */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : messages.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16 bg-card border border-border rounded-3xl"
+          >
+            <MessageSquare className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
+            <p className="text-muted-foreground font-medium">{language === "ar" ? "لا توجد رسائل" : "No messages yet"}</p>
+          </motion.div>
+        ) : (
+          <div className="space-y-3">
+            {messages.map((msg, i) => {
+              const isSelected = selectedMsg?.id === msg.id;
+              return (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className={`bg-card border rounded-2xl p-5 shadow-sm transition-all ${isSelected ? "border-primary/40 shadow-md" : "border-border hover:shadow-md"}`}
+                >
+                  <div className="cursor-pointer" onClick={() => { setSelectedMsg(isSelected ? null : msg); setReplyText(msg.reply || ""); }}>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                          <User className="w-5 h-5 text-white" />
                         </div>
-                        <p className={`text-[11px] font-medium mb-1 ${isSent ? "text-primary-foreground/60" : "text-primary"}`}>
-                          {bubble.subject}
-                        </p>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap" dir="auto">{bubble.text}</p>
-                        {/* Footer */}
-                        <div className={`flex items-center gap-1.5 mt-1.5 ${isSent ? "justify-end" : "justify-start"}`}>
-                          <span className={`text-[10px] ${isSent ? "text-primary-foreground/50" : "text-muted-foreground/60"}`}>
-                            {bubble.time}
-                          </span>
-                          {!isSent && (
-                            bubble.status?.toLowerCase() === "replied"
-                              ? <CheckCircle2 className="w-3 h-3 text-primary/60" />
-                              : <Clock className="w-3 h-3 text-amber-500/60" />
-                          )}
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-foreground truncate">{msg.sender_name}</h4>
+                          <p className="text-xs text-muted-foreground truncate">{msg.sender_email}</p>
                         </div>
                       </div>
+                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                        {getStatusBadge(msg.status)}
+                        <span className="text-xs text-muted-foreground/60">{formatTime(msg.date)}</span>
+                      </div>
                     </div>
+                    <div className="bg-secondary/30 rounded-xl p-4">
+                      <p className="text-xs font-medium text-primary mb-1" dir="auto">{msg.subject}</p>
+                      <p className="text-sm text-foreground" dir="auto">{msg.content}</p>
+                    </div>
+                  </div>
 
-                    {/* Reply input for selected message */}
-                    <AnimatePresence>
-                      {isSelectedForReply && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className={`mt-2 ${isRTL ? "mr-0 ml-auto" : "ml-0 mr-auto"} max-w-[75%]`}
-                        >
-                          <div className="bg-card border border-primary/20 rounded-2xl p-3 space-y-2 shadow-sm">
-                            <Textarea
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                              placeholder={language === "ar" ? "اكتب ردك هنا..." : "Write your reply..."}
-                              className="rounded-xl min-h-[70px] bg-secondary/50 border-border resize-none text-sm"
-                            />
-                            <div className="flex justify-end">
-                              <Button
-                                onClick={() => handleReply(bubble.msgId)}
-                                disabled={replying}
-                                size="sm"
-                                className="rounded-xl gap-1.5"
-                              >
-                                {replying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Reply className="w-3.5 h-3.5" />}
-                                {replying ? (language === "ar" ? "إرسال..." : "Sending...") : (language === "ar" ? "رد" : "Reply")}
-                              </Button>
+                  {/* Expanded view */}
+                  <AnimatePresence>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4 pt-4 border-t border-border space-y-3"
+                      >
+                        {msg.reply && msg.status?.toLowerCase() === "replied" && (
+                          <div className="bg-primary/5 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
+                              <span className="text-xs font-medium text-primary">{language === "ar" ? "ردك السابق" : "Your previous reply"}</span>
                             </div>
+                            <p className="text-sm text-foreground" dir="auto">{msg.reply}</p>
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
-              <div ref={bottomRef} />
-            </>
-          )}
-        </div>
+                        )}
+                        <div>
+                          <Textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder={language === "ar" ? "اكتب ردك هنا..." : "Write your reply here..."}
+                            className="rounded-xl min-h-[100px] bg-secondary/50 border-border resize-none"
+                          />
+                        </div>
+                        <div className="flex justify-end">
+                          <Button onClick={() => handleReply(msg.id)} disabled={replying} className="rounded-xl gap-2">
+                            {replying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Reply className="w-4 h-4" />}
+                            {replying ? (language === "ar" ? "جاري الإرسال..." : "Sending...") : (language === "ar" ? "إرسال الرد" : "Send Reply")}
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
