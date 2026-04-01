@@ -29,13 +29,19 @@ const AdminReports = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [dateRange, setDateRange] = useState("30");
 
-  useEffect(() => {
-    getAdminReportStats()
+  const fetchData = (days: string) => {
+    setLoading(true);
+    getAdminReportStats(Number(days))
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchData(dateRange);
+  }, [dateRange]);
 
   const handleGenerateReport = async () => {
     setGeneratingPdf(true);
