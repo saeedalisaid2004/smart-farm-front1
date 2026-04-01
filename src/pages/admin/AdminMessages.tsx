@@ -1,13 +1,14 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, User, Reply } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getAllMessages, adminReplyMessage } from "@/services/smartFarmApi";
+import { getAllMessages, adminReplyMessage, getUserManagementData } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminMessage {
   id: number;
