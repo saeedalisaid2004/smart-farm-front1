@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState<AnalysisStats>(getAnalysisStats());
   const [daily, setDaily] = useState(getDailyStats());
   const [total, setTotal] = useState(getTotalAnalyses());
+  const [weather, setWeather] = useState<any>(null);
 
   useEffect(() => {
     const refresh = () => {
@@ -27,6 +28,12 @@ const Dashboard = () => {
     };
     window.addEventListener("stats-updated", refresh);
     return () => window.removeEventListener("stats-updated", refresh);
+  }, []);
+
+  useEffect(() => {
+    getCurrentWeather()
+      .then((res) => { if (res?.status === "success") setWeather(res.data); })
+      .catch(() => {});
   }, []);
 
   const features = [
