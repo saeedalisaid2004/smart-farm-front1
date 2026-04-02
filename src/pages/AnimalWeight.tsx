@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Eye, AlertCircle, Weight, PawPrint } from "lucide-react";
+import { Eye, AlertCircle, Weight, PawPrint, Camera, Info } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { estimateAnimalWeight, getExternalUserId } from "@/services/smartFarmApi";
