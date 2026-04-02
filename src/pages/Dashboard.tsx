@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity } from "lucide-react";
+import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity, CloudSun, Droplets, Wind, Thermometer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
 import { getAnalysisStats, getDailyStats, getTotalAnalyses, type AnalysisStats } from "@/services/analysisStats";
+import { getCurrentWeather } from "@/services/smartFarmApi";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState<AnalysisStats>(getAnalysisStats());
   const [daily, setDaily] = useState(getDailyStats());
   const [total, setTotal] = useState(getTotalAnalyses());
+  const [weather, setWeather] = useState<any>(null);
 
   useEffect(() => {
     const refresh = () => {
@@ -26,6 +28,12 @@ const Dashboard = () => {
     };
     window.addEventListener("stats-updated", refresh);
     return () => window.removeEventListener("stats-updated", refresh);
+  }, []);
+
+  useEffect(() => {
+    getCurrentWeather()
+      .then((res) => { if (res?.status === "success") setWeather(res.data); })
+      .catch(() => {});
   }, []);
 
   const features = [
@@ -71,7 +79,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {statCards.map((s, i) => (
             <motion.div
               key={s.label}
@@ -91,6 +99,49 @@ const Dashboard = () => {
               </div>
             </motion.div>
           ))}
+
+          {/* Weather Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-card border border-border rounded-2xl p-5 shadow-card overflow-hidden relative"
+          >
+            {weather ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
+                    {weather.icon_url ? (
+                      <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
+                    ) : (
+                      <CloudSun className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
+                    <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
+                  <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
+                </div>
+                {weather.description && (
+                  <p className="text-xs text-muted-foreground">{weather.description}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
+                  <CloudSun className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Weather</p>
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
 
         {/* Charts */}

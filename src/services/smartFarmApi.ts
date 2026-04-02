@@ -456,3 +456,10 @@ export const adminDeleteMessage = async (messageId: number) => {
   const res = await fetchWithTimeout(`${API_BASE}/messages/admin/delete/${messageId}`, { method: "DELETE" });
   return res.json();
 };
+
+// ============ Weather ============
+
+export const getCurrentWeather = async () => {
+  const res = await fetchWithTimeout(`${API_BASE}/weather/current-weather`);
+  return res.json();
+};
