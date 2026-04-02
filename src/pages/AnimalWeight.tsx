@@ -52,7 +52,7 @@ const AnimalWeight = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground mb-1 flex items-center gap-1.5">
-                <Info className="w-4 h-4 text-primary" />
+                <Info className="w-4 h-4 text-destructive" />
                 {isRTL ? "نصيحة للحصول على نتيجة دقيقة" : "Tip for accurate results"}
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
