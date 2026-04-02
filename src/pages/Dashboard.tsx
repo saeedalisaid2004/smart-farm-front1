@@ -79,7 +79,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {statCards.map((s, i) => (
             <motion.div
               key={s.label}
@@ -99,6 +99,49 @@ const Dashboard = () => {
               </div>
             </motion.div>
           ))}
+
+          {/* Weather Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-card border border-border rounded-2xl p-5 shadow-card overflow-hidden relative"
+          >
+            {weather ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
+                    {weather.icon_url ? (
+                      <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
+                    ) : (
+                      <CloudSun className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
+                    <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
+                  <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
+                </div>
+                {weather.description && (
+                  <p className="text-xs text-muted-foreground">{weather.description}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
+                  <CloudSun className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Weather</p>
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
 
         {/* Charts */}
