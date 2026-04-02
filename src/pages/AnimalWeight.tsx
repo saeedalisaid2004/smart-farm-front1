@@ -44,15 +44,15 @@ const AnimalWeight = () => {
     <DashboardLayout title={t("animalWeight.title")}>
        <div className="max-w-2xl mx-auto space-y-6">
         {/* Tip Card */}
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/30 p-4 shadow-sm">
-          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/10 blur-2xl" />
+        <div className="relative overflow-hidden rounded-2xl border border-destructive/20 bg-gradient-to-br from-destructive/10 via-destructive/5 to-secondary/30 p-4 shadow-sm">
+          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-destructive/10 blur-2xl" />
           <div className="flex items-start gap-3" dir={isRTL ? "rtl" : "ltr"}>
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mt-0.5">
-              <Camera className="w-5 h-5 text-primary" />
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center mt-0.5">
+              <Camera className="w-5 h-5 text-destructive" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground mb-1 flex items-center gap-1.5">
-                <Info className="w-4 h-4 text-primary" />
+                <Info className="w-4 h-4 text-destructive" />
                 {isRTL ? "نصيحة للحصول على نتيجة دقيقة" : "Tip for accurate results"}
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
