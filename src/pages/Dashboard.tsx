@@ -31,9 +31,21 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    getCurrentWeather()
-      .then((res) => { if (res?.status === "success") setWeather(res.data); })
-      .catch(() => {});
+    const fetchWeather = (lat?: number, lon?: number) => {
+      getCurrentWeather(lat, lon)
+        .then((res) => { if (res?.status === "success") setWeather(res.data); })
+        .catch(() => {});
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather(), // denied → Cairo default
+        { timeout: 5000 }
+      );
+    } else {
+      fetchWeather(); // no geolocation support → Cairo default
+    }
   }, []);
 
   const features = [
