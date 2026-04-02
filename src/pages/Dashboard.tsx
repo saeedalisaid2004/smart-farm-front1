@@ -101,47 +101,64 @@ const Dashboard = () => {
           ))}
 
           {/* Weather Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card border border-border rounded-2xl p-5 shadow-card overflow-hidden relative"
-          >
-            {weather ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
-                    {weather.icon_url ? (
-                      <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
-                    ) : (
-                      <CloudSun className="w-6 h-6 text-white" />
+          {(() => {
+            const level = weather?.irrigation_advice?.level;
+            const isSafe = level === "safe";
+            const isWarning = level === "warning";
+            const bgClass = isSafe
+              ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800"
+              : isWarning
+              ? "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800"
+              : "bg-card border-border";
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className={`rounded-2xl p-5 shadow-card overflow-hidden relative border ${bgClass}`}
+              >
+                {weather ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isSafe ? "from-emerald-400 to-green-500" : isWarning ? "from-red-400 to-rose-500" : "from-sky-400 to-blue-500"} flex items-center justify-center shadow-lg`}>
+                        {weather.icon_url ? (
+                          <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
+                        ) : (
+                          <CloudSun className="w-6 h-6 text-white" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
+                        <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
+                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
+                    </div>
+                    {weather.irrigation_advice?.message && (
+                      <p className={`text-xs font-medium ${isSafe ? "text-emerald-700 dark:text-emerald-400" : isWarning ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>
+                        {weather.irrigation_advice.message}
+                      </p>
+                    )}
+                    {weather.description && (
+                      <p className="text-xs text-muted-foreground">{weather.description}</p>
                     )}
                   </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
-                    <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
+                      <CloudSun className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Weather</p>
+                      <p className="text-sm text-muted-foreground">Loading...</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
-                  <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
-                </div>
-                {weather.description && (
-                  <p className="text-xs text-muted-foreground">{weather.description}</p>
                 )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg">
-                  <CloudSun className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Weather</p>
-                  <p className="text-sm text-muted-foreground">Loading...</p>
-                </div>
-              </div>
-            )}
-          </motion.div>
+              </motion.div>
+            );
+          })()}
         </div>
 
         {/* Charts */}
