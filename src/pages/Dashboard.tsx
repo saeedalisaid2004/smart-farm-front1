@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity } from "lucide-react";
+import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity, CloudSun, Droplets, Wind, Thermometer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
 import { getAnalysisStats, getDailyStats, getTotalAnalyses, type AnalysisStats } from "@/services/analysisStats";
+import { getCurrentWeather } from "@/services/smartFarmApi";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
