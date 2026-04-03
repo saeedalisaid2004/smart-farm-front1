@@ -31,31 +31,49 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const cached = sessionStorage.getItem("weather_data");
-    if (cached) {
-      try { setWeather(JSON.parse(cached)); return; } catch {}
-    }
+    const CACHE_KEY = "weather_data";
+    const CACHE_TS_KEY = "weather_data_ts";
+    const TEN_MIN = 10 * 60 * 1000;
+
+    const isCacheFresh = () => {
+      const ts = sessionStorage.getItem(CACHE_TS_KEY);
+      return ts ? Date.now() - Number(ts) < TEN_MIN : false;
+    };
+
+    const loadCached = () => {
+      try { const c = sessionStorage.getItem(CACHE_KEY); if (c) { setWeather(JSON.parse(c)); return true; } } catch {} return false;
+    };
 
     const fetchWeather = (lat?: number, lon?: number) => {
       getCurrentWeather(lat, lon)
         .then((res) => {
           if (res?.status === "success") {
             setWeather(res.data);
-            sessionStorage.setItem("weather_data", JSON.stringify(res.data));
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
+            sessionStorage.setItem(CACHE_TS_KEY, String(Date.now()));
           }
         })
         .catch(() => {});
     };
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather(),
-        { timeout: 5000 }
-      );
-    } else {
-      fetchWeather();
-    }
+    const doFetch = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+          () => fetchWeather(),
+          { timeout: 5000 }
+        );
+      } else {
+        fetchWeather();
+      }
+    };
+
+    // Load cache immediately, fetch only if stale
+    loadCached();
+    if (!isCacheFresh()) doFetch();
+
+    const interval = setInterval(() => doFetch(), TEN_MIN);
+    return () => clearInterval(interval);
   }, []);
 
   const features = [
