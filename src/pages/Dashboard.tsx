@@ -31,20 +31,30 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    const cached = sessionStorage.getItem("weather_data");
+    if (cached) {
+      try { setWeather(JSON.parse(cached)); return; } catch {}
+    }
+
     const fetchWeather = (lat?: number, lon?: number) => {
       getCurrentWeather(lat, lon)
-        .then((res) => { if (res?.status === "success") setWeather(res.data); })
+        .then((res) => {
+          if (res?.status === "success") {
+            setWeather(res.data);
+            sessionStorage.setItem("weather_data", JSON.stringify(res.data));
+          }
+        })
         .catch(() => {});
     };
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather(), // denied → Cairo default
+        () => fetchWeather(),
         { timeout: 5000 }
       );
     } else {
-      fetchWeather(); // no geolocation support → Cairo default
+      fetchWeather();
     }
   }, []);
 
