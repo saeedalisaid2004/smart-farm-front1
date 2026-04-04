@@ -2,6 +2,8 @@ import { useState, useEffect, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, ChevronLeft, Leaf, BarChart3, MessageCircle, Bell, Bug, Weight, Sprout, FlaskConical, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { getExternalUserId } from "@/services/smartFarmApi";
 
 interface Step {
   title: string;
@@ -71,16 +73,62 @@ const OnboardingTour = () => {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const done = localStorage.getItem(getTourKey());
-    if (!done) {
+    // Check local cache first for instant response
+    const localDone = localStorage.getItem(getTourKey());
+    if (localDone) return;
+
+    // Then check backend for cross-browser sync
+    const userId = getExternalUserId();
+    if (!userId) {
+      // No user ID yet, show tour after delay
       const timer = setTimeout(() => setShow(true), 1000);
       return () => clearTimeout(timer);
     }
+
+    let cancelled = false;
+    supabase.functions
+      .invoke("user-preferences", {
+        body: { action: "get", user_id: String(userId) },
+      })
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data?.preferences?.onboarding_completed) {
+          // Sync to local cache so we don't need to call backend again
+          localStorage.setItem(getTourKey(), "true");
+        } else {
+          const timer = setTimeout(() => {
+            if (!cancelled) setShow(true);
+          }, 1000);
+          return () => clearTimeout(timer);
+        }
+      })
+      .catch(() => {
+        // On error, fallback to showing tour
+        if (!cancelled) {
+          const timer = setTimeout(() => setShow(true), 1000);
+        }
+      });
+
+    return () => { cancelled = true; };
   }, []);
 
   const finish = () => {
     setShow(false);
+    // Save locally
     localStorage.setItem(getTourKey(), "true");
+    // Save to backend for cross-browser sync
+    const userId = getExternalUserId();
+    if (userId) {
+      supabase.functions
+        .invoke("user-preferences", {
+          body: {
+            action: "update",
+            user_id: String(userId),
+            preferences: { onboarding_completed: true },
+          },
+        })
+        .catch(() => {}); // Fire and forget
+    }
   };
 
   const next = () => {
