@@ -67,18 +67,25 @@ const PlantDisease = () => {
             const confidenceRaw = a.confidence;
             const confidenceNum = confidenceRaw ? parseFloat(String(confidenceRaw)) : null;
             const variant = isHealthy ? "primary" as const : "destructive" as const;
-            const cropName = a.crop_type_en || a.crop_type_ar || "";
-            const diseaseName = a.disease_en || a.disease_ar || "";
-            const treatments = a.suggested_treatments || (a.treatment ? [a.treatment] : []);
+            const cropNameEn = a.crop_type_en || "";
+            const cropNameAr = a.crop_type_ar || "";
+            const cropDisplay = cropNameEn && cropNameAr ? `${cropNameEn} (${cropNameAr})` : cropNameEn || cropNameAr;
+            const diseaseEn = a.disease_en || "";
+            const diseaseAr = a.disease_ar || "";
+            const diseaseDisplay = isHealthy
+              ? (diseaseEn || condition)
+              : (diseaseEn && diseaseAr ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
+            const fullDiagnosis = a.full_diagnosis || "";
+            const treatments = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
 
             return (
               <AnalysisResultCard key="res" title="Analysis Result" statusColor={variant}>
-                {cropName && (
+                {cropDisplay && (
                   <StaggerItem>
                     <ResultItem
                       icon={<Leaf className="w-6 h-6 text-primary" />}
                       label="Crop"
-                      value={cropName}
+                      value={cropDisplay}
                       variant="primary"
                       large
                     />
@@ -89,7 +96,7 @@ const PlantDisease = () => {
                     <ResultItem
                       icon={isHealthy ? <CheckCircle2 className="w-6 h-6 text-primary" /> : <AlertCircle className="w-6 h-6 text-destructive" />}
                       label="Status"
-                      value={isHealthy ? condition : `${diseaseName || condition}`}
+                      value={diseaseDisplay}
                       variant={variant}
                       large
                     />
@@ -98,19 +105,19 @@ const PlantDisease = () => {
                 {confidenceNum != null && !isNaN(confidenceNum) && (
                   <StaggerItem><ConfidenceBar value={confidenceNum} /></StaggerItem>
                 )}
+                {fullDiagnosis && (
+                  <StaggerItem>
+                    <ResultItem icon={<FileText className="w-5 h-5 text-primary" />} label="Full Diagnosis" value={fullDiagnosis} />
+                  </StaggerItem>
+                )}
                 {a.message && (
                   <StaggerItem>
-                    <ResultItem icon={<AlertCircle className="w-5 h-5 text-muted-foreground" />} label="Diagnosis" value={a.message} />
+                    <ResultItem icon={<MessageCircle className="w-5 h-5 text-muted-foreground" />} label="Details" value={a.message} />
                   </StaggerItem>
                 )}
                 {treatments.length > 0 && (
                   <StaggerItem>
                     <ResultItem icon={<Shield className="w-5 h-5 text-primary" />} label="Treatment" value={treatments.join(" • ")} />
-                  </StaggerItem>
-                )}
-                {!condition && !cropName && !a.message && !a.status && (
-                  <StaggerItem>
-                    <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">{JSON.stringify(result, null, 2)}</pre>
                   </StaggerItem>
                 )}
               </AnalysisResultCard>
