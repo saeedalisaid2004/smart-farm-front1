@@ -80,7 +80,7 @@ const OnboardingTour = () => {
 
   const finish = () => {
     setShow(false);
-    localStorage.setItem(TOUR_KEY, "true");
+    localStorage.setItem(getTourKey(), "true");
   };
 
   const next = () => {
