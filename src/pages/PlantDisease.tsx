@@ -108,7 +108,7 @@ const PlantDisease = () => {
                     <ResultItem icon={<Shield className="w-5 h-5 text-primary" />} label="Treatment" value={treatments.join(" • ")} />
                   </StaggerItem>
                 )}
-                {!condition && !cropName && (
+                {!condition && !cropName && !a.message && !a.status && (
                   <StaggerItem>
                     <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">{JSON.stringify(result, null, 2)}</pre>
                   </StaggerItem>
