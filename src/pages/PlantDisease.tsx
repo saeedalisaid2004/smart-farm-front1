@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Leaf, AlertCircle, CheckCircle2, Shield } from "lucide-react";
+import { Leaf, AlertCircle, CheckCircle2, Shield, FileText, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { detectPlantDisease, getExternalUserId } from "@/services/smartFarmApi";
