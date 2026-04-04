@@ -34,8 +34,10 @@ const PlantDisease = () => {
     try {
       const data = await detectPlantDisease(userId, file);
       setResult(data);
-      const isHealthy = data?.prediction?.toLowerCase().includes("healthy");
-      sendNotification({ title: isHealthy ? "Plant is Healthy ✅" : "Disease Detected ⚠️", description: `Plant Disease Analysis: ${data?.prediction || "Completed"}`, type: isHealthy ? "success" : "warning" });
+      const analysis = data?.analysis || data;
+      const condition = analysis?.condition || analysis?.disease_en || analysis?.prediction || "";
+      const isHealthy = condition.toLowerCase().includes("healthy");
+      sendNotification({ title: isHealthy ? "Plant is Healthy ✅" : "Disease Detected ⚠️", description: `Plant Disease Analysis: ${analysis?.disease_en || condition || "Completed"}`, type: isHealthy ? "success" : "warning" });
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
