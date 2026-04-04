@@ -7,31 +7,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { generateFarmerPdf, listFarmerReports, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 
-const getLocalReportStats = (userId: number) => {
-  const key = `report_stats_${userId}`;
-  const stored = localStorage.getItem(key);
-  if (stored) return JSON.parse(stored);
-  return { total: 0, thisMonth: 0, lastMonthTotal: 0, month: new Date().getMonth() };
-};
-
-const saveLocalReportStats = (userId: number, stats: any) => {
-  localStorage.setItem(`report_stats_${userId}`, JSON.stringify(stats));
-};
-
-const incrementReportStats = (userId: number) => {
-  const stats = getLocalReportStats(userId);
-  const currentMonth = new Date().getMonth();
-  if (stats.month !== currentMonth) {
-    stats.lastMonthTotal = stats.thisMonth;
-    stats.thisMonth = 0;
-    stats.month = currentMonth;
-  }
-  stats.total += 1;
-  stats.thisMonth += 1;
-  saveLocalReportStats(userId, stats);
-  return stats;
-};
-
 const calcGrowth = (thisMonth: number, lastMonth: number) => {
   if (lastMonth === 0 && thisMonth === 0) return "N/A";
   if (lastMonth === 0) return `+${thisMonth * 100}%`;
@@ -39,38 +14,55 @@ const calcGrowth = (thisMonth: number, lastMonth: number) => {
   return pct >= 0 ? `+${pct}%` : `${pct}%`;
 };
 
+const computeReportStats = (reports: any[]) => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  let thisMonth = 0;
+  let lastMonth = 0;
+
+  reports.forEach((r) => {
+    const d = new Date(r.date || r.created_at || "");
+    if (!isNaN(d.getTime())) {
+      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) thisMonth++;
+      const prev = currentMonth === 0 ? 11 : currentMonth - 1;
+      const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+      if (d.getMonth() === prev && d.getFullYear() === prevYear) lastMonth++;
+    }
+  });
+
+  return { total: reports.length, thisMonth, lastMonthTotal: lastMonth };
+};
+
 const DashboardReports = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [dateRange, setDateRange] = useState("all");
-  const [localStats, setLocalStats] = useState<any>(null);
+  const [reportStats, setReportStats] = useState<any>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  const fetchData = () => {
+  const fetchData = async () => {
     const userId = getExternalUserId();
-    if (!userId) return;
+    if (!userId) { setLoadingStats(false); return; }
 
     setLoadingStats(true);
-    const stats = getLocalReportStats(userId);
-    const currentMonth = new Date().getMonth();
-    if (stats.month !== currentMonth) {
-      stats.lastMonthTotal = stats.thisMonth;
-      stats.thisMonth = 0;
-      stats.month = currentMonth;
-      saveLocalReportStats(userId, stats);
+    try {
+      const reportsData = await listFarmerReports(userId);
+      const list = Array.isArray(reportsData) ? reportsData : [];
+      setReports(list);
+      setReportStats(computeReportStats(list));
+    } catch {
+      setReports([]);
+      setReportStats({ total: 0, thisMonth: 0, lastMonthTotal: 0 });
+    } finally {
+      setLoadingStats(false);
     }
-    setLocalStats(stats);
-
-    listFarmerReports(userId).catch(() => []).then((reportsData) => {
-      if (Array.isArray(reportsData)) setReports(reportsData);
-    }).finally(() => setLoadingStats(false));
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleGeneratePdf = async () => {
     const userId = getExternalUserId();
@@ -82,11 +74,9 @@ const DashboardReports = () => {
       if (data.detail) {
         toast({ variant: "destructive", title: "Failed to generate report", description: "The server encountered an error generating the PDF. Please try again later." });
       } else if (url) {
-        // Ensure absolute URL
         if (!url.startsWith("http")) {
           url = `https://mahmoud123mahmoud-smartfarm-api.hf.space${url}`;
         }
-        // Download as blob to avoid browser blocking
         try {
           const pdfRes = await fetch(url);
           const blob = await pdfRes.blob();
@@ -99,14 +89,11 @@ const DashboardReports = () => {
           document.body.removeChild(a);
           URL.revokeObjectURL(blobUrl);
         } catch {
-          // Fallback: try opening directly
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Increment local stats and refresh
-        const updatedStats = incrementReportStats(userId);
-        setLocalStats({ ...updatedStats });
-        listFarmerReports(userId).catch(() => []).then((r) => { if (Array.isArray(r)) setReports(r); });
+        // Refresh from API
+        fetchData();
       } else {
         toast({ title: data.message || "Report generated" });
       }
@@ -166,7 +153,7 @@ const DashboardReports = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{localStats?.total ?? 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{reportStats?.total ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.totalReports")}</p>
                 </div>
               </div>
@@ -175,7 +162,7 @@ const DashboardReports = () => {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{localStats?.thisMonth ?? 0}</p>
+                  <p className="text-2xl font-bold text-foreground">{reportStats?.thisMonth ?? 0}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.thisMonth")}</p>
                 </div>
               </div>
@@ -184,7 +171,7 @@ const DashboardReports = () => {
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{calcGrowth(localStats?.thisMonth ?? 0, localStats?.lastMonthTotal ?? 0)}</p>
+                  <p className="text-2xl font-bold text-foreground">{calcGrowth(reportStats?.thisMonth ?? 0, reportStats?.lastMonthTotal ?? 0)}</p>
                   <p className="text-sm text-muted-foreground">{t("reports.vsLastMonth")}</p>
                 </div>
               </div>

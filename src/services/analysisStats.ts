@@ -1,3 +1,5 @@
+import { getFarmerStats, getExternalUserId } from "./smartFarmApi";
+
 function getUserId(): string {
   try {
     const stored = localStorage.getItem("app_user");
@@ -35,6 +37,7 @@ function getToday(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+// Local cache read (fallback)
 export function getAnalysisStats(): AnalysisStats {
   try {
     const raw = localStorage.getItem(userKey(STATS_KEY));
@@ -48,6 +51,32 @@ export function getAnalysisStats(): AnalysisStats {
     fruit_quality: 0,
     chatbot: 0,
   };
+}
+
+// Fetch stats from API and sync to localStorage cache
+export async function fetchAndSyncStats(): Promise<AnalysisStats> {
+  const userId = getExternalUserId();
+  if (!userId) return getAnalysisStats();
+
+  try {
+    const data = await getFarmerStats(userId);
+    // API may return stats in different formats, normalize
+    const stats: AnalysisStats = {
+      plant_disease: data?.plant_disease ?? data?.plant ?? data?.stats?.plant_disease ?? 0,
+      animal_weight: data?.animal_weight ?? data?.animal ?? data?.stats?.animal_weight ?? 0,
+      crop_recommendation: data?.crop_recommendation ?? data?.crop ?? data?.stats?.crop_recommendation ?? 0,
+      soil_analysis: data?.soil_analysis ?? data?.soil ?? data?.stats?.soil_analysis ?? 0,
+      fruit_quality: data?.fruit_quality ?? data?.fruit ?? data?.stats?.fruit_quality ?? 0,
+      chatbot: data?.chatbot ?? data?.stats?.chatbot ?? 0,
+    };
+    // Cache locally
+    localStorage.setItem(userKey(STATS_KEY), JSON.stringify(stats));
+    window.dispatchEvent(new Event("stats-updated"));
+    return stats;
+  } catch {
+    // Fallback to local cache
+    return getAnalysisStats();
+  }
 }
 
 export function incrementAnalysis(type: keyof AnalysisStats) {
