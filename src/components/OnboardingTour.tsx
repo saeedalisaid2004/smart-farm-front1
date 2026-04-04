@@ -52,14 +52,26 @@ const steps: Step[] = [
   },
 ];
 
-const TOUR_KEY = "onboarding_completed";
+const TOUR_BASE_KEY = "onboarding_completed";
+
+function getTourKey(): string {
+  try {
+    const stored = localStorage.getItem("app_user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const id = parsed.id || parsed.email || "default";
+      return `${TOUR_BASE_KEY}_${id}`;
+    }
+  } catch {}
+  return TOUR_BASE_KEY;
+}
 
 const OnboardingTour = () => {
   const [show, setShow] = useState(false);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const done = localStorage.getItem(TOUR_KEY);
+    const done = localStorage.getItem(getTourKey());
     if (!done) {
       const timer = setTimeout(() => setShow(true), 1000);
       return () => clearTimeout(timer);
@@ -68,7 +80,7 @@ const OnboardingTour = () => {
 
   const finish = () => {
     setShow(false);
-    localStorage.setItem(TOUR_KEY, "true");
+    localStorage.setItem(getTourKey(), "true");
   };
 
   const next = () => {

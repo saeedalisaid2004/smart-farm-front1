@@ -1,12 +1,12 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity, CloudSun, Droplets, Wind, Thermometer } from "lucide-react";
+import { Leaf, Eye, Sprout, FlaskConical, Apple, MessageCircle, ArrowUpRight, BarChart3, TrendingUp, Activity, CloudSun, Droplets, Wind } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
-import { getAnalysisStats, getDailyStats, getTotalAnalyses, type AnalysisStats } from "@/services/analysisStats";
+import { getAnalysisStats, getDailyStats, getTotalAnalyses, fetchAndSyncStats, type AnalysisStats } from "@/services/analysisStats";
 import { getCurrentWeather } from "@/services/smartFarmApi";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -20,7 +20,13 @@ const Dashboard = () => {
   const [total, setTotal] = useState(getTotalAnalyses());
   const [weather, setWeather] = useState<any>(null);
 
+  // Fetch stats from API on mount, then listen for local updates
   useEffect(() => {
+    fetchAndSyncStats().then((apiStats) => {
+      setStats(apiStats);
+      setTotal(Object.values(apiStats).reduce((a, b) => a + b, 0));
+    });
+
     const refresh = () => {
       setStats(getAnalysisStats());
       setDaily(getDailyStats());
@@ -68,7 +74,6 @@ const Dashboard = () => {
       }
     };
 
-    // Load cache immediately, fetch only if stale
     loadCached();
     if (!isCacheFresh()) doFetch();
 
@@ -94,7 +99,7 @@ const Dashboard = () => {
   ];
 
   const dailyData = daily.slice(-7).map((d) => ({
-    date: d.date.slice(5), // MM-DD
+    date: d.date.slice(5),
     analyses: d.count,
   }));
 
