@@ -457,13 +457,3 @@ export const adminDeleteMessage = async (messageId: number) => {
   return res.json();
 };
 
-// ============ Weather ============
-
-export const getCurrentWeather = async (lat?: number, lon?: number) => {
-  const params = new URLSearchParams();
-  if (lat !== undefined) params.append("lat", String(lat));
-  if (lon !== undefined) params.append("lon", String(lon));
-  const query = params.toString();
-  const res = await fetchWithTimeout(`${API_BASE}/weather/current-weather${query ? `?${query}` : ""}`);
-  return res.json();
-};
