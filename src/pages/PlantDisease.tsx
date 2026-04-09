@@ -75,7 +75,6 @@ const PlantDisease = () => {
             const diseaseDisplay = isHealthy
               ? (diseaseEn || condition)
               : (diseaseEn && diseaseAr ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
-            const fullDiagnosis = a.full_diagnosis || "";
             const treatments = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
 
             return (
