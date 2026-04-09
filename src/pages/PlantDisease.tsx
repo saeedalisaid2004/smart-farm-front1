@@ -104,11 +104,6 @@ const PlantDisease = () => {
                 {confidenceNum != null && !isNaN(confidenceNum) && (
                   <StaggerItem><ConfidenceBar value={confidenceNum} /></StaggerItem>
                 )}
-                {fullDiagnosis && (
-                  <StaggerItem>
-                    <ResultItem icon={<FileText className="w-5 h-5 text-primary" />} label="Full Diagnosis" value={fullDiagnosis} />
-                  </StaggerItem>
-                )}
                 {a.message && (
                   <StaggerItem>
                     <ResultItem icon={<MessageCircle className="w-5 h-5 text-muted-foreground" />} label="Details" value={a.message} />
