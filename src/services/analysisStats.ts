@@ -26,6 +26,24 @@ export interface AnalysisStats {
   chatbot: number;
 }
 
+export interface DashboardData {
+  statistics: {
+    total: number;
+    today: number;
+    most_used: string;
+  };
+  weather: {
+    temp: string;
+    location: string;
+    humidity: string;
+    wind: string;
+    advice: string;
+    level: string;
+    desc: string;
+  } | null;
+  services: AnalysisStats;
+}
+
 export interface DailyEntry {
   date: string;
   count: number;
@@ -53,31 +71,62 @@ export function getAnalysisStats(): AnalysisStats {
   };
 }
 
-// Fetch stats from API and sync to localStorage cache
-export async function fetchAndSyncStats(): Promise<AnalysisStats> {
+// Fetch all dashboard data (stats + weather) from unified API
+export async function fetchDashboardData(): Promise<DashboardData> {
   const userId = getExternalUserId();
-  if (!userId) return getAnalysisStats();
+  const fallbackStats = getAnalysisStats();
+  const fallback: DashboardData = {
+    statistics: {
+      total: Object.values(fallbackStats).reduce((a, b) => a + b, 0),
+      today: 0,
+      most_used: "N/A",
+    },
+    weather: null,
+    services: fallbackStats,
+  };
+
+  if (!userId) return fallback;
 
   try {
     const data = await getFarmerStats(userId);
-    // API returns: { top_cards: { total_reports }, services_summary: { Plants, Animals, Crops, Soil, Fruit } }
+
+    // New unified format: { statistics: {...}, weather: {...} }
+    // Also support old format: { services_summary: {...}, top_cards: {...} }
     const summary = data?.services_summary || {};
     const stats: AnalysisStats = {
-      plant_disease: summary?.Plants ?? data?.plant_disease ?? 0,
-      animal_weight: summary?.Animals ?? data?.animal_weight ?? 0,
-      crop_recommendation: summary?.Crops ?? data?.crop_recommendation ?? 0,
-      soil_analysis: summary?.Soil ?? data?.soil_analysis ?? 0,
-      fruit_quality: summary?.Fruit ?? data?.fruit_quality ?? 0,
-      chatbot: data?.chatbot ?? 0,
+      plant_disease: summary?.Plants ?? 0,
+      animal_weight: summary?.Animals ?? 0,
+      crop_recommendation: summary?.Crops ?? 0,
+      soil_analysis: summary?.Soil ?? 0,
+      fruit_quality: summary?.Fruit ?? 0,
+      chatbot: 0,
     };
-    // Cache locally
+
+    // Cache services locally
     localStorage.setItem(userKey(STATS_KEY), JSON.stringify(stats));
     window.dispatchEvent(new Event("stats-updated"));
-    return stats;
+
+    const apiStats = data?.statistics;
+    const totalFromApi = apiStats?.total ?? Object.values(stats).reduce((a, b) => a + b, 0);
+
+    return {
+      statistics: {
+        total: totalFromApi,
+        today: apiStats?.today ?? 0,
+        most_used: apiStats?.most_used || "N/A",
+      },
+      weather: data?.weather || null,
+      services: stats,
+    };
   } catch {
-    // Fallback to local cache
-    return getAnalysisStats();
+    return fallback;
   }
+}
+
+// Keep backward compat
+export async function fetchAndSyncStats(): Promise<AnalysisStats> {
+  const result = await fetchDashboardData();
+  return result.services;
 }
 
 export function incrementAnalysis(type: keyof AnalysisStats) {
