@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { detectPlantDisease, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence } from "framer-motion";
-import { sendNotification } from "@/services/notificationService";
+
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
@@ -37,7 +37,7 @@ const PlantDisease = () => {
       const analysis = data?.analysis || data;
       const condition = analysis?.condition || analysis?.disease_en || analysis?.prediction || "";
       const isHealthy = condition.toLowerCase().includes("healthy");
-      sendNotification({ title: isHealthy ? "Plant is Healthy ✅" : "Disease Detected ⚠️", description: `Plant Disease Analysis: ${analysis?.disease_en || condition || "Completed"}`, type: isHealthy ? "success" : "warning" });
+      
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
