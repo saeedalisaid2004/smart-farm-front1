@@ -64,10 +64,10 @@ const AdminSettings = () => {
     let cancelled = false;
     setNotifLoading(true);
 
-    updateAdminNotificationSettings(userId, {})
+    getNotificationSettings(userId)
       .then((data) => {
         if (cancelled) return;
-        const s = data?.settings || data?.current_settings || data;
+        const s = data?.settings || data;
         if (s) {
           setNotifications({
             pushNotifications: s.push_notifications_admin ?? s.push ?? defaultNotifications.pushNotifications,
