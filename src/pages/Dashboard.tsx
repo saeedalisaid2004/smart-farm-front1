@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
-import { getAnalysisStats, getDailyStats, getTotalAnalyses, fetchDashboardData, type AnalysisStats, type DashboardData } from "@/services/analysisStats";
+import { getAnalysisStats, getDailyStats, getTotalAnalyses, fetchDashboardData, type AnalysisStats, type DashboardData, type ChartItem } from "@/services/analysisStats";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [weather, setWeather] = useState<any>(null);
   const [apiToday, setApiToday] = useState(0);
   const [apiMostUsed, setApiMostUsed] = useState("N/A");
+  const [chartData, setChartData] = useState<ChartItem[]>([]);
 
   // Fetch all dashboard data (stats + weather) from unified API
   useEffect(() => {
@@ -27,9 +28,9 @@ const Dashboard = () => {
       setStats(data.services);
       setTotal(data.statistics.total);
       setWeather(data.weather);
-      // Store today & most_used from API
       setApiToday(data.statistics.today);
       setApiMostUsed(data.statistics.most_used);
+      setChartData(data.chart);
     });
 
     const refresh = () => {
@@ -50,13 +51,16 @@ const Dashboard = () => {
     { icon: MessageCircle, title: t("dashboard.chatbot"), desc: t("dashboard.chatbotDesc"), path: "/dashboard/chatbot", gradient: "from-cyan-500 to-teal-600" },
   ];
 
-  const barData = [
-    { name: "🌿 Plant", value: stats.plant_disease },
-    { name: "🐄 Animal", value: stats.animal_weight },
-    { name: "🌾 Crop", value: stats.crop_recommendation },
-    { name: "🧪 Soil", value: stats.soil_analysis },
-    { name: "🍎 Fruit", value: stats.fruit_quality },
-  ];
+  const emojiMap: Record<string, string> = { Plant: "🌿", Animal: "🐄", Crop: "🌾", Soil: "🧪", Fruit: "🍎" };
+  const barData = chartData.length > 0
+    ? chartData.map(c => ({ name: `${emojiMap[c.name] || ""} ${c.name}`, value: c.value }))
+    : [
+        { name: "🌿 Plant", value: stats.plant_disease },
+        { name: "🐄 Animal", value: stats.animal_weight },
+        { name: "🌾 Crop", value: stats.crop_recommendation },
+        { name: "🧪 Soil", value: stats.soil_analysis },
+        { name: "🍎 Fruit", value: stats.fruit_quality },
+      ];
 
   const dailyData = daily.slice(-7).map((d) => ({
     date: d.date.slice(5),
