@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { estimateAnimalWeight, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence } from "framer-motion";
-import { sendNotification } from "@/services/notificationService";
+
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
@@ -34,7 +34,7 @@ const AnimalWeight = () => {
     try {
       const data = await estimateAnimalWeight(userId, file);
       setResult(data);
-      sendNotification({ title: "Animal Weight Estimated 🐄", description: `Estimated weight: ${data?.weight || data?.estimated_weight || "N/A"} kg`, type: "success" });
+      
       incrementAnalysis("animal_weight");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }

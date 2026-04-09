@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeSoil, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { sendNotification } from "@/services/notificationService";
+
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ResultItem, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
 
@@ -43,7 +43,7 @@ const SoilAnalysis = () => {
       setResult(data);
       const nested = data?.["Analysis Result"] || data?.result || data;
       const soilType = nested?.["Soil Type"] || nested?.detected_soil_type || data?.soil_type || data?.prediction || "Analyzed";
-      sendNotification({ title: "Soil Analysis Complete 🧪", description: `Soil type: ${soilType}`, type: "success" });
+      
       incrementAnalysis("soil_analysis");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }

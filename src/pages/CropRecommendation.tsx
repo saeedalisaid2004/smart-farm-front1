@@ -9,7 +9,7 @@ import { recommendCrop, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { sendNotification } from "@/services/notificationService";
+
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
 
@@ -31,7 +31,7 @@ const CropRecommendation = () => {
     try {
       const data = await recommendCrop(userId, { city_name: cityName, soil: soilMap[soil] || soil });
       setResult(data);
-      sendNotification({ title: language === "ar" ? "توصية المحاصيل جاهزة 🌾" : "Crop Recommendation Ready 🌾", description: data?.recommendation?.primary || "Available", type: "success" });
+      
       incrementAnalysis("crop_recommendation");
     } catch { toast({ variant: "destructive", title: t("crop.error"), description: language === "ar" ? "حاول مرة أخرى" : "Please try again" }); }
     finally { setLoading(false); }

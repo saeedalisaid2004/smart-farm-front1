@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeFruit, getExternalUserId } from "@/services/smartFarmApi";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence } from "framer-motion";
-import { sendNotification } from "@/services/notificationService";
+
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
@@ -34,7 +34,7 @@ const FruitQuality = () => {
     try {
       const data = await analyzeFruit(userId, file);
       setResult(data);
-      sendNotification({ title: "Fruit Quality Analyzed 🍎", description: `Quality: ${data?.quality || data?.prediction || "Completed"}`, type: "success" });
+      
       incrementAnalysis("fruit_quality");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }

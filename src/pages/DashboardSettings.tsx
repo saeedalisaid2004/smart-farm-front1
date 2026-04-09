@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
-import { setAnalysisAlertsEnabled } from "@/services/notificationService";
+
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
@@ -113,7 +113,7 @@ const DashboardSettings = () => {
         };
 
         setNotifications(nextNotifications);
-        setAnalysisAlertsEnabled(nextNotifications.analysis_alerts);
+        
       })
       .catch(() => {
         if (cancelled) return;
@@ -162,7 +162,7 @@ const DashboardSettings = () => {
     const prev = { ...notifications };
     const optimistic = { ...notifications, [key]: value };
     setNotifications(optimistic);
-    if (key === "analysis_alerts") setAnalysisAlertsEnabled(value);
+    
     setNotifSaving(true);
 
     try {
@@ -170,11 +170,11 @@ const DashboardSettings = () => {
       const serverSettings = extractNotificationSettings(data?.settings || data?.current_settings || data);
       const nextSettings = serverSettings ?? optimistic;
       setNotifications(nextSettings);
-      setAnalysisAlertsEnabled(nextSettings.analysis_alerts);
+      
       toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
     } catch {
       setNotifications(prev);
-      if (key === "analysis_alerts") setAnalysisAlertsEnabled(prev.analysis_alerts);
+      
       toast({ title: "Failed to update notifications", variant: "destructive" });
     } finally {
       setNotifSaving(false);
