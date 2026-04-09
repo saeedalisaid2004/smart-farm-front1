@@ -18,6 +18,8 @@ const Dashboard = () => {
   const [daily, setDaily] = useState(getDailyStats());
   const [total, setTotal] = useState(getTotalAnalyses());
   const [weather, setWeather] = useState<any>(null);
+  const [apiToday, setApiToday] = useState(0);
+  const [apiMostUsed, setApiMostUsed] = useState("N/A");
 
   // Fetch all dashboard data (stats + weather) from unified API
   useEffect(() => {
