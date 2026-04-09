@@ -354,42 +354,55 @@ export const markNotificationAsRead = async (notifId: number | string) => {
   return res.json();
 };
 
+export const markAllNotificationsAsRead = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/read-all/${userId}`, {
+    method: "PATCH",
+  });
+  return res.json();
+};
+
+export const deleteNotification = async (notifId: number | string) => {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/delete/${notifId}`, {
+    method: "DELETE",
+  });
+  return res.json();
+};
+
+export const deleteAllNotifications = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/delete-all/${userId}`, {
+    method: "DELETE",
+  });
+  return res.json();
+};
+
+export const getNotificationSettings = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/get-settings/${userId}`);
+  return res.json();
+};
+
 export const updateAdminNotificationSettings = async (
   userId: number,
   settings: { push?: boolean; email?: boolean }
 ) => {
-  const hasUpdates = settings.push !== undefined || settings.email !== undefined;
+  const params = new URLSearchParams();
+  if (settings.push !== undefined) params.append("push", String(settings.push));
+  if (settings.email !== undefined) params.append("email", String(settings.email));
 
-  const payload = hasUpdates
-    ? {
-        action: "update",
-        user_id: String(userId),
-        role: "admin",
-        settings: {
-          ...(settings.push !== undefined ? { push: settings.push } : {}),
-          ...(settings.email !== undefined ? { email: settings.email } : {}),
-        },
-      }
-    : {
-        action: "get",
-        user_id: String(userId),
-        role: "admin",
-      };
+  const query = params.toString();
+  const url = `${API_BASE}/notifications/notifications/admin-settings/${userId}${query ? `?${query}` : ""}`;
 
-  const { data, error } = await supabase.functions.invoke("notification-settings", {
-    body: payload,
-  });
+  const res = await fetchWithTimeout(url, { method: "PATCH" });
+  if (!res.ok) throw new Error("Failed to update admin notification settings");
+  const data = await res.json();
 
-  if (error) throw new Error(error.message || "Failed to update admin notification settings");
-
-  const current = data?.current_settings || data?.settings || data;
+  const s = data?.settings || data;
   return {
     status: "success",
     settings: {
-      push_notifications_admin: current?.push ?? true,
-      email_alerts_admin: current?.email ?? true,
+      push_notifications_admin: s?.push ?? true,
+      email_alerts_admin: s?.email ?? true,
     },
-    current_settings: current,
+    current_settings: s,
   };
 };
 
