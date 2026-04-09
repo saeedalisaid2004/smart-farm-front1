@@ -17,7 +17,7 @@ import {
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
   updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
-import { sendNotification } from "@/services/notificationService";
+
 import { Switch } from "@/components/ui/switch";
 
 const cardVariants = {
@@ -83,7 +83,7 @@ const AdminUsers = () => {
       const result = await apiPromoteToAdmin(adminEmail.trim());
       if (result.success || result.status === "success") {
         toast({ title: t("adminUsers.addNewAdmin"), description: `${adminEmail} promoted successfully` });
-        sendNotification({ title: "New Admin Added", description: `${adminEmail} has been promoted to admin`, type: "success" });
+        
         setShowAddAdmin(false);
         setAdminEmail("");
         loadData();
@@ -101,7 +101,7 @@ const AdminUsers = () => {
     try {
       await apiDeleteUser(user.id || user.user_id);
       toast({ title: `${user.name} deleted`, variant: "destructive" });
-      sendNotification({ title: "User Deleted", description: `${user.name || user.email} has been removed from the system`, type: "warning" });
+      
       loadData();
     } catch {
       toast({ title: "Failed to delete", variant: "destructive" });
@@ -112,7 +112,7 @@ const AdminUsers = () => {
     try {
       await apiDeactivateUser(user.id || user.user_id);
       toast({ title: `${user.name} deactivated` });
-      sendNotification({ title: "User Deactivated", description: `${user.name || user.email} account has been deactivated`, type: "warning" });
+      
       loadData();
     } catch {
       toast({ title: "Failed", variant: "destructive" });
@@ -123,7 +123,7 @@ const AdminUsers = () => {
     try {
       await apiActivateUser(user.id || user.user_id);
       toast({ title: `${user.name} activated` });
-      sendNotification({ title: "User Activated", description: `${user.name || user.email} account has been activated`, type: "success" });
+      
       loadData();
     } catch {
       toast({ title: "Failed", variant: "destructive" });

@@ -8,7 +8,7 @@ import {
   getSystemStatus, getSystemSettings, getModelsTable,
   toggleService as apiToggleService, toggleSystemSetting as apiToggleSystemSetting,
 } from "@/services/smartFarmApi";
-import { sendNotification } from "@/services/notificationService";
+
 
 const AdminSystem = () => {
   const { t } = useLanguage();
@@ -75,11 +75,6 @@ const AdminSystem = () => {
     try {
       await apiToggleService(svc.module || svc.name);
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
-      sendNotification({
-        title: newOnline ? "Service Enabled" : "Service Disabled",
-        description: `${svc.name} has been turned ${newOnline ? "on" : "off"}`,
-        type: newOnline ? "success" : "warning",
-      });
     } catch {
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     }
@@ -95,11 +90,6 @@ const AdminSystem = () => {
       const key = s.key || s.setting_name || s.name;
       return key === settingKey ? { ...s, enabled: newEnabled } : s;
     }));
-    sendNotification({
-      title: "System Setting Changed",
-      description: `${current?.name || settingKey} has been ${newEnabled ? "enabled" : "disabled"}`,
-      type: "info",
-    });
   };
 
   const defaultSettings = [
