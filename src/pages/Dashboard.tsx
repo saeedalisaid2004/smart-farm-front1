@@ -124,18 +124,20 @@ const Dashboard = () => {
               >
                 {weather ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isSafe ? "from-emerald-400 to-green-500" : isWarning ? "from-red-400 to-rose-500" : "from-sky-400 to-blue-500"} flex items-center justify-center shadow-lg`}>
-                        <CloudSun className="w-6 h-6 text-white" />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isSafe ? "from-emerald-400 to-green-500" : isWarning ? "from-red-400 to-rose-500" : "from-sky-400 to-blue-500"} flex items-center justify-center shadow-lg`}>
+                          <CloudSun className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
+                          <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
-                        <p className="text-lg font-bold text-foreground">{weather.temp}</p>
+                      <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
+                        <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
-                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
                     </div>
                     {weather.advice && (
                       <p className={`text-xs font-medium ${isSafe ? "text-emerald-700 dark:text-emerald-400" : isWarning ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>
