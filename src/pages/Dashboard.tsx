@@ -6,8 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import OnboardingTour from "@/components/OnboardingTour";
 import { useEffect, useState } from "react";
-import { getAnalysisStats, getDailyStats, getTotalAnalyses, fetchAndSyncStats, type AnalysisStats } from "@/services/analysisStats";
-import { getCurrentWeather } from "@/services/smartFarmApi";
+import { getAnalysisStats, getDailyStats, getTotalAnalyses, fetchDashboardData, type AnalysisStats, type DashboardData } from "@/services/analysisStats";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
@@ -19,12 +18,18 @@ const Dashboard = () => {
   const [daily, setDaily] = useState(getDailyStats());
   const [total, setTotal] = useState(getTotalAnalyses());
   const [weather, setWeather] = useState<any>(null);
+  const [apiToday, setApiToday] = useState(0);
+  const [apiMostUsed, setApiMostUsed] = useState("N/A");
 
-  // Fetch stats from API on mount, then listen for local updates
+  // Fetch all dashboard data (stats + weather) from unified API
   useEffect(() => {
-    fetchAndSyncStats().then((apiStats) => {
-      setStats(apiStats);
-      setTotal(Object.values(apiStats).reduce((a, b) => a + b, 0));
+    fetchDashboardData().then((data) => {
+      setStats(data.services);
+      setTotal(data.statistics.total);
+      setWeather(data.weather);
+      // Store today & most_used from API
+      setApiToday(data.statistics.today);
+      setApiMostUsed(data.statistics.most_used);
     });
 
     const refresh = () => {
@@ -34,51 +39,6 @@ const Dashboard = () => {
     };
     window.addEventListener("stats-updated", refresh);
     return () => window.removeEventListener("stats-updated", refresh);
-  }, []);
-
-  useEffect(() => {
-    const CACHE_KEY = "weather_data";
-    const CACHE_TS_KEY = "weather_data_ts";
-    const TEN_MIN = 10 * 60 * 1000;
-
-    const isCacheFresh = () => {
-      const ts = sessionStorage.getItem(CACHE_TS_KEY);
-      return ts ? Date.now() - Number(ts) < TEN_MIN : false;
-    };
-
-    const loadCached = () => {
-      try { const c = sessionStorage.getItem(CACHE_KEY); if (c) { setWeather(JSON.parse(c)); return true; } } catch {} return false;
-    };
-
-    const fetchWeather = (lat?: number, lon?: number) => {
-      getCurrentWeather(lat, lon)
-        .then((res) => {
-          if (res?.status === "success") {
-            setWeather(res.data);
-            sessionStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
-            sessionStorage.setItem(CACHE_TS_KEY, String(Date.now()));
-          }
-        })
-        .catch(() => {});
-    };
-
-    const doFetch = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-          () => fetchWeather(),
-          { timeout: 5000 }
-        );
-      } else {
-        fetchWeather();
-      }
-    };
-
-    loadCached();
-    if (!isCacheFresh()) doFetch();
-
-    const interval = setInterval(() => doFetch(), TEN_MIN);
-    return () => clearInterval(interval);
   }, []);
 
   const features = [
@@ -105,8 +65,8 @@ const Dashboard = () => {
 
   const statCards = [
     { label: "Total Analyses", value: total, icon: BarChart3, gradient: "from-primary to-primary-glow" },
-    { label: "Today", value: daily.find((d) => d.date === new Date().toISOString().split("T")[0])?.count || 0, icon: Activity, gradient: "from-emerald-500 to-green-600" },
-    { label: "Most Used", value: total > 0 ? (Object.entries(stats).filter(([k]) => k !== "chatbot").sort((a, b) => b[1] - a[1])[0]?.[0]?.replace("_", " ") || "N/A") : "N/A", icon: TrendingUp, gradient: "from-amber-500 to-orange-600" },
+    { label: "Today", value: apiToday, icon: Activity, gradient: "from-emerald-500 to-green-600" },
+    { label: "Most Used", value: apiMostUsed, icon: TrendingUp, gradient: "from-amber-500 to-orange-600" },
   ];
 
   return (
@@ -147,7 +107,7 @@ const Dashboard = () => {
 
           {/* Weather Card */}
           {(() => {
-            const level = weather?.irrigation_advice?.level;
+            const level = weather?.level;
             const isSafe = level === "safe";
             const isWarning = level === "warning";
             const bgClass = isSafe
@@ -166,11 +126,7 @@ const Dashboard = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isSafe ? "from-emerald-400 to-green-500" : isWarning ? "from-red-400 to-rose-500" : "from-sky-400 to-blue-500"} flex items-center justify-center shadow-lg`}>
-                        {weather.icon_url ? (
-                          <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
-                        ) : (
-                          <CloudSun className="w-6 h-6 text-white" />
-                        )}
+                        <CloudSun className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
@@ -179,15 +135,15 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
-                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
+                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
                     </div>
-                    {weather.irrigation_advice?.message && (
+                    {weather.advice && (
                       <p className={`text-xs font-medium ${isSafe ? "text-emerald-700 dark:text-emerald-400" : isWarning ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>
-                        {weather.irrigation_advice.message}
+                        {weather.advice}
                       </p>
                     )}
-                    {weather.description && (
-                      <p className="text-xs text-muted-foreground">{weather.description}</p>
+                    {weather.desc && (
+                      <p className="text-xs text-muted-foreground">{weather.desc}</p>
                     )}
                   </div>
                 ) : (
