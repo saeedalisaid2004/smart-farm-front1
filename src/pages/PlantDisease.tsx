@@ -75,7 +75,6 @@ const PlantDisease = () => {
             const diseaseDisplay = isHealthy
               ? (diseaseEn || condition)
               : (diseaseEn && diseaseAr ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
-            const fullDiagnosis = a.full_diagnosis || "";
             const treatments = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
 
             return (
@@ -104,11 +103,6 @@ const PlantDisease = () => {
                 )}
                 {confidenceNum != null && !isNaN(confidenceNum) && (
                   <StaggerItem><ConfidenceBar value={confidenceNum} /></StaggerItem>
-                )}
-                {fullDiagnosis && (
-                  <StaggerItem>
-                    <ResultItem icon={<FileText className="w-5 h-5 text-primary" />} label="Full Diagnosis" value={fullDiagnosis} />
-                  </StaggerItem>
                 )}
                 {a.message && (
                   <StaggerItem>
