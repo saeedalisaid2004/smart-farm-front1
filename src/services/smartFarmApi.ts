@@ -234,7 +234,7 @@ export const getUserReportSummary = async (userId: number) => {
 };
 
 export const getFarmerStats = async (userId: number) => {
-  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/stats/${userId}`);
+  const res = await fetchWithTimeout(`${API_BASE}/farmer/dashboard-all/${userId}`);
   return res.json();
 };
 
