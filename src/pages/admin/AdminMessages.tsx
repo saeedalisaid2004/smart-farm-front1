@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
+
 
 interface AdminMessage {
   id: number;
@@ -81,23 +81,6 @@ const AdminMessages = () => {
       await adminReplyMessage(msgId, replyText);
       toast({ title: language === "ar" ? "تم إرسال الرد ✅" : "Reply sent ✅" });
 
-      const msg = messages.find(m => m.id === msgId);
-      if (msg) {
-        const farmerId = emailToIdMap.current[msg.sender_email];
-        if (farmerId) {
-          supabase.functions.invoke("manage-notifications", {
-            body: {
-              action: "create",
-              user_id: String(farmerId),
-              title: language === "ar" ? "رد من الإدارة 💬" : "Admin Reply 💬",
-              description: language === "ar"
-                ? `تم الرد على رسالتك "${msg.subject}": ${replyText.slice(0, 100)}`
-                : `Reply to "${msg.subject}": ${replyText.slice(0, 100)}`,
-              type: "info",
-            },
-          }).catch(() => {});
-        }
-      }
 
       setReplyText("");
       setSelectedMsg(null);
