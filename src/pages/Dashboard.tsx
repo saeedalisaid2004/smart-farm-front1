@@ -107,7 +107,7 @@ const Dashboard = () => {
 
           {/* Weather Card */}
           {(() => {
-            const level = weather?.irrigation_advice?.level;
+            const level = weather?.level;
             const isSafe = level === "safe";
             const isWarning = level === "warning";
             const bgClass = isSafe
@@ -126,11 +126,7 @@ const Dashboard = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isSafe ? "from-emerald-400 to-green-500" : isWarning ? "from-red-400 to-rose-500" : "from-sky-400 to-blue-500"} flex items-center justify-center shadow-lg`}>
-                        {weather.icon_url ? (
-                          <img src={weather.icon_url} alt="weather" className="w-8 h-8" />
-                        ) : (
-                          <CloudSun className="w-6 h-6 text-white" />
-                        )}
+                        <CloudSun className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{weather.location || "Weather"}</p>
@@ -139,15 +135,15 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
-                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind_speed}</span>
+                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
                     </div>
-                    {weather.irrigation_advice?.message && (
+                    {weather.advice && (
                       <p className={`text-xs font-medium ${isSafe ? "text-emerald-700 dark:text-emerald-400" : isWarning ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>
-                        {weather.irrigation_advice.message}
+                        {weather.advice}
                       </p>
                     )}
-                    {weather.description && (
-                      <p className="text-xs text-muted-foreground">{weather.description}</p>
+                    {weather.desc && (
+                      <p className="text-xs text-muted-foreground">{weather.desc}</p>
                     )}
                   </div>
                 ) : (
