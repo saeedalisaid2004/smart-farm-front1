@@ -60,14 +60,15 @@ export async function fetchAndSyncStats(): Promise<AnalysisStats> {
 
   try {
     const data = await getFarmerStats(userId);
-    // API may return stats in different formats, normalize
+    // API returns: { top_cards: { total_reports }, services_summary: { Plants, Animals, Crops, Soil, Fruit } }
+    const summary = data?.services_summary || {};
     const stats: AnalysisStats = {
-      plant_disease: data?.plant_disease ?? data?.plant ?? data?.stats?.plant_disease ?? 0,
-      animal_weight: data?.animal_weight ?? data?.animal ?? data?.stats?.animal_weight ?? 0,
-      crop_recommendation: data?.crop_recommendation ?? data?.crop ?? data?.stats?.crop_recommendation ?? 0,
-      soil_analysis: data?.soil_analysis ?? data?.soil ?? data?.stats?.soil_analysis ?? 0,
-      fruit_quality: data?.fruit_quality ?? data?.fruit ?? data?.stats?.fruit_quality ?? 0,
-      chatbot: data?.chatbot ?? data?.stats?.chatbot ?? 0,
+      plant_disease: summary?.Plants ?? data?.plant_disease ?? 0,
+      animal_weight: summary?.Animals ?? data?.animal_weight ?? 0,
+      crop_recommendation: summary?.Crops ?? data?.crop_recommendation ?? 0,
+      soil_analysis: summary?.Soil ?? data?.soil_analysis ?? 0,
+      fruit_quality: summary?.Fruit ?? data?.fruit_quality ?? 0,
+      chatbot: data?.chatbot ?? 0,
     };
     // Cache locally
     localStorage.setItem(userKey(STATS_KEY), JSON.stringify(stats));
