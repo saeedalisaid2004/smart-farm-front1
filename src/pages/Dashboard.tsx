@@ -139,10 +139,6 @@ const Dashboard = () => {
                         <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
-                      <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
-                    </div>
                     {weather.advice && (
                       <p className={`text-xs font-medium ${isSafe ? "text-emerald-700 dark:text-emerald-400" : isWarning ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>
                         {weather.advice}
