@@ -188,17 +188,41 @@ export const analyzeFruit = async (userId: number, image: File) => {
 
 // ============ Chatbot ============
 
-export const askFarmBot = async (userId: number, question: string, language = "ar") => {
+export const askFarmBot = async (userId: number, question: string, language = "ar", sessionId?: string) => {
+  const params: Record<string, any> = { user_id: userId, question, language };
+  if (sessionId) params.session_id = sessionId;
   const res = await fetchWithTimeout(`${API_BASE}/chatbot/ask-farm-bot`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded({ user_id: userId, question, language }),
+    body: toUrlEncoded(params),
   });
   return res.json();
 };
 
-export const getChatHistory = async (userId: number) => {
-  const res = await fetchWithTimeout(`${API_BASE}/chatbot/chat-history/${userId}`);
+export const getUserSessions = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/user-sessions/${userId}`);
+  return res.json();
+};
+
+export const getChatHistory = async (userId: number, sessionId?: string) => {
+  const query = sessionId ? `?session_id=${sessionId}` : "";
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/chat-history/${userId}${query}`);
+  return res.json();
+};
+
+export const deleteChatSession = async (sessionId: string) => {
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/delete-session/${sessionId}`, {
+    method: "DELETE",
+  });
+  return res.json();
+};
+
+export const renameChatSession = async (sessionId: string, newTitle: string) => {
+  const res = await fetchWithTimeout(`${API_BASE}/chatbot/rename-session/${sessionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: newTitle }),
+  });
   return res.json();
 };
 
