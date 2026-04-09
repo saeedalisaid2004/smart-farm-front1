@@ -26,6 +26,11 @@ export interface AnalysisStats {
   chatbot: number;
 }
 
+export interface ChartItem {
+  name: string;
+  value: number;
+}
+
 export interface DashboardData {
   statistics: {
     total: number;
@@ -42,6 +47,7 @@ export interface DashboardData {
     desc: string;
   } | null;
   services: AnalysisStats;
+  chart: ChartItem[];
 }
 
 export interface DailyEntry {
@@ -83,6 +89,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     },
     weather: null,
     services: fallbackStats,
+    chart: [],
   };
 
   if (!userId) return fallback;
@@ -109,6 +116,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     const apiStats = data?.statistics;
     const totalFromApi = apiStats?.total ?? Object.values(stats).reduce((a, b) => a + b, 0);
 
+    const chartData: ChartItem[] = Array.isArray(data?.chart) ? data.chart : [];
+
     return {
       statistics: {
         total: totalFromApi,
@@ -117,6 +126,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       },
       weather: data?.weather || null,
       services: stats,
+      chart: chartData,
     };
   } catch {
     return fallback;
