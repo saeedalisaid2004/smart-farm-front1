@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings } from "@/services/smartFarmApi";
+import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings, getNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
