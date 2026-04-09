@@ -251,7 +251,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                                   {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-2" />}
                                   <button
                                     onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
+                                    className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity w-7 h-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center"
                                   >
                                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                                   </button>

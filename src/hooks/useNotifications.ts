@@ -106,19 +106,19 @@ export function useNotifications() {
     }
   }, []);
 
-  const deleteNotification = useCallback((id: string) => {
+  const deleteNotification = useCallback(async (id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     try {
-      apiDeleteNotification(id);
+      await apiDeleteNotification(id);
     } catch {}
   }, []);
 
-  const clearAll = useCallback(() => {
+  const clearAll = useCallback(async () => {
     const userId = getExternalUserId();
     setNotifications([]);
     if (userId) {
       try {
-        deleteAllNotifications(userId);
+        await deleteAllNotifications(userId);
       } catch {}
     }
   }, []);
