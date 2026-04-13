@@ -83,13 +83,51 @@ const DashboardReports = () => {
     setGeneratingPdf(true);
     try {
       const data = await generateFarmerPdf(userId, dateRange);
+
+      if (data?.error || data?.detail) {
+        toast({
+          variant: "destructive",
+          title: "Failed to generate report",
+          description: data.error || data.detail || "Please try again later.",
+        });
+        return;
+      }
+
+      if (data?.file_base64) {
+        const binary = atob(data.file_base64);
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        const blob = new Blob([bytes], { type: data.mime_type || "application/pdf" });
+        const blobUrl = URL.createObjectURL(blob);
+        const fileName = data.file_name || `Farm_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+
+        const now = new Date();
+        const createdAt = `${now.toISOString().slice(0, 10)} | ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
+        const nextReports = [
+          ...reports,
+          {
+            name: fileName,
+            report_type: dateRange,
+            size: `${Math.max(1, Math.round((data.file_size_bytes || bytes.length) / 1024))} KB`,
+            created_at: createdAt,
+            file_url: `data:${data.mime_type || "application/pdf"};base64,${data.file_base64}`,
+          },
+        ].slice(-5);
+        setReports(nextReports);
+        setReportStats(computeReportStats(nextReports));
+        toast({ title: "Report generated successfully" });
+        return;
+      }
+
       let url = data.file_url || data.download_url;
-      if (data.detail) {
-        const desc = typeof data.detail === "string" && data.detail.includes("File size too large")
-          ? "Report file is too large. Try selecting a shorter date range (Weekly or Monthly)."
-          : "The server encountered an error generating the PDF. Please try again later.";
-        toast({ variant: "destructive", title: "Failed to generate report", description: desc });
-      } else if (url) {
+      if (url) {
         if (!url.startsWith("http")) {
           url = `https://mahmoud123mahmoud-smartfarm-api.hf.space${url}`;
         }
@@ -108,7 +146,6 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh from API
         fetchData();
       } else {
         toast({ title: data.message || "Report generated" });
