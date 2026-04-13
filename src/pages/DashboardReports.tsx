@@ -14,6 +14,19 @@ const calcGrowth = (thisMonth: number, lastMonth: number) => {
   return pct >= 0 ? `+${pct}%` : `${pct}%`;
 };
 
+const parseReportDate = (dateStr: string): Date | null => {
+  if (!dateStr) return null;
+  // Handle "2026-04-06 | 11:48 PM" format
+  const pipeMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})\s*\|/);
+  if (pipeMatch) {
+    const d = new Date(pipeMatch[1] + "T00:00:00");
+    return isNaN(d.getTime()) ? null : d;
+  }
+  // Handle ISO and standard formats
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 const computeReportStats = (reports: any[]) => {
   const now = new Date();
   const currentMonth = now.getMonth();
@@ -23,8 +36,8 @@ const computeReportStats = (reports: any[]) => {
   let lastMonth = 0;
 
   reports.forEach((r) => {
-    const d = new Date(r.date || r.created_at || "");
-    if (!isNaN(d.getTime())) {
+    const d = parseReportDate(r.created_at || r.date || "");
+    if (d) {
       if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) thisMonth++;
       const prev = currentMonth === 0 ? 11 : currentMonth - 1;
       const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
