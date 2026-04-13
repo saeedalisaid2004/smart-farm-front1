@@ -63,10 +63,22 @@ const DashboardReports = () => {
 
     setLoadingStats(true);
     try {
-      const reportsData = await listFarmerReports(userId);
+      const [reportsData, statsData] = await Promise.all([
+        listFarmerReports(userId),
+        getFarmerReportStats(userId),
+      ]);
       const list = Array.isArray(reportsData) ? reportsData : [];
       setReports(list);
-      setReportStats(computeReportStats(list));
+      // Use API stats if available, fallback to local computation
+      if (statsData && !statsData.detail) {
+        setReportStats({
+          total: statsData.total_reports ?? statsData.total ?? list.length,
+          thisMonth: statsData.this_month ?? statsData.thisMonth ?? 0,
+          lastMonthTotal: statsData.last_month ?? statsData.lastMonth ?? 0,
+        });
+      } else {
+        setReportStats(computeReportStats(list));
+      }
     } catch {
       setReports([]);
       setReportStats({ total: 0, thisMonth: 0, lastMonthTotal: 0 });
