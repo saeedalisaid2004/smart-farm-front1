@@ -218,10 +218,12 @@ export const deleteChatSession = async (sessionId: string) => {
 };
 
 export const renameChatSession = async (sessionId: string, newTitle: string) => {
+  const params = new URLSearchParams();
+  params.append("title", newTitle);
   const res = await fetchWithTimeout(`${API_BASE}/chatbot/rename-session/${sessionId}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title: newTitle }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
   });
   return res.json();
 };
