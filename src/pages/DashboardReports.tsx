@@ -204,19 +204,19 @@ const DashboardReports = () => {
                           <FileText className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-foreground">{report.name || report.title || `Report #${idx + 1}`}</h3>
-                          <p className="text-sm text-muted-foreground mt-0.5">{report.description || ""}</p>
+                          <h3 className="font-medium text-foreground">{report.name || `Report #${idx + 1}`}</h3>
+                          <p className="text-sm text-muted-foreground mt-0.5">{report.report_type || ""} {report.size ? `• ${report.size}` : ""}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Calendar className="w-3 h-3" /> {report.date || report.created_at || ""}
+                              <Calendar className="w-3 h-3" /> {report.created_at || ""}
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    {report.file_url && (
+                    {(report.file_path || report.file_url) && (
                       <a
-                        href={report.file_url}
+                        href={report.file_path || report.file_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full py-3 border-t border-border text-sm text-muted-foreground hover:bg-secondary transition-colors flex items-center justify-center gap-2"
