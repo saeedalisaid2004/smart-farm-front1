@@ -241,15 +241,8 @@ export const getFarmerStats = async (userId: number) => {
 };
 
 export const generateFarmerPdf = async (userId: number, period: string = "all") => {
-  const { data, error } = await supabase.functions.invoke("generate-farmer-report", {
-    body: { user_id: userId, period },
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/generate/${userId}?period=${encodeURIComponent(period)}`, { method: "POST" });
+  return res.json();
 };
 
 export const listFarmerReports = async (userId: number) => {
