@@ -85,8 +85,7 @@ const DashboardReports = () => {
       const data = await generateFarmerPdf(userId, dateRange);
       let url = data.file_url || data.download_url;
       if (data.detail) {
-        const desc = typeof data.detail === "string" && data.detail.includes("File size too large")
-          ? t("reports.fileTooLarge") || "Report file is too large. Try selecting a shorter date range (Weekly or Monthly)."
+          ? "Report file is too large. Try selecting a shorter date range (Weekly or Monthly)."
           : "The server encountered an error generating the PDF. Please try again later.";
         toast({ variant: "destructive", title: "Failed to generate report", description: desc });
       } else if (url) {
