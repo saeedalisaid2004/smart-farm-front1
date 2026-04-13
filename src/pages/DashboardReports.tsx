@@ -196,7 +196,7 @@ const DashboardReports = () => {
 
             {reports.length > 0 ? (
               <div className="space-y-4">
-                {reports.map((report: any, idx: number) => (
+                {reports.slice(-5).reverse().map((report: any, idx: number) => (
                   <div key={idx} className="bg-card border border-border rounded-2xl overflow-hidden">
                     <div className="p-5">
                       <div className="flex items-start gap-4">
