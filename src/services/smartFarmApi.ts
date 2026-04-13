@@ -250,6 +250,11 @@ export const listFarmerReports = async (userId: number) => {
   return res.json();
 };
 
+export const getFarmerReportStats = async (userId: number) => {
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/stats/${userId}`);
+  return res.json();
+};
+
 // ============ Admin ============
 
 export const getAdminDashboardStats = async () => {
