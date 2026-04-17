@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { User, Mail, Phone, Calendar, Edit2, Camera, Save, X, Trash2, Shield, Sparkles } from "lucide-react";
+import { User, Mail, Phone, Calendar, Edit2, Camera, Save, X, Trash2, Shield, Sparkles, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
