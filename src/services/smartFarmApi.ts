@@ -255,6 +255,11 @@ export const getFarmerReportStats = async (userId: number) => {
   return res.json();
 };
 
+export const deleteFarmerReport = async (reportId: number | string) => {
+  const res = await fetchWithTimeout(`${API_BASE}/farmer_reports/delete/${reportId}`, { method: "DELETE" });
+  try { return await res.json(); } catch { return { ok: res.ok }; }
+};
+
 // ============ Admin ============
 
 export const getAdminDashboardStats = async () => {
