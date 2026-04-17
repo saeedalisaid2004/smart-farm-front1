@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
+import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
