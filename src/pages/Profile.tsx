@@ -221,6 +221,25 @@ const Profile = () => {
             )}
           </div>
         </motion.div>
+
+        {/* Change Password */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-5 bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden shadow-sm"
+        >
+          <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+          <div className="p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm">
+                <Lock className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">{t("settings.changePassword")}</h2>
+            </div>
+            <ChangePasswordSection />
+          </div>
+        </motion.div>
       </div>
     </DashboardLayout>
   );
