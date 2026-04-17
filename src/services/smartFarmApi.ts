@@ -326,7 +326,7 @@ export const toggleService = async (moduleName: string) => {
 };
 
 export const getModelsTable = async () => {
-  const res = await fetchWithTimeout(`${API_BASE}/admin/system/models-table`);
+  const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/ai-models`);
   return res.json();
 };
 
