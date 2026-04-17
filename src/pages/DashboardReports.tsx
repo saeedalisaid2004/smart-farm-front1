@@ -57,7 +57,29 @@ const DashboardReports = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
-  const fetchData = async () => {
+  const MAX_REPORTS = 5;
+
+  const sortReportsDesc = (list: any[]) =>
+    [...list].sort((a, b) => {
+      const da = parseReportDate(a.created_at || a.date || "")?.getTime() ?? 0;
+      const db = parseReportDate(b.created_at || b.date || "")?.getTime() ?? 0;
+      return db - da;
+    });
+
+  const pruneOldReports = async (list: any[]) => {
+    const sorted = sortReportsDesc(list);
+    const toDelete = sorted.slice(MAX_REPORTS);
+    if (toDelete.length === 0) return sorted;
+    await Promise.all(
+      toDelete
+        .map((r) => r.id ?? r.report_id)
+        .filter((id) => id !== undefined && id !== null)
+        .map((id) => deleteFarmerReport(id).catch(() => null))
+    );
+    return sorted.slice(0, MAX_REPORTS);
+  };
+
+  const fetchData = async (prune = false) => {
     const userId = getExternalUserId();
     if (!userId) { setLoadingStats(false); return; }
 
@@ -67,12 +89,17 @@ const DashboardReports = () => {
         listFarmerReports(userId),
         getFarmerReportStats(userId),
       ]);
-      const list = Array.isArray(reportsData) ? reportsData : [];
+      let list = Array.isArray(reportsData) ? reportsData : [];
+      if (prune && list.length > MAX_REPORTS) {
+        list = await pruneOldReports(list);
+      } else {
+        list = sortReportsDesc(list);
+      }
       setReports(list);
       // Use API stats if available, fallback to local computation
       if (statsData && !statsData.detail) {
         setReportStats({
-          total: statsData.total_reports ?? statsData.total ?? list.length,
+          total: Math.min(statsData.total_reports ?? statsData.total ?? list.length, MAX_REPORTS),
           thisMonth: statsData.this_month ?? statsData.thisMonth ?? 0,
           lastMonthTotal: statsData.last_month ?? statsData.lastMonth ?? 0,
         });
@@ -87,7 +114,7 @@ const DashboardReports = () => {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(true); }, []);
 
   const handleGeneratePdf = async () => {
     const userId = getExternalUserId();
