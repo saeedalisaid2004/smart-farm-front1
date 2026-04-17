@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
+import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
 
 import { motion } from "framer-motion";
-import ChangePasswordSection from "@/components/ChangePasswordSection";
+
 
 const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
@@ -296,9 +296,6 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          <SectionCard icon={Lock} title={t("settings.changePassword")} index={4} gradient="from-emerald-500 to-teal-500">
-            <ChangePasswordSection />
-          </SectionCard>
         </div>
       </div>
     </DashboardLayout>
