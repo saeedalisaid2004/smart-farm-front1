@@ -147,8 +147,8 @@ const DashboardReports = () => {
           window.open(url, "_blank");
         }
         toast({ title: "Report generated successfully" });
-        // Refresh from API
-        fetchData();
+        // Refresh from API and prune old reports beyond MAX
+        fetchData(true);
       } else {
         toast({ title: data.message || "Report generated" });
       }
