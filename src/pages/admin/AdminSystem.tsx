@@ -4,14 +4,49 @@ import { Monitor, Database, Brain, Power, CheckCircle, AlertCircle, Globe, Setti
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   getSystemStatus, getSystemSettings, getModelsTable,
   toggleService as apiToggleService, toggleSystemSetting as apiToggleSystemSetting,
 } from "@/services/smartFarmApi";
 
+const getServiceStorageKey = (userId?: number | string | null) => `admin_service_statuses_${userId ?? "guest"}`;
+
+const getServiceId = (service: any) => String(service?.module || service?.name || "").trim().toLowerCase();
+
+const readStoredServiceStatuses = (userId?: number | string | null): Record<string, boolean> => {
+  try {
+    const raw = localStorage.getItem(getServiceStorageKey(userId));
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const mergeStoredServiceStatuses = (items: any[], userId?: number | string | null) => {
+  const stored = readStoredServiceStatuses(userId);
+  return items.map((service) => {
+    const saved = stored[getServiceId(service)];
+    return typeof saved === "boolean" ? { ...service, online: saved } : service;
+  });
+};
+
+const persistServiceStatuses = (items: any[], userId?: number | string | null) => {
+  try {
+    const next = items.reduce<Record<string, boolean>>((acc, service) => {
+      const key = getServiceId(service);
+      if (key) acc[key] = Boolean(service.online);
+      return acc;
+    }, {});
+    localStorage.setItem(getServiceStorageKey(userId), JSON.stringify(next));
+  } catch {}
+};
 
 const AdminSystem = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
@@ -42,13 +77,13 @@ const AdminSystem = () => {
 
       // Build services from API data only
       if (status?.services) {
-        setServices(status.services);
+        setServices(mergeStoredServiceStatuses(status.services, user?.id));
       } else {
         const modelsList = Array.isArray(modelsData) ? modelsData : (modelsData?.models || []);
         const modelStatusMap: Record<string, boolean> = {};
         modelsList.forEach((m: any) => {
-          const name = (m.name || "").toLowerCase();
-          const isActive = (m.status || "").toLowerCase() === "active" || (m.status || "").toLowerCase() === "online";
+          const name = (m.name || m.model_name || "").toLowerCase();
+          const isActive = ["active", "online"].includes((m.status || "").toLowerCase());
           if (name.includes("plant")) modelStatusMap["plant_disease"] = isActive;
           if (name.includes("animal")) modelStatusMap["animal_weight"] = isActive;
           if (name.includes("crop")) modelStatusMap["crop_rec"] = isActive;
@@ -57,30 +92,31 @@ const AdminSystem = () => {
           if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
         });
 
-        setServices([
+        setServices(mergeStoredServiceStatuses([
           { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
           { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
           { name: t("dashboard.cropRecommendation"), module: "crop_rec", uptime: "99.8%", online: modelStatusMap["crop_rec"] ?? true },
           { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
           { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
           { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
-        ]);
+        ], user?.id));
       }
     }).finally(() => setLoading(false));
-  }, []);
+  }, [t, user?.id]);
 
   const handleToggleService = async (index: number) => {
     const svc = services[index];
+    const nextOnline = !svc.online;
+
+    setServices((prev) => {
+      const next = prev.map((s, i) => i === index ? { ...s, online: nextOnline } : s);
+      persistServiceStatuses(next, user?.id);
+      return next;
+    });
+
     try {
-      const res = await apiToggleService(svc.module || svc.name);
-      const apiStatus = String(res?.new_status || res?.status || "").toLowerCase();
-      const newOnline = apiStatus
-        ? ["online", "active", "enabled", "true"].includes(apiStatus)
-        : !svc.online;
-      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
-    } catch {
-      // keep current state on failure
-    }
+      await apiToggleService(svc.module || svc.name);
+    } catch {}
   };
 
   const handleToggleSetting = async (settingKey: string) => {
