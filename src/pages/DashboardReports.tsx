@@ -98,10 +98,11 @@ const DashboardReports = () => {
       setReports(list);
       // Use API stats if available, fallback to local computation
       if (statsData && !statsData.detail) {
+        const top = statsData.top_cards ?? statsData;
         setReportStats({
-          total: Math.min(statsData.total_reports ?? statsData.total ?? list.length, MAX_REPORTS),
-          thisMonth: statsData.this_month ?? statsData.thisMonth ?? 0,
-          lastMonthTotal: statsData.last_month ?? statsData.lastMonth ?? 0,
+          total: Math.min(top.total_reports ?? top.total ?? list.length, MAX_REPORTS),
+          thisMonth: top.this_month ?? top.thisMonth ?? 0,
+          lastMonthTotal: top.last_month ?? top.lastMonth ?? 0,
         });
       } else {
         setReportStats(computeReportStats(list));
