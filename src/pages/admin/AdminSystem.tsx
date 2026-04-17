@@ -177,7 +177,15 @@ const AdminSystem = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{t("adminSys.aiModels")}</p>
-                <p className="text-xs text-green-500 font-medium">{systemStatus?.ai_models_summary?.active || "—"} {t("adminSys.activeModels")}</p>
+                <p className="text-xs text-green-500 font-medium">{(() => {
+                  const raw = systemStatus?.ai_models_summary?.active;
+                  if (raw === undefined || raw === null) return "—";
+                  // Extract first number from strings like "6 of 6" or "6/6"
+                  const match = String(raw).match(/\d+/);
+                  const num = match ? match[0] : String(raw);
+                  const total = systemStatus?.ai_models_summary?.total ?? 6;
+                  return `${num} / ${total} ${t("adminSys.activeModels")}`;
+                })()}</p>
               </div>
             </div>
             <div className="flex justify-between text-sm">
