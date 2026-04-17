@@ -71,12 +71,15 @@ const AdminSystem = () => {
 
   const handleToggleService = async (index: number) => {
     const svc = services[index];
-    const newOnline = !svc.online;
     try {
-      await apiToggleService(svc.module || svc.name);
+      const res = await apiToggleService(svc.module || svc.name);
+      const apiStatus = String(res?.new_status || res?.status || "").toLowerCase();
+      const newOnline = apiStatus
+        ? ["online", "active", "enabled", "true"].includes(apiStatus)
+        : !svc.online;
       setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
     } catch {
-      setServices(prev => prev.map((s, i) => i === index ? { ...s, online: newOnline } : s));
+      // keep current state on failure
     }
   };
 
