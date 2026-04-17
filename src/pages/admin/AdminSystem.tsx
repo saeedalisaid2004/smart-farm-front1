@@ -1,122 +1,94 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Monitor, Database, Brain, Power, CheckCircle, AlertCircle, Globe, Settings, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
 import {
   getSystemStatus, getSystemSettings, getModelsTable,
   toggleService as apiToggleService, toggleSystemSetting as apiToggleSystemSetting,
 } from "@/services/smartFarmApi";
 
-const getServiceStorageKey = (userId?: number | string | null) => `admin_service_statuses_${userId ?? "guest"}`;
+// Map module key -> matcher used against model name returned by /admin/system/ai-models
+const SERVICE_MODEL_MATCHERS: Array<{ module: string; match: (name: string) => boolean }> = [
+  { module: "plant_disease", match: (n) => n.includes("plant") },
+  { module: "animal_weight", match: (n) => n.includes("animal") },
+  { module: "crop_rec",      match: (n) => n.includes("crop") },
+  { module: "soil_analysis", match: (n) => n.includes("soil") },
+  { module: "fruit_quality", match: (n) => n.includes("fruit") },
+  { module: "chatbot",       match: (n) => n.includes("chat") },
+];
 
-const getServiceId = (service: any) => String(service?.module || service?.name || "").trim().toLowerCase();
-
-const readStoredServiceStatuses = (userId?: number | string | null): Record<string, boolean> => {
-  try {
-    const raw = localStorage.getItem(getServiceStorageKey(userId));
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-};
-
-const mergeStoredServiceStatuses = (items: any[], userId?: number | string | null) => {
-  const stored = readStoredServiceStatuses(userId);
-  return items.map((service) => {
-    const saved = stored[getServiceId(service)];
-    return typeof saved === "boolean" ? { ...service, online: saved } : service;
+const buildModelStatusMap = (modelsList: any[]): Record<string, boolean> => {
+  const map: Record<string, boolean> = {};
+  modelsList.forEach((m: any) => {
+    const name = String(m.name || m.model_name || "").toLowerCase();
+    const isActive = ["active", "online"].includes(String(m.status || "").toLowerCase());
+    SERVICE_MODEL_MATCHERS.forEach(({ module, match }) => {
+      if (match(name)) map[module] = isActive;
+    });
   });
-};
-
-const persistServiceStatuses = (items: any[], userId?: number | string | null) => {
-  try {
-    const next = items.reduce<Record<string, boolean>>((acc, service) => {
-      const key = getServiceId(service);
-      if (key) acc[key] = Boolean(service.online);
-      return acc;
-    }, {});
-    localStorage.setItem(getServiceStorageKey(userId), JSON.stringify(next));
-  } catch {}
+  return map;
 };
 
 const AdminSystem = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [settings, setSettings] = useState<any[]>([]);
 
-  useEffect(() => {
-    Promise.all([
+  const loadAll = useCallback(async () => {
+    const [status, settingsData, modelsData] = await Promise.all([
       getSystemStatus().catch(() => null),
       getSystemSettings().catch(() => null),
       getModelsTable().catch(() => []),
-    ]).then(([status, settingsData, modelsData]) => {
-      if (status) setSystemStatus(status);
-      
-      if (settingsData) {
-        let settingsArr: any[] = [];
-        if (Array.isArray(settingsData)) settingsArr = settingsData;
-        else if (settingsData.settings) settingsArr = settingsData.settings;
-        
-        // Map API status directly - the API is the source of truth
-        setSettings(settingsArr.map((s: any) => ({
-          ...s,
-          enabled: s.status === "online" || s.enabled === true,
-        })));
-      }
-      if (Array.isArray(modelsData)) setModels(modelsData);
-      else if (modelsData?.models) setModels(modelsData.models);
+    ]);
 
-      // Build services from API data only
-      if (status?.services) {
-        setServices(mergeStoredServiceStatuses(status.services, user?.id));
-      } else {
-        const modelsList = Array.isArray(modelsData) ? modelsData : (modelsData?.models || []);
-        const modelStatusMap: Record<string, boolean> = {};
-        modelsList.forEach((m: any) => {
-          const name = (m.name || m.model_name || "").toLowerCase();
-          const isActive = ["active", "online"].includes((m.status || "").toLowerCase());
-          if (name.includes("plant")) modelStatusMap["plant_disease"] = isActive;
-          if (name.includes("animal")) modelStatusMap["animal_weight"] = isActive;
-          if (name.includes("crop")) modelStatusMap["crop_rec"] = isActive;
-          if (name.includes("soil")) modelStatusMap["soil_analysis"] = isActive;
-          if (name.includes("fruit")) modelStatusMap["fruit_quality"] = isActive;
-          if (name.includes("chat")) modelStatusMap["chatbot"] = isActive;
-        });
+    if (status) setSystemStatus(status);
 
-        setServices(mergeStoredServiceStatuses([
-          { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
-          { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
-          { name: t("dashboard.cropRecommendation"), module: "crop_rec", uptime: "99.8%", online: modelStatusMap["crop_rec"] ?? true },
-          { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
-          { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
-          { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
-        ], user?.id));
-      }
-    }).finally(() => setLoading(false));
-  }, [t, user?.id]);
+    if (settingsData) {
+      let settingsArr: any[] = [];
+      if (Array.isArray(settingsData)) settingsArr = settingsData;
+      else if (settingsData.settings) settingsArr = settingsData.settings;
+      setSettings(settingsArr.map((s: any) => ({
+        ...s,
+        enabled: s.status === "online" || s.enabled === true,
+      })));
+    }
+
+    const modelsList = Array.isArray(modelsData) ? modelsData : (modelsData?.models || []);
+    setModels(modelsList);
+
+    // Always derive service status from API (ai-models endpoint) — no local overrides
+    if (status?.services && Array.isArray(status.services)) {
+      setServices(status.services);
+    } else {
+      const modelStatusMap = buildModelStatusMap(modelsList);
+      setServices([
+        { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
+        { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
+        { name: t("dashboard.cropRecommendation"), module: "crop_rec", uptime: "99.8%", online: modelStatusMap["crop_rec"] ?? true },
+        { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
+        { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
+        { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
+      ]);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    setLoading(true);
+    loadAll().finally(() => setLoading(false));
+  }, [loadAll]);
 
   const handleToggleService = async (index: number) => {
     const svc = services[index];
-    const nextOnline = !svc.online;
-
-    setServices((prev) => {
-      const next = prev.map((s, i) => i === index ? { ...s, online: nextOnline } : s);
-      persistServiceStatuses(next, user?.id);
-      return next;
-    });
-
     try {
       await apiToggleService(svc.module || svc.name);
     } catch {}
+    // Re-fetch from API so UI reflects whatever the backend actually persisted
+    await loadAll();
   };
 
   const handleToggleSetting = async (settingKey: string) => {
