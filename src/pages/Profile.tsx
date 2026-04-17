@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
 import { uploadAvatar, getSavedAvatarUrl, removeAvatar } from "@/services/avatarService";
 import { motion } from "framer-motion";
+import ChangePasswordSection from "@/components/ChangePasswordSection";
 
 const getSettingsKey = (userId?: string | number) =>
   userId ? `dashboard_settings_${userId}` : "dashboard_settings";
