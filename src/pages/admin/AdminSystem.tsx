@@ -180,10 +180,9 @@ const AdminSystem = () => {
                 <p className="text-xs text-green-500 font-medium">{(() => {
                   const raw = systemStatus?.ai_models_summary?.active;
                   if (raw === undefined || raw === null) return "—";
-                  // Extract first number from strings like "6 of 6" or "6/6"
-                  const match = String(raw).match(/\d+/);
-                  const num = match ? match[0] : String(raw);
-                  const total = systemStatus?.ai_models_summary?.total ?? 6;
+                  const nums = String(raw).match(/\d+/g) || [];
+                  const num = nums[0] ?? "0";
+                  const total = nums[1] ?? systemStatus?.ai_models_summary?.total ?? 6;
                   return `${num} / ${total} ${t("adminSys.activeModels")}`;
                 })()}</p>
               </div>
