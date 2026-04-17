@@ -251,19 +251,24 @@ const AdminSystem = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {displayModels.map((m: any) => (
-                  <tr key={m.name} className="hover:bg-secondary/30 transition-colors">
-                    <td className="px-5 py-3 text-sm font-medium text-foreground">{m.name || m.model_name}</td>
-                    <td className="px-5 py-3 text-sm text-muted-foreground">{m.version}</td>
-                    <td className="px-5 py-3"><Badge variant="secondary" className="text-xs font-normal">{m.type || m.model_type}</Badge></td>
-                    <td className="px-5 py-3 text-sm text-foreground">{m.accuracy}</td>
-                    <td className="px-5 py-3">
-                      <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
-                        <CheckCircle className="w-3.5 h-3.5" /> {m.status || "Active"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {displayModels.map((m: any) => {
+                  const status = String(m.status || "Active");
+                  const isActive = ["online", "active"].includes(status.toLowerCase());
+                  return (
+                    <tr key={m.name || m.model_name} className="hover:bg-secondary/30 transition-colors">
+                      <td className="px-5 py-3 text-sm font-medium text-foreground">{m.name || m.model_name}</td>
+                      <td className="px-5 py-3 text-sm text-muted-foreground">{m.version}</td>
+                      <td className="px-5 py-3"><Badge variant="secondary" className="text-xs font-normal">{m.type || m.model_type}</Badge></td>
+                      <td className="px-5 py-3 text-sm text-foreground">{m.accuracy}</td>
+                      <td className="px-5 py-3">
+                        <span className={`inline-flex items-center gap-1 text-xs font-medium ${isActive ? "text-green-600" : "text-destructive"}`}>
+                          {isActive ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                          {isActive ? "Active" : status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
