@@ -9,13 +9,14 @@ import { AnimatePresence } from "framer-motion";
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const FruitQuality = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,10 +62,11 @@ const FruitQuality = () => {
             if (result.status === "low_confidence")
               return <ErrorResult key="low" title={t("fruitQuality.lowConfidence")} message={result.message || ""} />;
 
-            const grade = result.quality_grade || result.quality || result.grade;
-            const gradeDescription = result.grade_description || result.description;
-            const ripeness = result.ripeness_level || result.ripeness;
-            const defect = result.defect_detection || result.defects;
+            const clean = (v: any) => (typeof v === "string" && language !== "ar" && containsArabic(v)) ? (stripArabic(v) || v) : v;
+            const grade = clean(result.quality_grade || result.quality || result.grade);
+            const gradeDescription = clean(result.grade_description || result.description);
+            const ripeness = clean(result.ripeness_level || result.ripeness);
+            const defect = clean(result.defect_detection || result.defects);
             const confidence = result.confidence;
             const confidenceNum = confidence ? (typeof confidence === 'number' ? confidence * 100 : parseFloat(String(confidence).replace('%', ''))) : null;
             const isLow = grade && (grade.toLowerCase().includes('c') || grade.toLowerCase().includes('low'));
