@@ -10,6 +10,7 @@ import AdminRoute from "@/components/AdminRoute";
 import { lazy, Suspense } from "react";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 import AnalysisSkeleton from "@/components/AnalysisSkeleton";
+import ThemeSync from "@/components/ThemeSync";
 
 // Eager-loaded (critical path)
 import Index from "./pages/Index";
@@ -55,6 +56,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <LanguageProvider>
+          <ThemeSync />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
