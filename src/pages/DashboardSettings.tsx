@@ -1,14 +1,12 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
+import { Settings, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { apiSaveSettings, getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
+import { getExternalUserId, updateFarmerNotificationSettings } from "@/services/smartFarmApi";
 
 import { motion } from "framer-motion";
 
@@ -67,25 +65,14 @@ const SectionCard = ({ icon: Icon, title, children, index, gradient }: {
 );
 
 const DashboardSettings = () => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
   const currentUserId = getExternalUserId() || user?.id;
-  const [fullName, setFullName] = useState(user?.name || "Farm Owner");
-  const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState(() => getStoredSettings(currentUserId).phone);
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
   const [notifications, setNotifications] = useState<NotificationSettings | null>(null);
   const [notifSaving, setNotifSaving] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      setFullName(user.name || "Farm Owner");
-      setEmail(user.email || "owner@smartfarm.com");
-    }
-  }, [user]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -181,21 +168,6 @@ const DashboardSettings = () => {
     }
   };
 
-  const handleSave = async () => {
-    const userId = currentUserId;
-    setSaving(true);
-    try {
-      if (userId) await apiSaveSettings(userId, { full_name: fullName, email, phone });
-      if (user) setUser({ ...user, name: fullName, email });
-      persistSettings(currentUserId, { phone });
-      toast({ title: t("settings.profileUpdated"), description: t("settings.profileSaved") });
-    } catch {
-      toast({ title: "Failed to update profile", variant: "destructive" });
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const notificationValues = notifications ?? defaultNotifications;
 
   return (
@@ -212,27 +184,7 @@ const DashboardSettings = () => {
         </motion.div>
 
         <div className="space-y-5">
-          <SectionCard icon={User} title={t("settings.profile")} index={0} gradient="from-blue-500 to-cyan-500">
-            <div className="space-y-4">
-              {[
-                { label: t("settings.fullName"), value: fullName, onChange: setFullName, type: "text" },
-                { label: t("settings.email"), value: email, onChange: setEmail, type: "email" },
-                { label: t("settings.phone"), value: phone, onChange: setPhone, type: "tel" },
-              ].map((field) => (
-                <div key={field.label} className="space-y-1.5">
-                  <Label className="text-sm font-medium text-muted-foreground">{field.label}</Label>
-                  <Input value={field.value} onChange={(e) => field.onChange(e.target.value)} type={field.type}
-                    className="h-12 rounded-xl bg-secondary/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20 px-4 transition-all" />
-                </div>
-              ))}
-              <Button onClick={handleSave} disabled={saving}
-                className="w-full h-12 rounded-xl text-base font-semibold mt-4 shadow-sm hover:shadow-md transition-shadow">
-                {saving ? "..." : t("settings.saveProfile")}
-              </Button>
-            </div>
-          </SectionCard>
-
-          <SectionCard icon={Palette} title={t("settings.theme")} index={1} gradient="from-amber-500 to-orange-500">
+          <SectionCard icon={Palette} title={t("settings.theme")} index={0} gradient="from-amber-500 to-orange-500">
             <div className="grid grid-cols-2 gap-3">
               {[
                 { value: "light" as const, label: t("settings.lightMode"), icon: Sun, desc: t("settings.lightDesc") },
@@ -254,7 +206,7 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          <SectionCard icon={Globe} title={t("settings.language")} index={2} gradient="from-violet-500 to-purple-500">
+          <SectionCard icon={Globe} title={t("settings.language")} index={1} gradient="from-violet-500 to-purple-500">
             <div className="grid grid-cols-2 gap-3">
               {[
                 { value: "en" as const, label: "English", flag: "🇺🇸" },
@@ -277,7 +229,7 @@ const DashboardSettings = () => {
             </div>
           </SectionCard>
 
-          <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
+          <SectionCard icon={Bell} title={t("settings.notifications")} index={2} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
                 { key: "email" as const, label: t("settings.emailAlerts"), checked: notificationValues.email },
