@@ -1,14 +1,13 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
+import { Settings, Palette, Globe, Bell, Sun, Moon, Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getExternalUserId, updateAdminNotificationSettings, getNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
-import ChangePasswordSection from "@/components/ChangePasswordSection";
 
 type NotificationSettings = { pushNotifications: boolean; emailAlerts: boolean };
 
@@ -194,9 +193,6 @@ const AdminSettings = () => {
             </div>
           </SectionCard>
 
-          <SectionCard icon={Lock} title={t("settings.changePassword")} index={3} gradient="from-emerald-500 to-teal-500">
-            <ChangePasswordSection />
-          </SectionCard>
         </div>
       </div>
     </AdminLayout>
