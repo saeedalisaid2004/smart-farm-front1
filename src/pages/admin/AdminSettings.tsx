@@ -1,14 +1,12 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, User, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
+import { Settings, Palette, Globe, Bell, Sun, Moon, Check, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiSaveSettings, getExternalUserId, updateAdminNotificationSettings, getNotificationSettings } from "@/services/smartFarmApi";
+import { getExternalUserId, updateAdminNotificationSettings, getNotificationSettings } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 import ChangePasswordSection from "@/components/ChangePasswordSection";
 
@@ -40,20 +38,15 @@ const SectionCard = ({ icon: Icon, title, children, index, gradient }: {
 );
 
 const AdminSettings = () => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
   const currentUserId = getExternalUserId() || user?.id;
-  const [fullName, setFullName] = useState(user?.name || "Farm Owner");
-  const [email, setEmail] = useState(user?.email || "owner@smartfarm.com");
-  const [phone, setPhone] = useState("");
   const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
-  const [saving, setSaving] = useState(false);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
 
-  useEffect(() => { if (user) { setFullName(user.name || "Farm Owner"); setEmail(user.email || "owner@smartfarm.com"); } }, [user]);
   useEffect(() => { document.documentElement.classList.toggle("dark", theme === "dark"); localStorage.setItem("theme", theme); }, [theme]);
 
   // Fetch notification settings from external API on mount
@@ -105,19 +98,6 @@ const AdminSettings = () => {
     } finally { setNotifSaving(false); }
   };
 
-  const handleSave = async () => {
-    const userId = getExternalUserId();
-    setSaving(true);
-    try {
-      if (userId) await apiSaveSettings(userId, { full_name: fullName, email, phone });
-      if (user) setUser({ ...user, name: fullName, email });
-      
-      toast({ title: t("settings.settingsSaved"), description: t("settings.profileUpdatedDesc") });
-    } catch {
-      toast({ title: "Failed to update profile", variant: "destructive" });
-    } finally { setSaving(false); }
-  };
-
   return (
     <AdminLayout title={t("settings.title")}>
       <div className="max-w-2xl mx-auto">
@@ -132,29 +112,8 @@ const AdminSettings = () => {
         </motion.div>
 
         <div className="space-y-5">
-          {/* Profile */}
-          <SectionCard icon={User} title={t("settings.profile")} index={0} gradient="from-blue-500 to-cyan-500">
-            <div className="space-y-4">
-              {[
-                { label: t("settings.fullName"), value: fullName, onChange: setFullName, type: "text" },
-                { label: t("settings.email"), value: email, onChange: setEmail, type: "email" },
-                { label: t("settings.phone"), value: phone, onChange: setPhone, type: "tel" },
-              ].map((field) => (
-                <div key={field.label} className="space-y-1.5">
-                  <Label className="text-sm font-medium text-muted-foreground">{field.label}</Label>
-                  <Input value={field.value} onChange={(e) => field.onChange(e.target.value)} type={field.type}
-                    className="h-12 rounded-xl bg-secondary/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20 px-4 transition-all" />
-                </div>
-              ))}
-              <Button onClick={handleSave} disabled={saving}
-                className="w-full h-12 rounded-xl text-base font-semibold mt-4 shadow-sm hover:shadow-md transition-shadow">
-                {saving ? "..." : t("settings.saveProfile")}
-              </Button>
-            </div>
-          </SectionCard>
-
           {/* Theme */}
-          <SectionCard icon={Palette} title={t("settings.theme")} index={1} gradient="from-amber-500 to-orange-500">
+          <SectionCard icon={Palette} title={t("settings.theme")} index={0} gradient="from-amber-500 to-orange-500">
             <div className="grid grid-cols-2 gap-3">
               {[
                 { value: "light" as const, label: t("settings.lightMode"), icon: Sun, desc: t("settings.lightDesc") },
@@ -177,7 +136,7 @@ const AdminSettings = () => {
           </SectionCard>
 
           {/* Language */}
-          <SectionCard icon={Globe} title={t("settings.language")} index={2} gradient="from-violet-500 to-purple-500">
+          <SectionCard icon={Globe} title={t("settings.language")} index={1} gradient="from-violet-500 to-purple-500">
             <div className="grid grid-cols-2 gap-3">
               {[
                 { value: "en" as const, label: "English", flag: "🇺🇸" },
@@ -199,7 +158,7 @@ const AdminSettings = () => {
           </SectionCard>
 
           {/* Notifications */}
-          <SectionCard icon={Bell} title={t("settings.notifications")} index={3} gradient="from-rose-500 to-pink-500">
+          <SectionCard icon={Bell} title={t("settings.notifications")} index={2} gradient="from-rose-500 to-pink-500">
             <div className="space-y-3">
               {[
                 { key: "pushNotifications" as const, label: t("settings.pushNotifications"), desc: t("settings.pushDesc"), checked: notifications.pushNotifications },
@@ -217,7 +176,7 @@ const AdminSettings = () => {
             </div>
           </SectionCard>
 
-          <SectionCard icon={Lock} title={t("settings.changePassword")} index={4} gradient="from-emerald-500 to-teal-500">
+          <SectionCard icon={Lock} title={t("settings.changePassword")} index={3} gradient="from-emerald-500 to-teal-500">
             <ChangePasswordSection />
           </SectionCard>
         </div>
