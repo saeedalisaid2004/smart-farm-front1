@@ -42,9 +42,9 @@ export const ResultItem = ({ icon, label, value, variant = "default", large }: R
       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${style.iconBg}`}>
         {icon}
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
-        <p className={`font-bold truncate ${large ? 'text-2xl sm:text-3xl' : 'text-base sm:text-lg'} ${style.text}`} dir="auto">
+        <p className={`font-bold break-words ${large ? 'text-2xl sm:text-3xl' : 'text-base sm:text-lg'} ${style.text}`} dir="auto">
           {value}
         </p>
       </div>
