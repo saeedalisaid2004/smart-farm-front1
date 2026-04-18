@@ -100,7 +100,7 @@ const DashboardReports = () => {
       if (statsData && !statsData.detail) {
         const top = statsData.top_cards ?? statsData;
         setReportStats({
-          total: Math.min(top.total_reports ?? top.total ?? list.length, MAX_REPORTS),
+          total: top.total_reports ?? top.total ?? list.length,
           thisMonth: top.this_month ?? top.thisMonth ?? 0,
           lastMonthTotal: top.last_month ?? top.lastMonth ?? 0,
         });
