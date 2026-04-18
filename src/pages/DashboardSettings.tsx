@@ -69,15 +69,29 @@ const DashboardSettings = () => {
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
   const currentUserId = getExternalUserId() || user?.id;
-  const [theme, setTheme] = useState<"light" | "dark">(() => localStorage.getItem("theme") === "dark" ? "dark" : "light");
+  const [theme, setThemeState] = useState<"light" | "dark">(() =>
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
   const [notifications, setNotifications] = useState<NotificationSettings | null>(null);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    const sync = () => setThemeState(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    window.addEventListener("storage", sync);
+    window.addEventListener("theme-changed", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("theme-changed", sync);
+    };
+  }, []);
+
+  const setTheme = (next: "light" | "dark") => {
+    setThemeState(next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+    localStorage.setItem("theme", next);
+    window.dispatchEvent(new Event("theme-changed"));
+  };
 
   useEffect(() => {
     const userId = currentUserId;
