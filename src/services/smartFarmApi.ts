@@ -144,8 +144,8 @@ export const buildProfileImageUrl = (profileImagePath?: string): string | null =
 
 // ============ AI Analysis ============
 
-export const detectPlantDisease = async (userId: number, image: File) => {
-  const fd = toFormData({ user_id: userId, image });
+export const detectPlantDisease = async (userId: number, image: File, lang: string = "ar") => {
+  const fd = toFormData({ user_id: userId, image, lang });
   const res = await fetchWithTimeout(`${API_BASE}/plants/detect`, { method: "POST", body: fd });
   return res.json();
 };
