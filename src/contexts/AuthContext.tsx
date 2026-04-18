@@ -6,6 +6,7 @@ interface AppUser {
   name: string;
   email: string;
   role: string;
+  phone?: string;
   avatar_url?: string;
   created_at?: string;
 }

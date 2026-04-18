@@ -77,10 +77,12 @@ const Profile = () => {
   const [editName, setEditName] = useState(userName);
   const [editEmail, setEditEmail] = useState(userEmail);
   const currentUserId = getExternalUserId() || user?.id;
-  const [editPhone, setEditPhone] = useState(getStoredPhone(currentUserId));
+  const [editPhone, setEditPhone] = useState(user?.phone || getStoredPhone(currentUserId));
 
   useEffect(() => { setAvatarUrl(user?.avatar_url || getSavedAvatarUrl()); }, [user?.avatar_url]);
-  useEffect(() => { setEditPhone(getStoredPhone(currentUserId)); }, [currentUserId]);
+  useEffect(() => {
+    setEditPhone(user?.phone || getStoredPhone(currentUserId));
+  }, [currentUserId, user?.phone]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,7 +117,7 @@ const Profile = () => {
     try {
       await apiSaveSettings(userId, { full_name: editName, email: editEmail, phone: editPhone });
       persistPhone(editPhone, currentUserId);
-      setUser({ ...user, name: editName, email: editEmail, avatar_url: avatarUrl || user.avatar_url });
+      setUser({ ...user, name: editName, email: editEmail, phone: editPhone, avatar_url: avatarUrl || user.avatar_url });
       setEditing(false);
       toast({ title: "Profile updated successfully" });
     } catch {
