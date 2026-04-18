@@ -9,7 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
-import { containsArabic, stripArabic } from "@/lib/textLang";
+import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
 
 const FruitQuality = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -62,7 +62,15 @@ const FruitQuality = () => {
             if (result.status === "low_confidence")
               return <ErrorResult key="low" title={t("fruitQuality.lowConfidence")} message={result.message || ""} />;
 
-            const clean = (v: any) => (typeof v === "string" && language !== "ar" && containsArabic(v)) ? (stripArabic(v) || v) : v;
+            const clean = (v: any) => {
+              if (typeof v !== "string") return v;
+              if (language === "ar") {
+                if (containsArabic(v) && containsLatin(v)) return stripEnglish(v) || v;
+                return v;
+              }
+              if (containsArabic(v)) return stripArabic(v) || v;
+              return v;
+            };
             const grade = clean(result.quality_grade || result.quality || result.grade);
             const gradeDescription = clean(result.grade_description || result.description);
             const ripeness = clean(result.ripeness_level || result.ripeness);

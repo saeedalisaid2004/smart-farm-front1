@@ -9,7 +9,17 @@ import { AnimatePresence } from "framer-motion";
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
-import { containsArabic, stripArabic } from "@/lib/textLang";
+import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
+
+const cleanByLang = (v: any, lang: string) => {
+  if (typeof v !== "string" || !v) return v;
+  if (lang === "ar") {
+    if (containsArabic(v) && containsLatin(v)) return stripEnglish(v) || v;
+    return v;
+  }
+  if (containsArabic(v)) return stripArabic(v) || v;
+  return v;
+};
 
 const PlantDisease = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -101,18 +111,19 @@ const PlantDisease = () => {
             const cropNameEn = a.crop_type_en || "";
             const cropNameAr = a.crop_type_ar || "";
             const cropDisplay = language === "ar"
-              ? (cropNameEn && cropNameAr ? `${cropNameEn} (${cropNameAr})` : cropNameEn || cropNameAr)
+              ? cleanByLang(cropNameAr || cropNameEn, "ar")
               : (cropNameEn || stripArabic(cropNameAr));
             const diseaseEn = a.disease_en || "";
             const diseaseAr = a.disease_ar || "";
-            const sameDisease = diseaseEn && diseaseAr && diseaseEn.trim().toLowerCase() === diseaseAr.trim().toLowerCase();
             const diseaseDisplay = language === "ar"
-              ? (isHealthy ? (diseaseEn || condition) : (diseaseEn && diseaseAr && !sameDisease ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition))
+              ? cleanByLang(diseaseAr || diseaseEn || condition, "ar")
               : (diseaseEn || stripArabic(condition));
-            const messageDisplay = language === "ar" ? a.message : (a.message && !containsArabic(a.message) ? a.message : "");
+            const messageDisplay = language === "ar"
+              ? cleanByLang(a.message, "ar")
+              : (a.message && !containsArabic(a.message) ? a.message : "");
             const treatmentsRaw = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
             const treatments = language === "ar"
-              ? treatmentsRaw
+              ? treatmentsRaw.map((tt: string) => cleanByLang(tt, "ar")).filter(Boolean)
               : treatmentsRaw.filter((tt: string) => !containsArabic(tt));
 
             return (
