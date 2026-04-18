@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const soilMap: Record<string, string> = { clay: "طينية", sandy: "رملية", loamy: "طميية" };
 
@@ -163,13 +164,16 @@ const CropRecommendation = () => {
                               { icon: Droplets, label: t("crop.irrigation"), val: day["نصيحة الري"] || day.irrigation },
                               { icon: Leaf, label: t("crop.fertilizer"), val: day["نصيحة السماد"] || day.fertilizer },
                               { icon: Bug, label: t("crop.diseaseAlert"), val: day["تنبيه الأمراض"] || day.disease_alert || day.disease },
-                            ].map(({ icon: Ic, label, val }, j) => (
-                              <div key={j} className="flex items-center gap-2">
-                                <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-muted-foreground">{label}:</span>
-                                <span className="text-foreground font-medium" dir="auto">{val}</span>
-                              </div>
-                            ))}
+                            ].map(({ icon: Ic, label, val }, j) => {
+                              const displayVal = language !== "ar" && containsArabic(val) ? (stripArabic(val) || val) : val;
+                              return (
+                                <div key={j} className="flex items-center gap-2">
+                                  <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                  <span className="text-muted-foreground">{label}:</span>
+                                  <span className="text-foreground font-medium" dir="auto">{displayVal}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </StaggerItem>
