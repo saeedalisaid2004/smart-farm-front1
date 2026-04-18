@@ -12,7 +12,17 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
-import { containsArabic, stripArabic } from "@/lib/textLang";
+import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
+
+const cleanByLang = (v: any, lang: string) => {
+  if (typeof v !== "string" || !v) return v;
+  if (lang === "ar") {
+    if (containsArabic(v) && containsLatin(v)) return stripEnglish(v) || v;
+    return v;
+  }
+  if (containsArabic(v)) return stripArabic(v) || v;
+  return v;
+};
 
 const soilMap: Record<string, string> = { clay: "طينية", sandy: "رملية", loamy: "طميية" };
 
