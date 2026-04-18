@@ -15,7 +15,7 @@ const PlantDisease = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +32,7 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await detectPlantDisease(userId, file);
+      const data = await detectPlantDisease(userId, file, language === "ar" ? "ar" : "en");
       setResult(data);
       const analysis = data?.analysis || data;
       const condition = analysis?.condition || analysis?.disease_en || analysis?.prediction || "";
