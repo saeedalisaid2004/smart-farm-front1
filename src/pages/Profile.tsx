@@ -117,7 +117,7 @@ const Profile = () => {
     try {
       await apiSaveSettings(userId, { full_name: editName, email: editEmail, phone: editPhone });
       persistPhone(editPhone, currentUserId);
-      setUser({ ...user, name: editName, email: editEmail, avatar_url: avatarUrl || user.avatar_url });
+      setUser({ ...user, name: editName, email: editEmail, phone: editPhone, avatar_url: avatarUrl || user.avatar_url });
       setEditing(false);
       toast({ title: "Profile updated successfully" });
     } catch {
