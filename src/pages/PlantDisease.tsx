@@ -125,10 +125,18 @@ const PlantDisease = () => {
             const messageDisplay = language === "ar"
               ? cleanByLang(a.message, "ar")
               : (a.message && !containsArabic(a.message) ? a.message : "");
-            const treatmentsRaw = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
-            const treatments = language === "ar"
-              ? treatmentsRaw.map((tt: string) => cleanByLang(tt, "ar")).filter(Boolean)
-              : treatmentsRaw.filter((tt: string) => !containsArabic(tt));
+            const treatmentsRaw: string[] = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
+            const formatTreatment = (tt: string): string => {
+              if (typeof tt !== "string") return "";
+              const enPart = stripArabic(tt).replace(/^[\s\-—–•:.,]+|[\s\-—–•:.,]+$/g, "").trim();
+              const arPart = containsArabic(tt) ? stripEnglish(tt) : "";
+              if (language === "ar") {
+                if (arPart && enPart) return `${arPart} (${enPart})`;
+                return arPart || enPart;
+              }
+              return enPart;
+            };
+            const treatments = treatmentsRaw.map(formatTreatment).filter(Boolean);
 
             return (
               <AnalysisResultCard key="res" title="Analysis Result" statusColor={variant}>
