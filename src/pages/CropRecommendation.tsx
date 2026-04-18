@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const soilMap: Record<string, string> = { clay: "طينية", sandy: "رملية", loamy: "طميية" };
 
@@ -112,8 +113,9 @@ const CropRecommendation = () => {
                           { key: "secondary", label: t("crop.secondaryCrop"), color: "from-emerald-500 to-green-600" },
                           { key: "tertiary", label: t("crop.tertiaryCrop"), color: "from-blue-500 to-cyan-600" },
                         ].map(({ key, label, color }) => {
-                          const crop = result.recommendation[key];
-                          if (!crop) return null;
+                          const cropRaw = result.recommendation[key];
+                          if (!cropRaw) return null;
+                          const crop = language !== "ar" && containsArabic(cropRaw) ? (stripArabic(cropRaw) || cropRaw) : cropRaw;
                           return (
                             <motion.div
                               key={key}
@@ -130,26 +132,34 @@ const CropRecommendation = () => {
                         })}
                       </div>
                     </StaggerItem>
-                    {result.recommendation.description && (
-                      <StaggerItem>
-                        <div className="bg-gradient-to-br from-secondary/60 to-secondary/30 border border-border rounded-2xl p-5">
-                          <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">{t("crop.details")}</p>
-                          <p className="text-sm text-foreground leading-7 font-medium" dir="auto">{result.recommendation.description}</p>
-                        </div>
-                      </StaggerItem>
-                    )}
+                    {result.recommendation.description && (() => {
+                      const desc = result.recommendation.description;
+                      const cleanDesc = language !== "ar" && containsArabic(desc) ? (stripArabic(desc) || desc) : desc;
+                      return (
+                        <StaggerItem>
+                          <div className="bg-gradient-to-br from-secondary/60 to-secondary/30 border border-border rounded-2xl p-5">
+                            <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">{t("crop.details")}</p>
+                            <p className="text-sm text-foreground leading-7 font-medium" dir="auto">{cleanDesc}</p>
+                          </div>
+                        </StaggerItem>
+                      );
+                    })()}
                   </AnalysisResultCard>
                 )}
 
-                {(result.general_warning || result.general_status) && (
-                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card border border-border rounded-3xl p-4 flex items-center gap-3 shadow-card">
-                    <CloudSun className="w-5 h-5 text-primary shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t("crop.generalWarning")}</p>
-                      <p className="text-sm font-semibold text-foreground" dir="auto">{result.general_warning || result.general_status}</p>
-                    </div>
-                  </motion.div>
-                )}
+                {(result.general_warning || result.general_status) && (() => {
+                  const gw = result.general_warning || result.general_status;
+                  const cleanGw = language !== "ar" && containsArabic(gw) ? (stripArabic(gw) || gw) : gw;
+                  return (
+                    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card border border-border rounded-3xl p-4 flex items-center gap-3 shadow-card">
+                      <CloudSun className="w-5 h-5 text-primary shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t("crop.generalWarning")}</p>
+                        <p className="text-sm font-semibold text-foreground" dir="auto">{cleanGw}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })()}
 
                 {result.expert_daily_guide?.length > 0 && (
                   <AnalysisResultCard title={t("crop.dailyGuide")}>
@@ -163,13 +173,16 @@ const CropRecommendation = () => {
                               { icon: Droplets, label: t("crop.irrigation"), val: day["نصيحة الري"] || day.irrigation },
                               { icon: Leaf, label: t("crop.fertilizer"), val: day["نصيحة السماد"] || day.fertilizer },
                               { icon: Bug, label: t("crop.diseaseAlert"), val: day["تنبيه الأمراض"] || day.disease_alert || day.disease },
-                            ].map(({ icon: Ic, label, val }, j) => (
-                              <div key={j} className="flex items-center gap-2">
-                                <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-muted-foreground">{label}:</span>
-                                <span className="text-foreground font-medium" dir="auto">{val}</span>
-                              </div>
-                            ))}
+                            ].map(({ icon: Ic, label, val }, j) => {
+                              const displayVal = language !== "ar" && containsArabic(val) ? (stripArabic(val) || val) : val;
+                              return (
+                                <div key={j} className="flex items-center gap-2">
+                                  <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                  <span className="text-muted-foreground">{label}:</span>
+                                  <span className="text-foreground font-medium" dir="auto">{displayVal}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </StaggerItem>

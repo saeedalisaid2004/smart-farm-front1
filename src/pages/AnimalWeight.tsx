@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const AnimalWeight = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -79,9 +80,10 @@ const AnimalWeight = () => {
             if (result.detail || result.status === "Rejected" || result.status === "Not Supported")
               return <ErrorResult key="err" title={result.status === "Not Supported" ? "Not Supported" : "Analysis Error"} message={result.message || result.detail || "Request rejected"} />;
 
-            const animalName = isRTL
+            const animalNameRaw = isRTL
               ? result.animal_name_ar || result.animal_name || result.animal_type || result.animal || result.class_name || result.label || result.animal_name_en
               : result.animal_name_en || result.animal_name || result.animal_type || result.animal || result.class_name || result.label || result.animal_name_ar;
+            const animalName = isRTL ? animalNameRaw : (animalNameRaw && !containsArabic(animalNameRaw) ? animalNameRaw : stripArabic(animalNameRaw));
             const weightValue = result.estimated_weight || result.weight;
             const confidenceNum = result.confidence
               ? typeof result.confidence === 'number' ? result.confidence * 100 : parseFloat(String(result.confidence))

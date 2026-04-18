@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisUploadCard from "@/components/AnalysisUploadCard";
 import AnalysisResultCard, { ResultItem, ConfidenceBar, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const PlantDisease = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -32,30 +33,42 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const [enData, arData] = await Promise.all([
-        detectPlantDisease(userId, file, "en"),
-        detectPlantDisease(userId, file, "ar"),
-      ]);
-      const enA = enData?.analysis || enData || {};
-      const arA = arData?.analysis || arData || {};
-      const merged = {
-        ...enData,
-        analysis: {
-          ...enA,
-          ...arA,
-          condition: enA.condition || arA.condition,
-          disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
-          disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
-          crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
-          crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
-          message: language === "ar" ? (arA.message || enA.message) : (enA.message || arA.message),
-          suggested_treatments: language === "ar"
-            ? (arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments)
-            : (enA.suggested_treatments?.length ? enA.suggested_treatments : arA.suggested_treatments),
-          confidence: enA.confidence ?? arA.confidence,
-        },
-      };
-      setResult(merged);
+      if (language === "ar") {
+        const [enData, arData] = await Promise.all([
+          detectPlantDisease(userId, file, "en"),
+          detectPlantDisease(userId, file, "ar"),
+        ]);
+        const enA = enData?.analysis || enData || {};
+        const arA = arData?.analysis || arData || {};
+        setResult({
+          ...enData,
+          analysis: {
+            ...enA,
+            ...arA,
+            condition: enA.condition || arA.condition,
+            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
+            disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
+            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
+            crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
+            message: arA.message || enA.message,
+            suggested_treatments: arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments,
+            confidence: enA.confidence ?? arA.confidence,
+          },
+        });
+      } else {
+        const enData = await detectPlantDisease(userId, file, "en");
+        const enA = enData?.analysis || enData || {};
+        setResult({
+          ...enData,
+          analysis: {
+            ...enA,
+            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
+            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
+            disease_ar: undefined,
+            crop_type_ar: undefined,
+          },
+        });
+      }
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
@@ -87,14 +100,20 @@ const PlantDisease = () => {
             const variant = isHealthy ? "primary" as const : "destructive" as const;
             const cropNameEn = a.crop_type_en || "";
             const cropNameAr = a.crop_type_ar || "";
-            const cropDisplay = cropNameEn && cropNameAr ? `${cropNameEn} (${cropNameAr})` : cropNameEn || cropNameAr;
+            const cropDisplay = language === "ar"
+              ? (cropNameEn && cropNameAr ? `${cropNameEn} (${cropNameAr})` : cropNameEn || cropNameAr)
+              : (cropNameEn || stripArabic(cropNameAr));
             const diseaseEn = a.disease_en || "";
             const diseaseAr = a.disease_ar || "";
             const sameDisease = diseaseEn && diseaseAr && diseaseEn.trim().toLowerCase() === diseaseAr.trim().toLowerCase();
-            const diseaseDisplay = isHealthy
-              ? (diseaseEn || condition)
-              : (diseaseEn && diseaseAr && !sameDisease ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
-            const treatments = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
+            const diseaseDisplay = language === "ar"
+              ? (isHealthy ? (diseaseEn || condition) : (diseaseEn && diseaseAr && !sameDisease ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition))
+              : (diseaseEn || stripArabic(condition));
+            const messageDisplay = language === "ar" ? a.message : (a.message && !containsArabic(a.message) ? a.message : "");
+            const treatmentsRaw = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
+            const treatments = language === "ar"
+              ? treatmentsRaw
+              : treatmentsRaw.filter((tt: string) => !containsArabic(tt));
 
             return (
               <AnalysisResultCard key="res" title="Analysis Result" statusColor={variant}>
@@ -123,9 +142,9 @@ const PlantDisease = () => {
                 {confidenceNum != null && !isNaN(confidenceNum) && (
                   <StaggerItem><ConfidenceBar value={confidenceNum} /></StaggerItem>
                 )}
-                {a.message && (
+                {messageDisplay && (
                   <StaggerItem>
-                    <ResultItem icon={<MessageCircle className="w-5 h-5 text-muted-foreground" />} label="Details" value={a.message} />
+                    <ResultItem icon={<MessageCircle className="w-5 h-5 text-muted-foreground" />} label="Details" value={messageDisplay} />
                   </StaggerItem>
                 )}
                 {treatments.length > 0 && (

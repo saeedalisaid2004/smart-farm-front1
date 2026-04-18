@@ -11,9 +11,19 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ResultItem, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const translateRecommendation = (text: string, lang: string): string => {
-  if (lang !== "ar" || !text) return text;
+  if (!text) return text;
+  // EN UI: strip Arabic words/parens to keep only English
+  if (lang !== "ar") {
+    if (containsArabic(text)) {
+      const cleaned = stripArabic(text);
+      return cleaned || text;
+    }
+    return text;
+  }
+  // AR UI: try to translate english phrases
   const npkMatch = text.match(/Based on your soil's NPK \(([^)]+)\), it is classified as (\w+)/i);
   if (npkMatch) {
     const soilNames: Record<string, string> = { sandy: "رملية", loamy: "طينية رملية", clay: "طينية", silty: "طميية", peaty: "خثية", chalky: "كلسية", saline: "ملحية" };
@@ -122,8 +132,13 @@ const SoilAnalysis = () => {
 
             const soilTypeMap: Record<string, string> = { loamy: t("soil.types.loamy"), sandy: t("soil.types.sandy"), clay: t("soil.types.clay"), silty: t("soil.types.silty"), peaty: t("soil.types.peaty"), chalky: t("soil.types.chalky"), saline: t("soil.types.saline") };
             const fertilityMap: Record<string, string> = { high: t("soil.fertility.high"), medium: t("soil.fertility.medium"), low: t("soil.fertility.low") };
-            const soilType = soilTypeRaw ? (soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
-            const fertility = fertilityRaw ? (fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
+            const cleanLangVal = (v: string | undefined) => {
+              if (!v) return v;
+              if (language !== "ar" && containsArabic(v)) return stripArabic(v) || v;
+              return v;
+            };
+            const soilType = soilTypeRaw ? cleanLangVal(soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
+            const fertility = fertilityRaw ? cleanLangVal(fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
             let fertVariant: "primary" | "warning" | "destructive" | "default" = "default";
             if (fertilityRaw) {
               const fl = fertilityRaw.toLowerCase();
