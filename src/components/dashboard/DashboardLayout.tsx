@@ -54,9 +54,7 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const unreadMsgCount = useUnreadMessages("farmer");
 
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-  };
+  const toggleTheme = () => { import("@/lib/theme").then(m => m.toggleTheme("farmer")); };
 
   const handleLogout = async () => {
     await signOut();

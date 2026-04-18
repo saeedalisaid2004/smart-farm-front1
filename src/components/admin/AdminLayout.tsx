@@ -56,7 +56,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
     } catch { return dateStr; }
   };
 
-  const toggleTheme = () => document.documentElement.classList.toggle("dark");
+  const toggleTheme = () => { import("@/lib/theme").then(m => m.toggleTheme("admin")); };
 
   const handleLogout = async () => {
     await signOut();
