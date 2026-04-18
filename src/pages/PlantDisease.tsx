@@ -32,7 +32,7 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await detectPlantDisease(userId, file, language === "ar" ? "ar" : "en");
+      const data = await detectPlantDisease(userId, file, "en");
       setResult(data);
       const analysis = data?.analysis || data;
       const condition = analysis?.condition || analysis?.disease_en || analysis?.prediction || "";
