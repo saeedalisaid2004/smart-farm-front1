@@ -32,30 +32,42 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const [enData, arData] = await Promise.all([
-        detectPlantDisease(userId, file, "en"),
-        detectPlantDisease(userId, file, "ar"),
-      ]);
-      const enA = enData?.analysis || enData || {};
-      const arA = arData?.analysis || arData || {};
-      const merged = {
-        ...enData,
-        analysis: {
-          ...enA,
-          ...arA,
-          condition: enA.condition || arA.condition,
-          disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
-          disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
-          crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
-          crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
-          message: language === "ar" ? (arA.message || enA.message) : (enA.message || arA.message),
-          suggested_treatments: language === "ar"
-            ? (arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments)
-            : (enA.suggested_treatments?.length ? enA.suggested_treatments : arA.suggested_treatments),
-          confidence: enA.confidence ?? arA.confidence,
-        },
-      };
-      setResult(merged);
+      if (language === "ar") {
+        const [enData, arData] = await Promise.all([
+          detectPlantDisease(userId, file, "en"),
+          detectPlantDisease(userId, file, "ar"),
+        ]);
+        const enA = enData?.analysis || enData || {};
+        const arA = arData?.analysis || arData || {};
+        setResult({
+          ...enData,
+          analysis: {
+            ...enA,
+            ...arA,
+            condition: enA.condition || arA.condition,
+            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
+            disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
+            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
+            crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
+            message: arA.message || enA.message,
+            suggested_treatments: arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments,
+            confidence: enA.confidence ?? arA.confidence,
+          },
+        });
+      } else {
+        const enData = await detectPlantDisease(userId, file, "en");
+        const enA = enData?.analysis || enData || {};
+        setResult({
+          ...enData,
+          analysis: {
+            ...enA,
+            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
+            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
+            disease_ar: undefined,
+            crop_type_ar: undefined,
+          },
+        });
+      }
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
