@@ -42,16 +42,18 @@ const AdminSettings = () => {
   const { toast } = useToast();
   const { t, language, setLanguage } = useLanguage();
   const currentUserId = getExternalUserId() || user?.id;
-  const [theme, setThemeState] = useState<"light" | "dark">(() =>
-    document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
+  const [theme, setThemeState] = useState<"light" | "dark">(() => {
+    try { return localStorage.getItem("theme_admin") === "dark" ? "dark" : "light"; } catch { return "light"; }
+  });
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifLoading, setNotifLoading] = useState(true);
 
   // Sync local state if theme changes elsewhere (header toggle, other tabs)
   useEffect(() => {
-    const sync = () => setThemeState(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    const sync = () => {
+      try { setThemeState(localStorage.getItem("theme_admin") === "dark" ? "dark" : "light"); } catch {}
+    };
     window.addEventListener("storage", sync);
     window.addEventListener("theme-changed", sync);
     return () => {
@@ -62,9 +64,7 @@ const AdminSettings = () => {
 
   const setTheme = (next: "light" | "dark") => {
     setThemeState(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem("theme", next);
-    window.dispatchEvent(new Event("theme-changed"));
+    import("@/lib/theme").then(m => m.setTheme("admin", next));
   };
 
   // Fetch notification settings from external API on mount
