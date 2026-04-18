@@ -108,16 +108,20 @@ const PlantDisease = () => {
             const confidenceRaw = a.confidence;
             const confidenceNum = confidenceRaw ? parseFloat(String(confidenceRaw)) : null;
             const variant = isHealthy ? "primary" as const : "destructive" as const;
-            const cropNameEn = a.crop_type_en || "";
-            const cropNameAr = a.crop_type_ar || "";
+            const cropNameEnRaw = a.crop_type_en || "";
+            const cropNameArRaw = a.crop_type_ar || "";
+            const cropEnOnly = stripArabic(cropNameEnRaw) || stripArabic(cropNameArRaw);
+            const cropArOnly = containsArabic(cropNameArRaw) ? stripEnglish(cropNameArRaw) : (containsArabic(cropNameEnRaw) ? stripEnglish(cropNameEnRaw) : "");
             const cropDisplay = language === "ar"
-              ? cleanByLang(cropNameAr || cropNameEn, "ar")
-              : (cropNameEn || stripArabic(cropNameAr));
-            const diseaseEn = a.disease_en || "";
-            const diseaseAr = a.disease_ar || "";
+              ? (cropArOnly && cropEnOnly ? `${cropArOnly} (${cropEnOnly})` : (cropArOnly || cropEnOnly))
+              : cropEnOnly;
+            const diseaseEnRaw = a.disease_en || "";
+            const diseaseArRaw = a.disease_ar || "";
+            const diseaseEnOnly = stripArabic(diseaseEnRaw) || stripArabic(diseaseArRaw) || stripArabic(condition);
+            const diseaseArOnly = containsArabic(diseaseArRaw) ? stripEnglish(diseaseArRaw) : (containsArabic(diseaseEnRaw) ? stripEnglish(diseaseEnRaw) : (containsArabic(condition) ? stripEnglish(condition) : ""));
             const diseaseDisplay = language === "ar"
-              ? cleanByLang(diseaseAr || diseaseEn || condition, "ar")
-              : (diseaseEn || stripArabic(condition));
+              ? (diseaseArOnly && diseaseEnOnly ? `${diseaseArOnly} (${diseaseEnOnly})` : (diseaseArOnly || diseaseEnOnly))
+              : diseaseEnOnly;
             const messageDisplay = language === "ar"
               ? cleanByLang(a.message, "ar")
               : (a.message && !containsArabic(a.message) ? a.message : "");
