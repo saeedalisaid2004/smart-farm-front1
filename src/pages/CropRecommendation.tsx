@@ -125,7 +125,7 @@ const CropRecommendation = () => {
                         ].map(({ key, label, color }) => {
                           const cropRaw = result.recommendation[key];
                           if (!cropRaw) return null;
-                          const crop = language !== "ar" && containsArabic(cropRaw) ? (stripArabic(cropRaw) || cropRaw) : cropRaw;
+                          const crop = cleanByLang(cropRaw, language);
                           return (
                             <motion.div
                               key={key}
@@ -144,7 +144,7 @@ const CropRecommendation = () => {
                     </StaggerItem>
                     {result.recommendation.description && (() => {
                       const desc = result.recommendation.description;
-                      const cleanDesc = language !== "ar" && containsArabic(desc) ? (stripArabic(desc) || desc) : desc;
+                      const cleanDesc = cleanByLang(desc, language);
                       return (
                         <StaggerItem>
                           <div className="bg-gradient-to-br from-secondary/60 to-secondary/30 border border-border rounded-2xl p-5">
@@ -159,7 +159,7 @@ const CropRecommendation = () => {
 
                 {(result.general_warning || result.general_status) && (() => {
                   const gw = result.general_warning || result.general_status;
-                  const cleanGw = language !== "ar" && containsArabic(gw) ? (stripArabic(gw) || gw) : gw;
+                  const cleanGw = cleanByLang(gw, language);
                   return (
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card border border-border rounded-3xl p-4 flex items-center gap-3 shadow-card">
                       <CloudSun className="w-5 h-5 text-primary shrink-0" />
@@ -184,7 +184,7 @@ const CropRecommendation = () => {
                               { icon: Leaf, label: t("crop.fertilizer"), val: day["نصيحة السماد"] || day.fertilizer },
                               { icon: Bug, label: t("crop.diseaseAlert"), val: day["تنبيه الأمراض"] || day.disease_alert || day.disease },
                             ].map(({ icon: Ic, label, val }, j) => {
-                              const displayVal = language !== "ar" && containsArabic(val) ? (stripArabic(val) || val) : val;
+                              const displayVal = cleanByLang(val, language);
                               return (
                                 <div key={j} className="flex items-center gap-2">
                                   <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
