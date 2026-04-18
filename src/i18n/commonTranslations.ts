@@ -38,7 +38,7 @@ export const commonTranslations = {
     "settings.passwordRequired": "All password fields are required",
     // Header
     "header.notifications": "Notifications",
-    "header.new": "new",
+    "header.new": "Read all",
     "header.clearAll": "Clear all",
     "header.markAllRead": "Mark all as read",
     "header.myAccount": "My Account",
@@ -200,7 +200,7 @@ export const commonTranslations = {
     "settings.passwordRequired": "جميع حقول كلمة المرور مطلوبة",
     // Header
     "header.notifications": "الإشعارات",
-    "header.new": "جديد",
+    "header.new": "قراءة الكل",
     "header.clearAll": "مسح الكل",
     "header.markAllRead": "تعليم الكل كمقروء",
     "header.myAccount": "حسابي",
