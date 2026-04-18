@@ -132,8 +132,13 @@ const SoilAnalysis = () => {
 
             const soilTypeMap: Record<string, string> = { loamy: t("soil.types.loamy"), sandy: t("soil.types.sandy"), clay: t("soil.types.clay"), silty: t("soil.types.silty"), peaty: t("soil.types.peaty"), chalky: t("soil.types.chalky"), saline: t("soil.types.saline") };
             const fertilityMap: Record<string, string> = { high: t("soil.fertility.high"), medium: t("soil.fertility.medium"), low: t("soil.fertility.low") };
-            const soilType = soilTypeRaw ? (soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
-            const fertility = fertilityRaw ? (fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
+            const cleanLangVal = (v: string | undefined) => {
+              if (!v) return v;
+              if (language !== "ar" && containsArabic(v)) return stripArabic(v) || v;
+              return v;
+            };
+            const soilType = soilTypeRaw ? cleanLangVal(soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
+            const fertility = fertilityRaw ? cleanLangVal(fertilityMap[fertilityRaw.toLowerCase()] || fertilityRaw) : undefined;
             let fertVariant: "primary" | "warning" | "destructive" | "default" = "default";
             if (fertilityRaw) {
               const fl = fertilityRaw.toLowerCase();
