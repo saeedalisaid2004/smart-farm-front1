@@ -90,9 +90,10 @@ const PlantDisease = () => {
             const cropDisplay = cropNameEn && cropNameAr ? `${cropNameEn} (${cropNameAr})` : cropNameEn || cropNameAr;
             const diseaseEn = a.disease_en || "";
             const diseaseAr = a.disease_ar || "";
+            const sameDisease = diseaseEn && diseaseAr && diseaseEn.trim().toLowerCase() === diseaseAr.trim().toLowerCase();
             const diseaseDisplay = isHealthy
               ? (diseaseEn || condition)
-              : (diseaseEn && diseaseAr ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
+              : (diseaseEn && diseaseAr && !sameDisease ? `${diseaseEn} (${diseaseAr})` : diseaseEn || diseaseAr || condition);
             const treatments = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
 
             return (
