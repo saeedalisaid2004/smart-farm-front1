@@ -32,12 +32,30 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await detectPlantDisease(userId, file, language === "ar" ? "ar" : "en");
-      setResult(data);
-      const analysis = data?.analysis || data;
-      const condition = analysis?.condition || analysis?.disease_en || analysis?.prediction || "";
-      const isHealthy = condition.toLowerCase().includes("healthy");
-      
+      const [enData, arData] = await Promise.all([
+        detectPlantDisease(userId, file, "en"),
+        detectPlantDisease(userId, file, "ar"),
+      ]);
+      const enA = enData?.analysis || enData || {};
+      const arA = arData?.analysis || arData || {};
+      const merged = {
+        ...enData,
+        analysis: {
+          ...enA,
+          ...arA,
+          condition: enA.condition || arA.condition,
+          disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
+          disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
+          crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
+          crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
+          message: language === "ar" ? (arA.message || enA.message) : (enA.message || arA.message),
+          suggested_treatments: language === "ar"
+            ? (arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments)
+            : (enA.suggested_treatments?.length ? enA.suggested_treatments : arA.suggested_treatments),
+          confidence: enA.confidence ?? arA.confidence,
+        },
+      };
+      setResult(merged);
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
