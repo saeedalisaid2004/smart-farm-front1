@@ -11,9 +11,19 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ResultItem, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
+import { containsArabic, stripArabic } from "@/lib/textLang";
 
 const translateRecommendation = (text: string, lang: string): string => {
-  if (lang !== "ar" || !text) return text;
+  if (!text) return text;
+  // EN UI: strip Arabic words/parens to keep only English
+  if (lang !== "ar") {
+    if (containsArabic(text)) {
+      const cleaned = stripArabic(text);
+      return cleaned || text;
+    }
+    return text;
+  }
+  // AR UI: try to translate english phrases
   const npkMatch = text.match(/Based on your soil's NPK \(([^)]+)\), it is classified as (\w+)/i);
   if (npkMatch) {
     const soilNames: Record<string, string> = { sandy: "رملية", loamy: "طينية رملية", clay: "طينية", silty: "طميية", peaty: "خثية", chalky: "كلسية", saline: "ملحية" };
