@@ -162,7 +162,7 @@ const CropRecommendation = () => {
                               { icon: CloudSun, label: t("crop.weather"), val: day["الطقس"] || day.weather },
                               { icon: Droplets, label: t("crop.irrigation"), val: day["نصيحة الري"] || day.irrigation },
                               { icon: Leaf, label: t("crop.fertilizer"), val: day["نصيحة السماد"] || day.fertilizer },
-                              { icon: Bug, label: t("crop.diseaseAlert"), val: day["تنبيه الأمراض"] || day.disease_alert },
+                              { icon: Bug, label: t("crop.diseaseAlert"), val: day["تنبيه الأمراض"] || day.disease_alert || day.disease },
                             ].map(({ icon: Ic, label, val }, j) => (
                               <div key={j} className="flex items-center gap-2">
                                 <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
