@@ -241,9 +241,9 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                                   <Icon className={cn("w-5 h-5", color)} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className={cn("text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                                  <p className={cn("text-sm text-foreground break-words", !n.is_read && "font-medium")}>{n.title}</p>
                                   {n.description && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5 break-words whitespace-normal">{n.description}</p>
                                   )}
                                   <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
                                 </div>
@@ -371,9 +371,9 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                                   <Icon className={cn("w-5 h-5", color)} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className={cn("text-sm text-foreground", !n.is_read && "font-medium")}>{n.title}</p>
+                                  <p className={cn("text-sm text-foreground break-words", !n.is_read && "font-medium")}>{n.title}</p>
                                   {n.description && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5 break-words whitespace-normal">{n.description}</p>
                                   )}
                                   <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
                                 </div>
