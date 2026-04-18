@@ -36,6 +36,8 @@ export const toggleTheme = (scope: Scope) => {
 
 // Apply the right theme for the current path; safe to call on every route change
 export const syncThemeForPath = (pathname: string) => {
+  // Only manage theme inside the app sections (admin/dashboard). Leave public pages alone.
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/dashboard")) return;
   const scope = getScopeFromPath(pathname);
   applyTheme(getStoredTheme(scope));
 };
