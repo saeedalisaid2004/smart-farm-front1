@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ResultItem, ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
-import { containsArabic, stripArabic } from "@/lib/textLang";
+import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
 
 const translateRecommendation = (text: string, lang: string): string => {
   if (!text) return text;
@@ -23,13 +23,21 @@ const translateRecommendation = (text: string, lang: string): string => {
     }
     return text;
   }
-  // AR UI: try to translate english phrases
-  const npkMatch = text.match(/Based on your soil's NPK \(([^)]+)\), it is classified as (\w+)/i);
+  // AR UI: strip embedded English to keep only Arabic
+  let out = text;
+  const npkMatch = out.match(/Based on your soil's NPK \(([^)]+)\), it is classified as (\w+)/i);
   if (npkMatch) {
     const soilNames: Record<string, string> = { sandy: "رملية", loamy: "طينية رملية", clay: "طينية", silty: "طميية", peaty: "خثية", chalky: "كلسية", saline: "ملحية" };
-    return `بناءً على قيم NPK للتربة (${npkMatch[1]})، تم تصنيفها كتربة ${soilNames[npkMatch[2].toLowerCase()] || npkMatch[2]}.`;
+    out = `بناءً على قيم NPK للتربة (${npkMatch[1]})، تم تصنيفها كتربة ${soilNames[npkMatch[2].toLowerCase()] || npkMatch[2]}.`;
+  } else {
+    out = out.replace(/Based on your soil/gi, "بناءً على تربتك").replace(/it is classified as/gi, "تم تصنيفها كـ");
   }
-  return text.replace(/Based on your soil/gi, "بناءً على تربتك").replace(/it is classified as/gi, "تم تصنيفها كـ");
+  // If still mixed, drop remaining English words
+  if (containsArabic(out) && containsLatin(out)) {
+    const stripped = stripEnglish(out);
+    if (stripped) out = stripped;
+  }
+  return out;
 };
 
 const SoilAnalysis = () => {
@@ -134,7 +142,11 @@ const SoilAnalysis = () => {
             const fertilityMap: Record<string, string> = { high: t("soil.fertility.high"), medium: t("soil.fertility.medium"), low: t("soil.fertility.low") };
             const cleanLangVal = (v: string | undefined) => {
               if (!v) return v;
-              if (language !== "ar" && containsArabic(v)) return stripArabic(v) || v;
+              if (language === "ar") {
+                if (containsArabic(v) && containsLatin(v)) return stripEnglish(v) || v;
+                return v;
+              }
+              if (containsArabic(v)) return stripArabic(v) || v;
               return v;
             };
             const soilType = soilTypeRaw ? cleanLangVal(soilTypeMap[soilTypeRaw.toLowerCase()] || soilTypeRaw) : undefined;
