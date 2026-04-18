@@ -43,6 +43,7 @@ const Login = () => {
           name: data.user.name,
           email: data.user.email,
           role: data.user.role,
+          phone: data.user.phone || undefined,
           avatar_url: avatarUrl || undefined,
           created_at: data.user.created_at || new Date().toISOString(),
         });
