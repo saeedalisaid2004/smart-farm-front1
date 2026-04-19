@@ -208,8 +208,8 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                           </button>
                         )}
                         {notifications.length > 0 && (
-                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
-                            <XCircle className="w-3 h-3" />
+                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1" title="Clear all">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -340,8 +340,8 @@ const DashboardLayout = ({ children, title }: DashboardLayoutProps) => {
                           </button>
                         )}
                         {notifications.length > 0 && (
-                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1">
-                            <XCircle className="w-3 h-3" />
+                          <button onClick={clearAll} className="text-xs text-destructive hover:underline flex items-center gap-1" title="Clear all">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
