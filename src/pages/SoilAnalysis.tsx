@@ -57,7 +57,7 @@ const SoilAnalysis = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await analyzeSoil(userId, { ph: parseFloat(ph), moisture: parseFloat(moisture), n: parseFloat(n), p: parseFloat(p), k: parseFloat(k) });
+      const data = await analyzeSoil(userId, { ph: parseFloat(ph), moisture: parseFloat(moisture), n: parseFloat(n), p: parseFloat(p), k: parseFloat(k) }, language);
       setResult(data);
       const nested = data?.["Analysis Result"] || data?.result || data;
       const soilType = nested?.["Soil Type"] || nested?.detected_soil_type || data?.soil_type || data?.prediction || "Analyzed";

@@ -33,7 +33,7 @@ const FruitQuality = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await analyzeFruit(userId, file);
+      const data = await analyzeFruit(userId, file, language);
       setResult(data);
       
       incrementAnalysis("fruit_quality");
