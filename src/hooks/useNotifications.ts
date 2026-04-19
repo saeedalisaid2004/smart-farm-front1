@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   getUserNotifications,
   markNotificationAsRead,
@@ -8,6 +8,20 @@ import {
   getExternalUserId,
   getNotificationSettings,
 } from "@/services/smartFarmApi";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
+
+const localizeText = (text: string | null | undefined, lang: "en" | "ar"): string => {
+  if (!text) return text ?? "";
+  if (typeof text !== "string") return String(text);
+  if (lang === "ar") {
+    if (containsArabic(text) && containsLatin(text)) return stripEnglish(text) || text;
+    return text;
+  }
+  // en: strip arabic if mixed
+  if (containsArabic(text) && containsLatin(text)) return stripArabic(text) || text;
+  return text;
+};
 
 export interface Notification {
   id: string;
@@ -19,6 +33,7 @@ export interface Notification {
 }
 
 export function useNotifications() {
+  const { language } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
@@ -81,9 +96,15 @@ export function useNotifications() {
     return () => window.removeEventListener("notifications-updated", handler);
   }, [fetchNotifications]);
 
-  const sorted = [...notifications].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  const sorted = useMemo(() => {
+    return [...notifications]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .map((n) => ({
+        ...n,
+        title: localizeText(n.title, language),
+        description: localizeText(n.description, language),
+      }));
+  }, [notifications, language]);
 
   const unreadCount = sorted.filter((n) => !n.is_read).length;
 
