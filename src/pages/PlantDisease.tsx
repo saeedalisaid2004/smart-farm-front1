@@ -98,9 +98,7 @@ const PlantDisease = () => {
 
             const cropDisplay = formatBi(a.crop_type_ar || a.crop_type_en || a.crop_type || a.crop || "");
             const diseaseDisplay = formatBi(a.disease_name || a.disease_ar || a.disease_en || a.disease || condition || "");
-            const messageDisplay = language === "ar"
-              ? cleanByLang(a.message, "ar")
-              : (a.message ? stripArabic(a.message).replace(/\s+[-–—]\s+/g, " ").replace(/\s{2,}/g, " ").trim() : "");
+            const messageDisplay = a.message || "";
             const treatmentsRaw: string[] = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
             const treatments = treatmentsRaw.map(formatBi).filter(Boolean);
 
