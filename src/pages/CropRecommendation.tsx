@@ -14,13 +14,21 @@ import { incrementAnalysis } from "@/services/analysisStats";
 import AnalysisResultCard, { ErrorResult, StaggerItem } from "@/components/AnalysisResultCard";
 import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
 
+const hasMeaningfulText = (s: string) => /[A-Za-z\u0600-\u06FF]/.test(s);
+
 const cleanByLang = (v: any, lang: string) => {
   if (typeof v !== "string" || !v) return v;
   if (lang === "ar") {
-    if (containsArabic(v) && containsLatin(v)) return stripEnglish(v) || v;
+    if (containsArabic(v) && containsLatin(v)) {
+      const stripped = stripEnglish(v);
+      return stripped && hasMeaningfulText(stripped) ? stripped : v;
+    }
     return v;
   }
-  if (containsArabic(v)) return stripArabic(v) || v;
+  if (containsArabic(v)) {
+    const stripped = stripArabic(v);
+    return stripped && hasMeaningfulText(stripped) ? stripped : v;
+  }
   return v;
 };
 
