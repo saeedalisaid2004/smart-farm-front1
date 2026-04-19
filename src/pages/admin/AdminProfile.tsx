@@ -97,6 +97,12 @@ const AdminProfile = () => {
     try {
       await apiSaveSettings(userId, { full_name: editName, email: editEmail, phone: editPhone });
       setUser({ ...user, name: editName, email: editEmail });
+      try {
+        const key = currentUserId ? `admin_settings_${currentUserId}` : "admin_settings";
+        const stored = localStorage.getItem(key);
+        const parsed = stored ? JSON.parse(stored) : {};
+        localStorage.setItem(key, JSON.stringify({ ...parsed, phone: editPhone }));
+      } catch {}
       setEditing(false);
       toast({ title: "Profile updated successfully" });
     } catch {
