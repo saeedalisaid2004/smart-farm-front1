@@ -22,6 +22,79 @@ const localizeText = (text: string | null | undefined, lang: "en" | "ar"): strin
   return text;
 };
 
+// ============ Admin notification translation ============
+const SERVICE_MAP: Record<string, { en: string; ar: string }> = {
+  plant: { en: "Plant Disease Detection", ar: "تشخيص أمراض النبات" },
+  animal: { en: "Animal Weight Estimation", ar: "تقدير وزن الحيوان" },
+  crop: { en: "Crop Recommendation", ar: "توصية المحاصيل" },
+  soil: { en: "Soil Analysis", ar: "تحليل التربة" },
+  fruit: { en: "Fruit Quality Analysis", ar: "تحليل جودة الفاكهة" },
+  chat: { en: "Smart Farm Chatbot", ar: "روبوت الدردشة" },
+};
+
+const findService = (text: string): { en: string; ar: string } | null => {
+  const lower = text.toLowerCase();
+  for (const key of Object.keys(SERVICE_MAP)) {
+    if (lower.includes(key)) return SERVICE_MAP[key];
+  }
+  return null;
+};
+
+const STATUS_WORDS = {
+  enabled: { en: "enabled", ar: "تم التفعيل" },
+  disabled: { en: "disabled", ar: "تم الإيقاف" },
+  online: { en: "online", ar: "يعمل الآن" },
+  offline: { en: "offline", ar: "متوقفة الآن" },
+  active: { en: "active", ar: "نشطة" },
+  inactive: { en: "inactive", ar: "غير نشطة" },
+};
+
+const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"): string => {
+  if (!text) return text ?? "";
+  let out = String(text);
+  const lower = out.toLowerCase();
+
+  const svc = findService(out);
+
+  let status: keyof typeof STATUS_WORDS | null = null;
+  for (const k of Object.keys(STATUS_WORDS) as (keyof typeof STATUS_WORDS)[]) {
+    if (lower.includes(k)) { status = k; break; }
+  }
+
+  if (svc && status) {
+    return lang === "ar"
+      ? `${svc.ar} — ${STATUS_WORDS[status].ar}`
+      : `${svc.en} — ${STATUS_WORDS[status].en}`;
+  }
+
+  if (svc) {
+    if (lang === "ar") out = out.replace(new RegExp(svc.en, "ig"), svc.ar);
+    else out = out.replace(svc.ar, svc.en);
+  }
+
+  for (const k of Object.keys(STATUS_WORDS) as (keyof typeof STATUS_WORDS)[]) {
+    const w = STATUS_WORDS[k];
+    if (lang === "ar") out = out.replace(new RegExp(`\\b${w.en}\\b`, "ig"), w.ar);
+    else out = out.replace(new RegExp(w.ar, "g"), w.en);
+  }
+
+  const KEYWORDS: Array<[RegExp, string, string]> = [
+    [/\bservice\b/ig, "service", "الخدمة"],
+    [/\bsetting\b/ig, "setting", "الإعداد"],
+    [/\bmodel\b/ig, "model", "النموذج"],
+    [/\bsystem\b/ig, "system", "النظام"],
+    [/\bnew message\b/ig, "new message", "رسالة جديدة"],
+    [/\balert\b/ig, "alert", "تنبيه"],
+    [/\bupdated\b/ig, "updated", "تم التحديث"],
+  ];
+  for (const [re, en, ar] of KEYWORDS) {
+    if (lang === "ar") out = out.replace(re, ar);
+    else out = out.replace(new RegExp(ar, "g"), en);
+  }
+
+  return out.replace(/\s+/g, " ").trim();
+};
+
 export interface Notification {
   id: string;
   title: string;
