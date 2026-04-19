@@ -86,14 +86,25 @@ export function useNotifications() {
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(() => fetchNotifications(), 30000);
+    return () => clearInterval(interval);
   }, [fetchNotifications]);
 
   useEffect(() => {
     const handler = () => {
       setTimeout(() => fetchNotifications(), 500);
     };
+    const visibilityHandler = () => {
+      if (document.visibilityState === "visible") fetchNotifications();
+    };
     window.addEventListener("notifications-updated", handler);
-    return () => window.removeEventListener("notifications-updated", handler);
+    window.addEventListener("focus", handler);
+    document.addEventListener("visibilitychange", visibilityHandler);
+    return () => {
+      window.removeEventListener("notifications-updated", handler);
+      window.removeEventListener("focus", handler);
+      document.removeEventListener("visibilitychange", visibilityHandler);
+    };
   }, [fetchNotifications]);
 
   const sorted = useMemo(() => {
