@@ -166,8 +166,8 @@ const matchesRole = (n: any, role: Role): boolean => {
   if (explicit === "admin" || explicit === "farmer") return explicit === role;
 
   const serviceType = (n.service_type || "").toString().toLowerCase();
-  if (serviceType === "admin_alert" || serviceType === "system") return role === "admin";
-  if (serviceType === "farmer_alert") return role === "farmer";
+  if (serviceType === "admin_alert") return role === "admin";
+  if (serviceType === "farmer_alert" || serviceType === "system") return role === "farmer";
 
   const type = (n.type || "").toString().toLowerCase();
   if (type.startsWith("admin_") || type.startsWith("admin-")) return role === "admin";
