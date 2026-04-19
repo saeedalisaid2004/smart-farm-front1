@@ -96,9 +96,15 @@ export function useNotifications() {
     return () => window.removeEventListener("notifications-updated", handler);
   }, [fetchNotifications]);
 
-  const sorted = [...notifications].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  const sorted = useMemo(() => {
+    return [...notifications]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .map((n) => ({
+        ...n,
+        title: localizeText(n.title, language),
+        description: localizeText(n.description, language),
+      }));
+  }, [notifications, language]);
 
   const unreadCount = sorted.filter((n) => !n.is_read).length;
 
