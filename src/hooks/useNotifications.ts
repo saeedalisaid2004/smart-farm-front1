@@ -7,6 +7,11 @@ import {
   deleteAllNotifications,
   getExternalUserId,
   getNotificationSettings,
+  getLocalNotifications,
+  deleteLocalNotification,
+  markLocalNotificationRead,
+  markAllLocalNotificationsRead,
+  clearAllLocalNotifications,
 } from "@/services/smartFarmApi";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/textLang";
@@ -30,6 +35,7 @@ export interface Notification {
   type: string;
   is_read: boolean;
   created_at: string;
+  __source?: "local" | "external";
 }
 
 type Role = "admin" | "farmer";
@@ -95,16 +101,34 @@ export function useNotifications(role: Role = "farmer") {
         return;
       }
 
-      const data = await getUserNotifications(userId);
-      const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-      const filtered = raw.filter((n: any) => matchesRole(n, role));
-      const list: Notification[] = filtered.map((n: any) => ({
+      // Fetch from BOTH sources in parallel: external API + local (admin-only events like service toggles)
+      const [externalRes, localRes] = await Promise.allSettled([
+        getUserNotifications(userId),
+        getLocalNotifications(userId),
+      ]);
+
+      const externalData = externalRes.status === "fulfilled" ? externalRes.value : null;
+      const localData = localRes.status === "fulfilled" ? localRes.value : [];
+
+      const externalRaw = Array.isArray(externalData)
+        ? externalData
+        : externalData?.notifications || externalData?.data || [];
+      const localRaw = Array.isArray(localData) ? localData : [];
+
+      // Tag local notifications so we know they belong to local store (for delete/mark-read routing)
+      const taggedLocal = localRaw.map((n: any) => ({ ...n, __source: "local" }));
+      const taggedExternal = externalRaw.map((n: any) => ({ ...n, __source: "external" }));
+
+      const combined = [...taggedLocal, ...taggedExternal].filter((n: any) => matchesRole(n, role));
+
+      const list: Notification[] = combined.map((n: any) => ({
         id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
         title: stripRolePrefix(n.title) || "Notification",
         description: stripRolePrefix(n.description ?? n.message ?? null),
         type: n.type ?? "info",
         is_read: n.is_read ?? n.read ?? false,
         created_at: n.created_at ?? n.date ?? new Date().toISOString(),
+        __source: n.__source,
       }));
 
       setNotifications(list);
@@ -151,37 +175,55 @@ export function useNotifications(role: Role = "farmer") {
   const unreadCount = sorted.filter((n) => !n.is_read).length;
 
   const markAsRead = useCallback(async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+    const userId = getExternalUserId();
     try {
-      await markNotificationAsRead(id);
+      if (target?.__source === "local" && userId) {
+        await markLocalNotificationRead(userId, id);
+      } else {
+        await markNotificationAsRead(id);
+      }
     } catch {}
-  }, []);
+  }, [notifications]);
 
   const markAllAsRead = useCallback(async () => {
     const userId = getExternalUserId();
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     if (userId) {
       try {
-        await markAllNotificationsAsRead(userId);
+        await Promise.allSettled([
+          markAllNotificationsAsRead(userId),
+          markAllLocalNotificationsRead(userId),
+        ]);
       } catch {}
     }
   }, []);
 
   const deleteNotification = useCallback(async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    const userId = getExternalUserId();
     try {
-      await apiDeleteNotification(id);
+      if (target?.__source === "local" && userId) {
+        await deleteLocalNotification(userId, id);
+      } else {
+        await apiDeleteNotification(id);
+      }
     } catch {}
-  }, []);
+  }, [notifications]);
 
   const clearAll = useCallback(async () => {
     const userId = getExternalUserId();
     setNotifications([]);
     if (userId) {
       try {
-        await deleteAllNotifications(userId);
+        await Promise.allSettled([
+          deleteAllNotifications(userId),
+          clearAllLocalNotifications(userId),
+        ]);
       } catch {}
     }
   }, []);
