@@ -43,42 +43,8 @@ const PlantDisease = () => {
     if (!userId) { toast({ variant: "destructive", title: "Please login first" }); return; }
     setLoading(true);
     try {
-      if (language === "ar") {
-        const [enData, arData] = await Promise.all([
-          detectPlantDisease(userId, file, "en"),
-          detectPlantDisease(userId, file, "ar"),
-        ]);
-        const enA = enData?.analysis || enData || {};
-        const arA = arData?.analysis || arData || {};
-        setResult({
-          ...enData,
-          analysis: {
-            ...enA,
-            ...arA,
-            condition: enA.condition || arA.condition,
-            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
-            disease_ar: arA.disease_ar || arA.disease || arA.condition || arA.prediction,
-            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
-            crop_type_ar: arA.crop_type_ar || arA.crop_type || arA.crop,
-            message: arA.message || enA.message,
-            suggested_treatments: arA.suggested_treatments?.length ? arA.suggested_treatments : enA.suggested_treatments,
-            confidence: enA.confidence ?? arA.confidence,
-          },
-        });
-      } else {
-        const enData = await detectPlantDisease(userId, file, "en");
-        const enA = enData?.analysis || enData || {};
-        setResult({
-          ...enData,
-          analysis: {
-            ...enA,
-            disease_en: enA.disease_en || enA.disease || enA.condition || enA.prediction,
-            crop_type_en: enA.crop_type_en || enA.crop_type || enA.crop,
-            disease_ar: undefined,
-            crop_type_ar: undefined,
-          },
-        });
-      }
+      const data = await detectPlantDisease(userId, file, language);
+      setResult(data);
       incrementAnalysis("plant_disease");
     } catch { toast({ variant: "destructive", title: "Analysis failed", description: "Please try again" }); }
     finally { setLoading(false); }
@@ -108,41 +74,35 @@ const PlantDisease = () => {
             const confidenceRaw = a.confidence;
             const confidenceNum = confidenceRaw ? parseFloat(String(confidenceRaw)) : null;
             const variant = isHealthy ? "primary" as const : "destructive" as const;
-            const cropNameEnRaw = a.crop_type_en || "";
-            const cropNameArRaw = a.crop_type_ar || "";
-            const cropEnOnly = stripArabic(cropNameEnRaw) || stripArabic(cropNameArRaw);
-            const cropArOnly = containsArabic(cropNameArRaw) ? stripEnglish(cropNameArRaw) : (containsArabic(cropNameEnRaw) ? stripEnglish(cropNameEnRaw) : "");
-            const cropDisplay = language === "ar"
-              ? (cropArOnly && cropEnOnly ? `${cropArOnly} (${cropEnOnly})` : (cropArOnly || cropEnOnly))
-              : cropEnOnly;
-            const diseaseEnRaw = a.disease_en || a.disease || a.prediction || a.label || "";
-            const diseaseArRaw = a.disease_ar || "";
-            // Prefer the latin part from the EN endpoint; fallback to stripping arabic from any field
-            const pickEn = (s: string) => {
-              if (!s) return "";
-              const stripped = stripArabic(s).replace(/^[\s\-—–•:.,()[\]]+|[\s\-—–•:.,()[\]]+$/g, "").trim();
-              return stripped;
+
+            // API returns "arabic - english" or "english - arabic" in single fields
+            const splitBilingual = (raw: string): { ar: string; en: string } => {
+              if (!raw || typeof raw !== "string") return { ar: "", en: "" };
+              const parts = raw.split(/\s+[-–—]\s+/).map(p => p.trim()).filter(Boolean);
+              let ar = "", en = "";
+              for (const p of parts) {
+                if (containsArabic(p) && !ar) ar = stripEnglish(p) || p;
+                else if (containsLatin(p) && !en) en = stripArabic(p).trim() || p;
+              }
+              if (!ar && !en) {
+                if (containsArabic(raw)) ar = stripEnglish(raw) || raw;
+                if (containsLatin(raw)) en = stripArabic(raw).trim() || raw;
+              }
+              return { ar, en };
             };
-            const diseaseEnOnly = pickEn(diseaseEnRaw) || pickEn(diseaseArRaw) || pickEn(condition);
-            const diseaseArOnly = containsArabic(diseaseArRaw) ? stripEnglish(diseaseArRaw) : (containsArabic(diseaseEnRaw) ? stripEnglish(diseaseEnRaw) : (containsArabic(condition) ? stripEnglish(condition) : ""));
-            const diseaseDisplay = language === "ar"
-              ? (diseaseArOnly && diseaseEnOnly ? `${diseaseArOnly} (${diseaseEnOnly})` : (diseaseArOnly || diseaseEnOnly))
-              : diseaseEnOnly;
+            const formatBi = (raw: string): string => {
+              const { ar, en } = splitBilingual(raw);
+              if (language === "ar") return ar && en ? `${ar} (${en})` : (ar || en);
+              return en || ar;
+            };
+
+            const cropDisplay = formatBi(a.crop_type_ar || a.crop_type_en || a.crop_type || a.crop || "");
+            const diseaseDisplay = formatBi(a.disease_name || a.disease_ar || a.disease_en || a.disease || condition || "");
             const messageDisplay = language === "ar"
               ? cleanByLang(a.message, "ar")
-              : (a.message && !containsArabic(a.message) ? a.message : "");
+              : (a.message ? stripArabic(a.message).replace(/\s+[-–—]\s+/g, " ").replace(/\s{2,}/g, " ").trim() : "");
             const treatmentsRaw: string[] = a.suggested_treatments?.length ? a.suggested_treatments : (a.treatment ? [a.treatment] : []);
-            const formatTreatment = (tt: string): string => {
-              if (typeof tt !== "string") return "";
-              const enPart = stripArabic(tt).replace(/^[\s\-—–•:.,]+|[\s\-—–•:.,]+$/g, "").trim();
-              const arPart = containsArabic(tt) ? stripEnglish(tt) : "";
-              if (language === "ar") {
-                if (arPart && enPart) return `${arPart} (${enPart})`;
-                return arPart || enPart;
-              }
-              return enPart;
-            };
-            const treatments = treatmentsRaw.map(formatTreatment).filter(Boolean);
+            const treatments = treatmentsRaw.map(formatBi).filter(Boolean);
 
             return (
               <AnalysisResultCard key="res" title="Analysis Result" statusColor={variant}>
