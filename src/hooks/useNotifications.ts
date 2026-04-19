@@ -51,7 +51,8 @@ const STATUS_WORDS = {
 
 const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"): string => {
   if (!text) return text ?? "";
-  let out = String(text).trim();
+  const original = String(text).trim();
+  let out = original;
 
   // ===== Specific API patterns =====
   if (lang === "en") {
@@ -83,7 +84,10 @@ const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"):
       "Service $1 is back online"
     );
 
-    // Generic standalone phrases (fallback)
+    // If a specific pattern matched, return early to keep model names intact
+    if (out !== original) return out.replace(/\s+/g, " ").trim();
+
+    // Generic standalone phrases (fallback only when no specific match)
     out = out.replace(/متوقفة\s*حالياً\s*للصيانة/g, "currently down for maintenance");
     out = out.replace(/عادت\s*للعمل\s*الآن/g, "back online");
     out = out.replace(/نحيطكم\s*علماً\s*بأن\s*/g, "Please be informed that ");
@@ -92,7 +96,7 @@ const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"):
     out = out.replace(/تم\s*إيقاف/g, "disabled");
     out = out.replace(/خدمة/g, "service");
   } else {
-    // English → Arabic reverse mapping
+    // Arabic mode: API already returns Arabic. Only translate English → Arabic if needed.
     out = out.replace(/Services\s*Alert/g, "تنبيه الخدمات");
     out = out.replace(/^System\s*update\s*:?\s*/i, "تحديث نظام: ");
     out = out.replace(
@@ -111,26 +115,19 @@ const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"):
       /Service\s+(.+?)\s+is\s+back\s+online/i,
       "نحيطكم علماً بأن خدمة $1 عادت للعمل الآن"
     );
+
+    // In Arabic mode, never run the generic service-name replacement
+    // (it would replace model identifiers like "Plant-CNN-v2.3" with full Arabic service names)
+    return out.replace(/\s+/g, " ").trim();
   }
 
-  // ===== Generic service/status fallback =====
-  const lower = out.toLowerCase();
+  // ===== Generic service/status fallback (English mode only, no specific match) =====
   const svc = findService(out);
-
-  let status: keyof typeof STATUS_WORDS | null = null;
-  for (const k of Object.keys(STATUS_WORDS) as (keyof typeof STATUS_WORDS)[]) {
-    if (lower.includes(k)) { status = k; break; }
-  }
-
-  if (svc) {
-    if (lang === "ar") out = out.replace(new RegExp(svc.en, "ig"), svc.ar);
-    else out = out.replace(svc.ar, svc.en);
-  }
+  if (svc) out = out.replace(svc.ar, svc.en);
 
   for (const k of Object.keys(STATUS_WORDS) as (keyof typeof STATUS_WORDS)[]) {
     const w = STATUS_WORDS[k];
-    if (lang === "ar") out = out.replace(new RegExp(`\\b${w.en}\\b`, "ig"), w.ar);
-    else out = out.replace(new RegExp(w.ar, "g"), w.en);
+    out = out.replace(new RegExp(w.ar, "g"), w.en);
   }
 
   const KEYWORDS: Array<[RegExp, string, string]> = [
@@ -143,8 +140,7 @@ const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"):
     [/\bupdated\b/ig, "updated", "تم التحديث"],
   ];
   for (const [re, en, ar] of KEYWORDS) {
-    if (lang === "ar") out = out.replace(re, ar);
-    else out = out.replace(new RegExp(ar, "g"), en);
+    out = out.replace(new RegExp(ar, "g"), en);
   }
 
   return out.replace(/\s+/g, " ").trim();
