@@ -327,11 +327,8 @@ export const activateUser = async (userId: number) => {
 };
 
 export const promoteToAdmin = async (email: string) => {
-  const res = await fetchWithTimeout(`${API_BASE}/admin/users/promote-to-admin`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded({ email }),
-  });
+  const url = `${API_BASE}/admin/users/promote-to-admin?email=${encodeURIComponent(email)}`;
+  const res = await fetchWithTimeout(url, { method: "POST" });
   return res.json();
 };
 
