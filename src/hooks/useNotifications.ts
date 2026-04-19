@@ -33,6 +33,7 @@ export interface Notification {
 }
 
 export function useNotifications() {
+  const { language } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
