@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiSaveSettings, getExternalUserId } from "@/services/smartFarmApi";
 import { uploadAvatar, getSavedAvatarUrl, removeAvatar } from "@/services/avatarService";
@@ -51,18 +51,9 @@ const AdminProfile = () => {
   const [editName, setEditName] = useState(userName);
   const [editEmail, setEditEmail] = useState(userEmail);
   const currentUserId = getExternalUserId() || user?.id;
-  const getStoredPhone = () => {
-    try {
-      const key = currentUserId ? `admin_settings_${currentUserId}` : "admin_settings";
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.phone && parsed.phone !== "+1234567890") return parsed.phone;
-      }
-    } catch {}
-    return "";
-  };
-  const [editPhone, setEditPhone] = useState(getStoredPhone());
+  const [editPhone, setEditPhone] = useState(user?.phone || "");
+
+  useEffect(() => { setEditPhone(user?.phone || ""); }, [user?.phone]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
