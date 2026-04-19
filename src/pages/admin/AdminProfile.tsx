@@ -53,9 +53,7 @@ const AdminProfile = () => {
   const currentUserId = getExternalUserId() || user?.id;
   const [editPhone, setEditPhone] = useState(user?.phone || "");
 
-  // Sync phone when user data loads/changes (e.g., after login response)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useState(() => { if (user?.phone) setEditPhone(user.phone); });
+  useEffect(() => { setEditPhone(user?.phone || ""); }, [user?.phone]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
