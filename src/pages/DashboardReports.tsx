@@ -277,7 +277,6 @@ const DashboardReports = () => {
                         rel="noopener noreferrer"
                         className="w-full py-3 border-t border-border text-sm text-muted-foreground hover:bg-secondary transition-colors flex items-center justify-center gap-2"
                       >
-                        <Download className="w-4 h-4" />
                         {t("reports.download")}
                       </a>
                     )}
