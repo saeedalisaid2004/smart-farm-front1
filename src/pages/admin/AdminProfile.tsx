@@ -51,18 +51,11 @@ const AdminProfile = () => {
   const [editName, setEditName] = useState(userName);
   const [editEmail, setEditEmail] = useState(userEmail);
   const currentUserId = getExternalUserId() || user?.id;
-  const getStoredPhone = () => {
-    try {
-      const key = currentUserId ? `admin_settings_${currentUserId}` : "admin_settings";
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.phone && parsed.phone !== "+1234567890") return parsed.phone;
-      }
-    } catch {}
-    return "";
-  };
-  const [editPhone, setEditPhone] = useState(getStoredPhone());
+  const [editPhone, setEditPhone] = useState(user?.phone || "");
+
+  // Sync phone when user data loads/changes (e.g., after login response)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useState(() => { if (user?.phone) setEditPhone(user.phone); });
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
