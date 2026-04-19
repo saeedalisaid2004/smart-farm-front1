@@ -16,6 +16,37 @@ import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/
 
 const hasMeaningfulText = (s: string) => /[A-Za-z\u0600-\u06FF]/.test(s);
 
+// Arabic → English dictionary for daily guide & crop values
+const arToEn: Record<string, string> = {
+  // Crops
+  "الطماطم": "Tomato", "الفلفل": "Pepper", "الذرة": "Corn", "القمح": "Wheat",
+  "الأرز": "Rice", "الشعير": "Barley", "الخيار": "Cucumber", "البطاطس": "Potato",
+  "البصل": "Onion", "الثوم": "Garlic", "الفول": "Beans", "العدس": "Lentils",
+  "القطن": "Cotton", "السمسم": "Sesame", "البطيخ": "Watermelon", "الباذنجان": "Eggplant",
+  // Weather
+  "سماء صافية": "Clear sky", "غائم جزئياً": "Partly cloudy", "غائم": "Cloudy",
+  "ممطر": "Rainy", "عاصف": "Stormy", "ضباب": "Foggy", "حار": "Hot", "بارد": "Cold",
+  // Irrigation
+  "ري معتدل": "Moderate Irrigation", "ري خفيف": "Light Irrigation",
+  "ري كثيف": "Heavy Irrigation", "لا حاجة للري": "No Irrigation Needed",
+  // Fertilizer
+  "مناسب للتسميد": "Suitable for Fertilizing", "غير مناسب للتسميد": "Not Suitable for Fertilizing",
+  "تسميد خفيف": "Light Fertilizing", "تسميد كثيف": "Heavy Fertilizing",
+  // Disease
+  "حالة مستقرة": "Stable Condition", "خطر منخفض": "Low Risk",
+  "خطر متوسط": "Medium Risk", "خطر عالي": "High Risk", "تنبيه": "Alert",
+  // General
+  "الجو مستقر": "Weather is stable", "الجو غير مستقر": "Weather is unstable",
+};
+
+const translateAr = (s: string): string => {
+  let out = s;
+  Object.entries(arToEn).forEach(([ar, en]) => {
+    out = out.split(ar).join(en);
+  });
+  return out;
+};
+
 const cleanByLang = (v: any, lang: string) => {
   if (typeof v !== "string" || !v) return v;
   if (lang === "ar") {
@@ -25,14 +56,17 @@ const cleanByLang = (v: any, lang: string) => {
     }
     return v;
   }
-  if (containsArabic(v)) {
-    const stripped = stripArabic(v);
-    return stripped && hasMeaningfulText(stripped) ? stripped : v;
+  // English UI: translate Arabic words first, then strip remaining Arabic
+  let translated = translateAr(v);
+  if (containsArabic(translated)) {
+    const stripped = stripArabic(translated);
+    translated = stripped && hasMeaningfulText(stripped) ? stripped : translated;
   }
-  return v;
+  return translated;
 };
 
 const soilMap: Record<string, string> = { clay: "طينية", sandy: "رملية", loamy: "طميية" };
+
 
 const CropRecommendation = () => {
   const { t, language } = useLanguage();
