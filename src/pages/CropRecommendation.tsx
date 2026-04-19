@@ -187,9 +187,9 @@ const CropRecommendation = () => {
                               const displayVal = cleanByLang(val, language);
                               return (
                                 <div key={j} className="flex items-center gap-2">
-                                  <Ic className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                  <span className="text-muted-foreground">{label}:</span>
-                                  <span className="text-foreground font-medium" dir="auto">{displayVal}</span>
+                                  <Ic className="w-3.5 h-3.5 text-primary shrink-0" />
+                                  <span className="text-foreground/80 font-medium">{label}:</span>
+                                  <span className="text-foreground font-semibold" dir="auto">{displayVal}</span>
                                 </div>
                               );
                             })}
