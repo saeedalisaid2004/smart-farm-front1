@@ -8,7 +8,7 @@ import {
   getSystemStatus, getSystemSettings, getModelsTable,
   toggleService as apiToggleService, toggleSystemSetting as apiToggleSystemSetting,
 } from "@/services/smartFarmApi";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 // Map module key -> matcher used against model name returned by /admin/system/ai-models
 const SERVICE_MODEL_MATCHERS: Array<{ module: string; match: (name: string) => boolean }> = [
@@ -34,7 +34,7 @@ const buildModelStatusMap = (modelsList: any[]): Record<string, boolean> => {
 
 const AdminSystem = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  
   const [loading, setLoading] = useState(true);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
