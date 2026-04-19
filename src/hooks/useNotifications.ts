@@ -166,8 +166,8 @@ const matchesRole = (n: any, role: Role): boolean => {
   if (explicit === "admin" || explicit === "farmer") return explicit === role;
 
   const serviceType = (n.service_type || "").toString().toLowerCase();
-  if (serviceType === "admin_alert" || serviceType === "system") return role === "admin";
-  if (serviceType === "farmer_alert") return role === "farmer";
+  if (serviceType === "admin_alert") return role === "admin";
+  if (serviceType === "farmer_alert" || serviceType === "system") return role === "farmer";
 
   const type = (n.type || "").toString().toLowerCase();
   if (type.startsWith("admin_") || type.startsWith("admin-")) return role === "admin";
@@ -275,12 +275,11 @@ export function useNotifications(role: Role = "farmer") {
         let title: string;
         let description: string | null;
         if (role === "admin") {
-          // Use translateAdminText only (no localizeText — it would strip model names like "Soil-DL-v2.0")
           title = translateAdminText(n.title, language);
           description = n.description ? translateAdminText(n.description, language) : n.description;
         } else {
-          title = localizeText(n.title, language);
-          description = localizeText(n.description, language);
+          title = translateAdminText(n.title, language);
+          description = n.description ? translateAdminText(n.description, language) : n.description;
         }
         return { ...n, title, description };
       });
