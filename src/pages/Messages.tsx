@@ -83,11 +83,11 @@ const Messages = () => {
         body: {
           action: "create",
           user_id: "2",
-          title: language === "ar" ? "رسالة جديدة 📩" : "New Message 📩",
+          title: language === "ar" ? "[admin] رسالة جديدة 📩" : "[admin] New Message 📩",
           description: language === "ar"
             ? `رسالة جديدة من ${userName}: "${subject}"`
             : `New message from ${userName}: "${subject}"`,
-          type: "info",
+          type: "admin_new_message",
         },
       }).catch(() => {});
 
