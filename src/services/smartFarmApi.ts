@@ -150,38 +150,40 @@ export const detectPlantDisease = async (userId: number, image: File, lang: stri
   return res.json();
 };
 
-export const estimateAnimalWeight = async (userId: number, image: File) => {
-  const fd = toFormData({ user_id: userId, image });
+export const estimateAnimalWeight = async (userId: number, image: File, lang: string = "ar") => {
+  const fd = toFormData({ user_id: userId, image, lang });
   const res = await fetchWithTimeout(`${API_BASE}/animals/estimate-weight`, { method: "POST", body: fd });
   return res.json();
 };
 
 export const recommendCrop = async (
   userId: number,
-  params: { city_name: string; soil: string }
+  params: { city_name: string; soil: string },
+  lang: string = "ar"
 ) => {
   const res = await fetchWithTimeout(`${API_BASE}/crops/recommend-smart-expert`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded({ user_id: userId, ...params }),
+    body: toUrlEncoded({ user_id: userId, ...params, lang }),
   });
   return res.json();
 };
 
 export const analyzeSoil = async (
   userId: number,
-  params: { ph: number; moisture: number; n: number; p: number; k: number }
+  params: { ph: number; moisture: number; n: number; p: number; k: number },
+  lang: string = "ar"
 ) => {
   const res = await fetchWithTimeout(`${API_BASE}/soil/analyze-soil`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded({ user_id: userId, ...params }),
+    body: toUrlEncoded({ user_id: userId, ...params, lang }),
   });
   return res.json();
 };
 
-export const analyzeFruit = async (userId: number, image: File) => {
-  const fd = toFormData({ user_id: userId, image });
+export const analyzeFruit = async (userId: number, image: File, lang: string = "ar") => {
+  const fd = toFormData({ user_id: userId, image, lang });
   const res = await fetchWithTimeout(`${API_BASE}/fruits/analyze-fruit`, { method: "POST", body: fd });
   return res.json();
 };
