@@ -220,12 +220,16 @@ export function useNotifications(role: Role = "farmer") {
   const sorted = useMemo(() => {
     return [...notifications]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .map((n) => ({
-        ...n,
-        title: localizeText(n.title, language),
-        description: localizeText(n.description, language),
-      }));
-  }, [notifications, language]);
+      .map((n) => {
+        let title = localizeText(n.title, language);
+        let description = localizeText(n.description, language);
+        if (role === "admin") {
+          title = translateAdminText(title, language);
+          description = translateAdminText(description, language);
+        }
+        return { ...n, title, description };
+      });
+  }, [notifications, language, role]);
 
   const unreadCount = sorted.filter((n) => !n.is_read).length;
 
