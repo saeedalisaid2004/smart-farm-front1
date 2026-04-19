@@ -276,11 +276,17 @@ export function useNotifications(role: Role = "farmer") {
     return [...notifications]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .map((n) => {
-        let title = localizeText(n.title, language);
-        let description = localizeText(n.description, language);
+        let title: string;
+        let description: string | null;
         if (role === "admin") {
-          title = translateAdminText(title, language);
-          description = translateAdminText(description, language);
+          // Translate first on the RAW text, then localize any leftover mixed segments
+          title = localizeText(translateAdminText(n.title, language), language);
+          description = n.description
+            ? localizeText(translateAdminText(n.description, language), language)
+            : n.description;
+        } else {
+          title = localizeText(n.title, language);
+          description = localizeText(n.description, language);
         }
         return { ...n, title, description };
       });
