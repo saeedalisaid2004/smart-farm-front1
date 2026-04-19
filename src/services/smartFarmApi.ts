@@ -402,6 +402,32 @@ export const getModelsTable = async () => {
   return res.json();
 };
 
+// Create a local notification (stored in our own backend) — used for admin-only confirmations
+// like service/model toggles, since the external API has no broadcast endpoint.
+export const createLocalNotification = async (params: {
+  user_id: string | number;
+  title: string;
+  description?: string;
+  type?: string; // e.g. "admin_service_toggled"
+}) => {
+  try {
+    const { data, error } = await supabase.functions.invoke("manage-notifications", {
+      body: {
+        action: "create",
+        user_id: String(params.user_id),
+        title: params.title,
+        description: params.description ?? null,
+        type: params.type ?? "admin_info",
+      },
+    });
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    console.error("createLocalNotification failed", e);
+    return null;
+  }
+};
+
 export const getAdminReportStats = async (days?: number) => {
   const url = days
     ? `${API_BASE}/admin/reports/admin/reports/dashboard-stats?days=${days}`
