@@ -115,9 +115,15 @@ const PlantDisease = () => {
             const cropDisplay = language === "ar"
               ? (cropArOnly && cropEnOnly ? `${cropArOnly} (${cropEnOnly})` : (cropArOnly || cropEnOnly))
               : cropEnOnly;
-            const diseaseEnRaw = a.disease_en || "";
+            const diseaseEnRaw = a.disease_en || a.disease || a.prediction || a.label || "";
             const diseaseArRaw = a.disease_ar || "";
-            const diseaseEnOnly = stripArabic(diseaseEnRaw) || stripArabic(diseaseArRaw) || stripArabic(condition);
+            // Prefer the latin part from the EN endpoint; fallback to stripping arabic from any field
+            const pickEn = (s: string) => {
+              if (!s) return "";
+              const stripped = stripArabic(s).replace(/^[\s\-—–•:.,()[\]]+|[\s\-—–•:.,()[\]]+$/g, "").trim();
+              return stripped;
+            };
+            const diseaseEnOnly = pickEn(diseaseEnRaw) || pickEn(diseaseArRaw) || pickEn(condition);
             const diseaseArOnly = containsArabic(diseaseArRaw) ? stripEnglish(diseaseArRaw) : (containsArabic(diseaseEnRaw) ? stripEnglish(diseaseEnRaw) : (containsArabic(condition) ? stripEnglish(condition) : ""));
             const diseaseDisplay = language === "ar"
               ? (diseaseArOnly && diseaseEnOnly ? `${diseaseArOnly} (${diseaseEnOnly})` : (diseaseArOnly || diseaseEnOnly))
