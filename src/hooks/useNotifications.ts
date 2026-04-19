@@ -97,6 +97,14 @@ export function useNotifications(role: Role = "farmer") {
       setPushEnabled(isEnabled);
 
       if (!isEnabled) {
+        // Push disabled: purge any notifications that may have been stored on the server
+        // during the disabled window, so they don't all appear at once when re-enabled.
+        try {
+          await Promise.allSettled([
+            deleteAllNotifications(userId),
+            clearAllLocalNotifications(userId),
+          ]);
+        } catch {}
         setNotifications([]);
         return;
       }
