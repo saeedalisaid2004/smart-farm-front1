@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiResetPassword, isTimeoutError } from "@/services/smartFarmApi";
+import { apiResetPassword, getApiErrorMessage, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ResetPassword = () => {
@@ -36,19 +36,15 @@ const ResetPassword = () => {
     }
     setLoading(true);
     try {
-      const data = await apiResetPassword(email, otp, newPassword);
-      if (data.detail) {
-        toast({ variant: "destructive", title: data.detail });
-      } else {
-        setSuccess(true);
-        toast({ title: "Password reset successfully!" });
-      }
+      await apiResetPassword(email, otp, newPassword);
+      setSuccess(true);
+      toast({ title: "Password reset successfully!" });
     } catch (err) {
       toast({
         variant: "destructive",
         title: isTimeoutError(err)
           ? "The server is not responding. Please try again shortly."
-          : "Something went wrong. Please try again.",
+          : getApiErrorMessage(err) || "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);

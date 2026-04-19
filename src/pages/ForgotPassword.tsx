@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf, ArrowLeft, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiForgotPassword, isTimeoutError } from "@/services/smartFarmApi";
+import { apiForgotPassword, getApiErrorMessage, isTimeoutError } from "@/services/smartFarmApi";
 import { motion } from "framer-motion";
 
 const ForgotPassword = () => {
@@ -23,19 +23,15 @@ const ForgotPassword = () => {
     }
     setLoading(true);
     try {
-      const data = await apiForgotPassword(email);
-      if (data.detail && data.detail.toLowerCase().includes("not found")) {
-        toast({ variant: "destructive", title: "Email not found" });
-      } else {
-        setSent(true);
-        toast({ title: "Code sent!", description: "Check your email for the verification code" });
-      }
+      await apiForgotPassword(email);
+      setSent(true);
+      toast({ title: "Code sent!", description: "Check your email for the verification code" });
     } catch (err) {
       toast({
         variant: "destructive",
         title: isTimeoutError(err)
           ? "The server is not responding. Please try again shortly."
-          : "Something went wrong. Please try again.",
+          : getApiErrorMessage(err) || "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);
