@@ -97,10 +97,11 @@ export function useNotifications(role: Role = "farmer") {
 
       const data = await getUserNotifications(userId);
       const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-      const list: Notification[] = raw.map((n: any) => ({
+      const filtered = raw.filter((n: any) => matchesRole(n, role));
+      const list: Notification[] = filtered.map((n: any) => ({
         id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
-        title: n.title ?? "Notification",
-        description: n.description ?? n.message ?? null,
+        title: stripRolePrefix(n.title) || "Notification",
+        description: stripRolePrefix(n.description ?? n.message ?? null),
         type: n.type ?? "info",
         is_read: n.is_read ?? n.read ?? false,
         created_at: n.created_at ?? n.date ?? new Date().toISOString(),
@@ -112,7 +113,7 @@ export function useNotifications(role: Role = "farmer") {
     } finally {
       setLoading(false);
     }
-  }, [checkPushSetting]);
+  }, [checkPushSetting, role]);
 
   useEffect(() => {
     fetchNotifications();
