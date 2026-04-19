@@ -275,12 +275,11 @@ export function useNotifications(role: Role = "farmer") {
         let title: string;
         let description: string | null;
         if (role === "admin") {
-          // Use translateAdminText only (no localizeText — it would strip model names like "Soil-DL-v2.0")
           title = translateAdminText(n.title, language);
           description = n.description ? translateAdminText(n.description, language) : n.description;
         } else {
-          title = localizeText(n.title, language);
-          description = localizeText(n.description, language);
+          title = translateAdminText(n.title, language);
+          description = n.description ? translateAdminText(n.description, language) : n.description;
         }
         return { ...n, title, description };
       });
