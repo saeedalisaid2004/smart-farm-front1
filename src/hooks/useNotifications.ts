@@ -51,20 +51,50 @@ const STATUS_WORDS = {
 
 const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"): string => {
   if (!text) return text ?? "";
-  let out = String(text);
-  const lower = out.toLowerCase();
+  let out = String(text).trim();
 
+  // ===== Specific API patterns (Arabic → English) =====
+  if (lang === "en") {
+    // Title: "تحديث نظام: <ModelName>" → "System update: <ModelName>"
+    out = out.replace(/^تحديث\s*نظام\s*:?\s*/i, "System update: ");
+
+    // Message: "نحيطكم علماً بأن خدمة <X> متوقفة حالياً للصيانة" → "Service <X> is currently down for maintenance"
+    out = out.replace(
+      /نحيطكم\s*علماً\s*بأن\s*خدمة\s*(.+?)\s*متوقفة\s*حالياً\s*للصيانة/i,
+      "Service $1 is currently down for maintenance"
+    );
+
+    // Message: "نحيطكم علماً بأن خدمة <X> عادت للعمل الآن" → "Service <X> is back online"
+    out = out.replace(
+      /نحيطكم\s*علماً\s*بأن\s*خدمة\s*(.+?)\s*عادت\s*للعمل\s*الآن/i,
+      "Service $1 is back online"
+    );
+
+    // Generic standalone phrases
+    out = out.replace(/متوقفة\s*حالياً\s*للصيانة/g, "currently down for maintenance");
+    out = out.replace(/عادت\s*للعمل\s*الآن/g, "back online");
+    out = out.replace(/نحيطكم\s*علماً\s*بأن\s*/g, "Please be informed that ");
+    out = out.replace(/خدمة/g, "service");
+  } else {
+    // English → Arabic reverse mapping (in case API ever returns English)
+    out = out.replace(/^System\s*update\s*:?\s*/i, "تحديث نظام: ");
+    out = out.replace(
+      /Service\s+(.+?)\s+is\s+currently\s+down\s+for\s+maintenance/i,
+      "نحيطكم علماً بأن خدمة $1 متوقفة حالياً للصيانة"
+    );
+    out = out.replace(
+      /Service\s+(.+?)\s+is\s+back\s+online/i,
+      "نحيطكم علماً بأن خدمة $1 عادت للعمل الآن"
+    );
+  }
+
+  // ===== Generic service/status fallback =====
+  const lower = out.toLowerCase();
   const svc = findService(out);
 
   let status: keyof typeof STATUS_WORDS | null = null;
   for (const k of Object.keys(STATUS_WORDS) as (keyof typeof STATUS_WORDS)[]) {
     if (lower.includes(k)) { status = k; break; }
-  }
-
-  if (svc && status) {
-    return lang === "ar"
-      ? `${svc.ar} — ${STATUS_WORDS[status].ar}`
-      : `${svc.en} — ${STATUS_WORDS[status].en}`;
   }
 
   if (svc) {
