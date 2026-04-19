@@ -402,31 +402,7 @@ export const getModelsTable = async () => {
   return res.json();
 };
 
-// Create a local notification (stored in our own backend) — used for admin-only confirmations
-// like service/model toggles, since the external API has no broadcast endpoint.
-export const createLocalNotification = async (params: {
-  user_id: string | number;
-  title: string;
-  description?: string;
-  type?: string; // e.g. "admin_service_toggled"
-}) => {
-  try {
-    const { data, error } = await supabase.functions.invoke("manage-notifications", {
-      body: {
-        action: "create",
-        user_id: String(params.user_id),
-        title: params.title,
-        description: params.description ?? null,
-        type: params.type ?? "admin_info",
-      },
-    });
-    if (error) throw error;
-    return data;
-  } catch (e) {
-    console.error("createLocalNotification failed", e);
-    return null;
-  }
-};
+// Local/Supabase notifications removed — notifications now rely solely on the external API.
 
 export const getAdminReportStats = async (days?: number) => {
   const url = days
@@ -457,60 +433,7 @@ export const getUserNotifications = async (userId: number) => {
   return res.json();
 };
 
-// Fetch admin-only notifications stored locally (in our backend) — created by edge function
-export const getLocalNotifications = async (userId: string | number) => {
-  try {
-    const { data, error } = await supabase.functions.invoke("manage-notifications", {
-      body: { action: "list", user_id: String(userId) },
-    });
-    if (error) throw error;
-    return Array.isArray(data) ? data : [];
-  } catch (e) {
-    console.error("getLocalNotifications failed", e);
-    return [];
-  }
-};
-
-export const deleteLocalNotification = async (userId: string | number, notificationId: string) => {
-  try {
-    const { error } = await supabase.functions.invoke("manage-notifications", {
-      body: { action: "delete", user_id: String(userId), notification_id: notificationId },
-    });
-    if (error) throw error;
-  } catch (e) {
-    console.error("deleteLocalNotification failed", e);
-  }
-};
-
-export const markLocalNotificationRead = async (userId: string | number, notificationId: string) => {
-  try {
-    await supabase.functions.invoke("manage-notifications", {
-      body: { action: "mark_read", user_id: String(userId), notification_id: notificationId },
-    });
-  } catch (e) {
-    console.error("markLocalNotificationRead failed", e);
-  }
-};
-
-export const markAllLocalNotificationsRead = async (userId: string | number) => {
-  try {
-    await supabase.functions.invoke("manage-notifications", {
-      body: { action: "mark_all_read", user_id: String(userId) },
-    });
-  } catch (e) {
-    console.error("markAllLocalNotificationsRead failed", e);
-  }
-};
-
-export const clearAllLocalNotifications = async (userId: string | number) => {
-  try {
-    await supabase.functions.invoke("manage-notifications", {
-      body: { action: "clear_all", user_id: String(userId) },
-    });
-  } catch (e) {
-    console.error("clearAllLocalNotifications failed", e);
-  }
-};
+// Local notification helpers removed — all notifications come from the external API only.
 
 export const markNotificationAsRead = async (notifId: number | string) => {
   const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/read/${notifId}`, {
