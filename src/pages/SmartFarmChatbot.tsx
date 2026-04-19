@@ -156,10 +156,18 @@ const SmartFarmChatbot = () => {
     setEditingId(null);
   };
 
+  const generateTitleFromMessage = (msg: string): string => {
+    const cleaned = msg.replace(/\s+/g, " ").trim();
+    if (!cleaned) return language === "ar" ? "محادثة جديدة" : "New Chat";
+    const words = cleaned.split(" ").slice(0, 6).join(" ");
+    return words.length > 40 ? words.slice(0, 40) + "…" : words;
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg = input;
+    const isFirstMessage = !activeSessionId;
     setMessages(prev => [...prev, { role: "user", content: userMsg, time: now }]);
     setInput("");
 
@@ -176,9 +184,15 @@ const SmartFarmChatbot = () => {
       const rawReply = data.bot_response || data.answer || data.response || data.reply || JSON.stringify(data);
       const reply = cleanBotResponse(rawReply);
 
-      // If this was a new chat, set the session and refresh sessions list
-      if (!activeSessionId && data.session_id) {
-        setActiveSessionId(data.session_id);
+      // If this was a new chat, set the session, auto-name it from the first message, then refresh
+      if (isFirstMessage && data.session_id) {
+        const newSessionId = data.session_id;
+        setActiveSessionId(newSessionId);
+        const autoTitle = generateTitleFromMessage(userMsg);
+        try {
+          await renameChatSession(newSessionId, autoTitle);
+          await saveStoredChatSessionTitle(userId, newSessionId, autoTitle);
+        } catch {}
         loadSessions();
       }
 
