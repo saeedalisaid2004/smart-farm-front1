@@ -128,7 +128,6 @@ export function useNotifications(role: Role = "farmer") {
         type: n.type ?? "info",
         is_read: n.is_read ?? n.read ?? false,
         created_at: n.created_at ?? n.date ?? new Date().toISOString(),
-        // @ts-expect-error track source for routing
         __source: n.__source,
       }));
 
