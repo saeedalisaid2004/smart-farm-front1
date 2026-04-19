@@ -35,6 +35,7 @@ const buildModelStatusMap = (modelsList: any[]): Record<string, boolean> => {
 
 const AdminSystem = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
