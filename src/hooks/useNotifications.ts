@@ -40,22 +40,23 @@ export interface Notification {
 
 type Role = "admin" | "farmer";
 
-const matchesRole = (n: any, role: Role): boolean => {
-  // Explicit role field wins
-  const explicit = (n.role || n.scope || n.audience || "").toString().toLowerCase();
-  if (explicit === "admin" || explicit === "farmer") return explicit === role;
-
-  // Otherwise infer from `type` prefix: admin_* / farmer_*
-  const type = (n.type || "").toString().toLowerCase();
-  if (type.startsWith("admin_") || type.startsWith("admin-")) return role === "admin";
-  if (type.startsWith("farmer_") || type.startsWith("farmer-")) return role === "farmer";
-
-  // Title prefix fallback: [admin] / [farmer]
+const matchesRole = (n: any, role: Role, source?: "local" | "external"): boolean => {
+  // Title prefix wins for our locally-created tagged notifications
   const title = (n.title || "").toString().toLowerCase();
   if (title.startsWith("[admin]")) return role === "admin";
   if (title.startsWith("[farmer]")) return role === "farmer";
 
-  // Untagged notifications default to farmer (legacy)
+  // Explicit role field
+  const explicit = (n.role || n.scope || n.audience || "").toString().toLowerCase();
+  if (explicit === "admin" || explicit === "farmer") return explicit === role;
+
+  // Type prefix: admin_* / farmer_*
+  const type = (n.type || "").toString().toLowerCase();
+  if (type.startsWith("admin_") || type.startsWith("admin-")) return role === "admin";
+  if (type.startsWith("farmer_") || type.startsWith("farmer-")) return role === "farmer";
+
+  // External API untagged notifications (admin_alert, system, info, etc.) → farmer only
+  // Admin gets notifications exclusively from local (Supabase) tagged with [admin]
   return role === "farmer";
 };
 
