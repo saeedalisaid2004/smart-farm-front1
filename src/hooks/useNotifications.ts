@@ -175,37 +175,55 @@ export function useNotifications(role: Role = "farmer") {
   const unreadCount = sorted.filter((n) => !n.is_read).length;
 
   const markAsRead = useCallback(async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+    const userId = getExternalUserId();
     try {
-      await markNotificationAsRead(id);
+      if (target?.__source === "local" && userId) {
+        await markLocalNotificationRead(userId, id);
+      } else {
+        await markNotificationAsRead(id);
+      }
     } catch {}
-  }, []);
+  }, [notifications]);
 
   const markAllAsRead = useCallback(async () => {
     const userId = getExternalUserId();
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     if (userId) {
       try {
-        await markAllNotificationsAsRead(userId);
+        await Promise.allSettled([
+          markAllNotificationsAsRead(userId),
+          markAllLocalNotificationsRead(userId),
+        ]);
       } catch {}
     }
   }, []);
 
   const deleteNotification = useCallback(async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    const userId = getExternalUserId();
     try {
-      await apiDeleteNotification(id);
+      if (target?.__source === "local" && userId) {
+        await deleteLocalNotification(userId, id);
+      } else {
+        await apiDeleteNotification(id);
+      }
     } catch {}
-  }, []);
+  }, [notifications]);
 
   const clearAll = useCallback(async () => {
     const userId = getExternalUserId();
     setNotifications([]);
     if (userId) {
       try {
-        await deleteAllNotifications(userId);
+        await Promise.allSettled([
+          deleteAllNotifications(userId),
+          clearAllLocalNotifications(userId),
+        ]);
       } catch {}
     }
   }, []);
