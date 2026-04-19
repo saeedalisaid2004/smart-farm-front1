@@ -275,11 +275,9 @@ export function useNotifications(role: Role = "farmer") {
         let title: string;
         let description: string | null;
         if (role === "admin") {
-          // Translate first on the RAW text, then localize any leftover mixed segments
-          title = localizeText(translateAdminText(n.title, language), language);
-          description = n.description
-            ? localizeText(translateAdminText(n.description, language), language)
-            : n.description;
+          // Use translateAdminText only (no localizeText — it would strip model names like "Soil-DL-v2.0")
+          title = translateAdminText(n.title, language);
+          description = n.description ? translateAdminText(n.description, language) : n.description;
         } else {
           title = localizeText(n.title, language);
           description = localizeText(n.description, language);
