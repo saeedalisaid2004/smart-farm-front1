@@ -157,6 +157,9 @@ export function incrementAnalysis(type: keyof AnalysisStats) {
   localStorage.setItem(userKey(DAILY_KEY), JSON.stringify(trimmed));
 
   window.dispatchEvent(new Event("stats-updated"));
+  // Trigger immediate notification refresh (backend creates one on each analysis)
+  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 800);
+  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 2500);
 }
 
 export function getDailyStats(): DailyEntry[] {
