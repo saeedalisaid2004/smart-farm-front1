@@ -190,6 +190,11 @@ export const analyzeFruit = async (userId: number, image: File, lang: string = "
 
 // ============ Chatbot ============
 
+export interface StoredChatSessionTitle {
+  session_id: string;
+  title: string;
+}
+
 export const askFarmBot = async (userId: number, question: string, language = "ar", sessionId?: string) => {
   const params: Record<string, any> = { user_id: userId, question, language };
   if (sessionId) params.session_id = sessionId;
@@ -206,6 +211,15 @@ export const getUserSessions = async (userId: number) => {
   return res.json();
 };
 
+export const getStoredChatSessionTitles = async (userId: number): Promise<StoredChatSessionTitle[]> => {
+  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
+    body: { action: "get_many", user_id: String(userId) },
+  });
+
+  if (error) throw error;
+  return Array.isArray(data?.titles) ? data.titles : [];
+};
+
 export const getChatHistory = async (userId: number, sessionId?: string) => {
   const query = sessionId ? `?session_id=${sessionId}` : "";
   const res = await fetchWithTimeout(`${API_BASE}/chatbot/chat-history/${userId}${query}`);
@@ -219,6 +233,15 @@ export const deleteChatSession = async (sessionId: string) => {
   return res.json();
 };
 
+export const deleteStoredChatSessionTitle = async (userId: number, sessionId: string) => {
+  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
+    body: { action: "delete", user_id: String(userId), session_id: sessionId },
+  });
+
+  if (error) throw error;
+  return data;
+};
+
 export const renameChatSession = async (sessionId: string, newTitle: string) => {
   const params = new URLSearchParams();
   params.append("new_title", newTitle);
@@ -228,6 +251,15 @@ export const renameChatSession = async (sessionId: string, newTitle: string) => 
     body: params.toString(),
   });
   return res.json();
+};
+
+export const saveStoredChatSessionTitle = async (userId: number, sessionId: string, title: string) => {
+  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
+    body: { action: "upsert", user_id: String(userId), session_id: sessionId, title },
+  });
+
+  if (error) throw error;
+  return data;
 };
 
 // ============ Reports ============
