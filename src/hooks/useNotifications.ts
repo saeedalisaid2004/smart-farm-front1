@@ -92,7 +92,7 @@ export function useNotifications() {
 
   useEffect(() => {
     const handler = () => {
-      setTimeout(() => fetchNotifications(), 500);
+      fetchNotifications();
     };
     const visibilityHandler = () => {
       if (document.visibilityState === "visible") fetchNotifications();

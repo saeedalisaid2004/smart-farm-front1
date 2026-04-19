@@ -158,8 +158,9 @@ export function incrementAnalysis(type: keyof AnalysisStats) {
 
   window.dispatchEvent(new Event("stats-updated"));
   // Trigger immediate notification refresh (backend creates one on each analysis)
-  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 800);
-  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 2500);
+  window.dispatchEvent(new Event("notifications-updated"));
+  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 400);
+  setTimeout(() => window.dispatchEvent(new Event("notifications-updated")), 1200);
 }
 
 export function getDailyStats(): DailyEntry[] {
