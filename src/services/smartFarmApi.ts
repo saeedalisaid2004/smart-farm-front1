@@ -457,6 +457,61 @@ export const getUserNotifications = async (userId: number) => {
   return res.json();
 };
 
+// Fetch admin-only notifications stored locally (in our backend) — created by edge function
+export const getLocalNotifications = async (userId: string | number) => {
+  try {
+    const { data, error } = await supabase.functions.invoke("manage-notifications", {
+      body: { action: "list", user_id: String(userId) },
+    });
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error("getLocalNotifications failed", e);
+    return [];
+  }
+};
+
+export const deleteLocalNotification = async (userId: string | number, notificationId: string) => {
+  try {
+    const { error } = await supabase.functions.invoke("manage-notifications", {
+      body: { action: "delete", user_id: String(userId), notification_id: notificationId },
+    });
+    if (error) throw error;
+  } catch (e) {
+    console.error("deleteLocalNotification failed", e);
+  }
+};
+
+export const markLocalNotificationRead = async (userId: string | number, notificationId: string) => {
+  try {
+    await supabase.functions.invoke("manage-notifications", {
+      body: { action: "mark_read", user_id: String(userId), notification_id: notificationId },
+    });
+  } catch (e) {
+    console.error("markLocalNotificationRead failed", e);
+  }
+};
+
+export const markAllLocalNotificationsRead = async (userId: string | number) => {
+  try {
+    await supabase.functions.invoke("manage-notifications", {
+      body: { action: "mark_all_read", user_id: String(userId) },
+    });
+  } catch (e) {
+    console.error("markAllLocalNotificationsRead failed", e);
+  }
+};
+
+export const clearAllLocalNotifications = async (userId: string | number) => {
+  try {
+    await supabase.functions.invoke("manage-notifications", {
+      body: { action: "clear_all", user_id: String(userId) },
+    });
+  } catch (e) {
+    console.error("clearAllLocalNotifications failed", e);
+  }
+};
+
 export const markNotificationAsRead = async (notifId: number | string) => {
   const res = await fetchWithTimeout(`${API_BASE}/notifications/notifications/read/${notifId}`, {
     method: "PATCH",
