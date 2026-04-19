@@ -82,7 +82,7 @@ const CropRecommendation = () => {
     if (!userId) { toast({ variant: "destructive", title: language === "ar" ? "سجل دخول أولاً" : "Please login first" }); return; }
     setLoading(true);
     try {
-      const data = await recommendCrop(userId, { city_name: cityName, soil: soilMap[soil] || soil });
+      const data = await recommendCrop(userId, { city_name: cityName, soil: soilMap[soil] || soil }, language);
       setResult(data);
       
       incrementAnalysis("crop_recommendation");
