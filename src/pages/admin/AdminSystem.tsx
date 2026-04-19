@@ -87,23 +87,47 @@ const AdminSystem = () => {
 
   const handleToggleService = async (index: number) => {
     const svc = services[index];
+    const wasOnline = !!svc.online;
     try {
       await apiToggleService(svc.module || svc.name);
     } catch {}
     // Re-fetch from API so UI reflects whatever the backend actually persisted
     await loadAll();
+    // Notify the current admin (admin-only confirmation)
+    const adminId = getExternalUserId() || user?.id;
+    if (adminId) {
+      const nowOnline = !wasOnline;
+      await createLocalNotification({
+        user_id: adminId,
+        type: "admin_service_toggled",
+        title: `[admin] ${nowOnline ? "Service enabled" : "Service disabled"} — ${svc.name}`,
+        description: `${svc.name} is now ${nowOnline ? "online" : "offline"}.`,
+      });
+      window.dispatchEvent(new Event("notifications-updated"));
+    }
   };
 
   const handleToggleSetting = async (settingKey: string) => {
+    const current = settings.find(s => (s.key || s.setting_name || s.name) === settingKey);
+    const newEnabled = !(current?.enabled);
     try {
       await apiToggleSystemSetting(settingKey);
     } catch {}
-    const current = settings.find(s => (s.key || s.setting_name || s.name) === settingKey);
-    const newEnabled = !(current?.enabled);
     setSettings(prev => prev.map(s => {
       const key = s.key || s.setting_name || s.name;
       return key === settingKey ? { ...s, enabled: newEnabled } : s;
     }));
+    const adminId = getExternalUserId() || user?.id;
+    if (adminId) {
+      const label = current?.name || settingKey;
+      await createLocalNotification({
+        user_id: adminId,
+        type: "admin_setting_toggled",
+        title: `[admin] Setting ${newEnabled ? "enabled" : "disabled"} — ${label}`,
+        description: `${label} is now ${newEnabled ? "ON" : "OFF"}.`,
+      });
+      window.dispatchEvent(new Event("notifications-updated"));
+    }
   };
 
   const defaultSettings = [
