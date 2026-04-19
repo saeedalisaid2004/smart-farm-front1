@@ -100,16 +100,35 @@ export function useNotifications(role: Role = "farmer") {
         return;
       }
 
-      const data = await getUserNotifications(userId);
-      const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-      const filtered = raw.filter((n: any) => matchesRole(n, role));
-      const list: Notification[] = filtered.map((n: any) => ({
+      // Fetch from BOTH sources in parallel: external API + local (admin-only events like service toggles)
+      const [externalRes, localRes] = await Promise.allSettled([
+        getUserNotifications(userId),
+        getLocalNotifications(userId),
+      ]);
+
+      const externalData = externalRes.status === "fulfilled" ? externalRes.value : null;
+      const localData = localRes.status === "fulfilled" ? localRes.value : [];
+
+      const externalRaw = Array.isArray(externalData)
+        ? externalData
+        : externalData?.notifications || externalData?.data || [];
+      const localRaw = Array.isArray(localData) ? localData : [];
+
+      // Tag local notifications so we know they belong to local store (for delete/mark-read routing)
+      const taggedLocal = localRaw.map((n: any) => ({ ...n, __source: "local" }));
+      const taggedExternal = externalRaw.map((n: any) => ({ ...n, __source: "external" }));
+
+      const combined = [...taggedLocal, ...taggedExternal].filter((n: any) => matchesRole(n, role));
+
+      const list: Notification[] = combined.map((n: any) => ({
         id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
         title: stripRolePrefix(n.title) || "Notification",
         description: stripRolePrefix(n.description ?? n.message ?? null),
         type: n.type ?? "info",
         is_read: n.is_read ?? n.read ?? false,
         created_at: n.created_at ?? n.date ?? new Date().toISOString(),
+        // @ts-expect-error track source for routing
+        __source: n.__source,
       }));
 
       setNotifications(list);
