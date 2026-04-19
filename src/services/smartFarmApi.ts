@@ -25,6 +25,47 @@ const fetchWithTimeout = (url: string, options?: RequestInit): Promise<Response>
 export const isTimeoutError = (err: unknown): boolean =>
   err instanceof ApiTimeoutError || (err instanceof DOMException && err.name === "AbortError");
 
+export class ApiResponseError extends Error {
+  status: number;
+  payload: unknown;
+
+  constructor(status: number, payload: unknown) {
+    const message =
+      typeof payload === "object" && payload !== null && "detail" in payload
+        ? String((payload as { detail?: unknown }).detail)
+        : `Request failed with status ${status}`;
+    super(message);
+    this.name = "ApiResponseError";
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
+export const getApiErrorMessage = (err: unknown): string | null => {
+  if (err instanceof ApiResponseError) {
+    const payload = err.payload;
+    if (typeof payload === "object" && payload !== null && "detail" in payload) {
+      const detail = (payload as { detail?: unknown }).detail;
+      if (typeof detail === "string") return detail;
+      if (Array.isArray(detail)) {
+        const firstMessage = detail.find(
+          (item) => typeof item === "object" && item !== null && "msg" in item && typeof item.msg === "string"
+        ) as { msg?: string } | undefined;
+        if (firstMessage?.msg) return firstMessage.msg;
+      }
+    }
+    return err.message;
+  }
+
+  return err instanceof Error ? err.message : null;
+};
+
+const parseJsonResponse = async (res: Response) => {
+  const data = await res.json();
+  if (!res.ok) throw new ApiResponseError(res.status, data);
+  return data;
+};
+
 // Store external API user ID
 let externalUserId: number | null = null;
 
@@ -74,16 +115,16 @@ export const apiForgotPassword = async (email: string) => {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: toUrlEncoded({ email }),
   });
-  return res.json();
+  return parseJsonResponse(res);
 };
 
 export const apiResetPassword = async (email: string, otp: string, new_password: string) => {
   const res = await fetchWithTimeout(`${API_BASE}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: toUrlEncoded({ email, otp, new_password }),
+    body: toUrlEncoded({ email, code: otp, new_password }),
   });
-  return res.json();
+  return parseJsonResponse(res);
 };
 
 export const apiRegister = async (name: string, email: string, password: string) => {
