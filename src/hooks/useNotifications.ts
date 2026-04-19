@@ -32,7 +32,33 @@ export interface Notification {
   created_at: string;
 }
 
-export function useNotifications() {
+type Role = "admin" | "farmer";
+
+const matchesRole = (n: any, role: Role): boolean => {
+  // Explicit role field wins
+  const explicit = (n.role || n.scope || n.audience || "").toString().toLowerCase();
+  if (explicit === "admin" || explicit === "farmer") return explicit === role;
+
+  // Otherwise infer from `type` prefix: admin_* / farmer_*
+  const type = (n.type || "").toString().toLowerCase();
+  if (type.startsWith("admin_") || type.startsWith("admin-")) return role === "admin";
+  if (type.startsWith("farmer_") || type.startsWith("farmer-")) return role === "farmer";
+
+  // Title prefix fallback: [admin] / [farmer]
+  const title = (n.title || "").toString().toLowerCase();
+  if (title.startsWith("[admin]")) return role === "admin";
+  if (title.startsWith("[farmer]")) return role === "farmer";
+
+  // Untagged notifications default to farmer (legacy)
+  return role === "farmer";
+};
+
+const stripRolePrefix = (text: string | null | undefined): string => {
+  if (!text) return text ?? "";
+  return text.replace(/^\s*\[(admin|farmer)\]\s*/i, "");
+};
+
+export function useNotifications(role: Role = "farmer") {
   const { language } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,11 +68,15 @@ export function useNotifications() {
     try {
       const data = await getNotificationSettings(userId);
       const s = data?.settings || data;
-      return s?.push !== false;
+      // Role-specific push key with fallback to generic `push`
+      const key = role === "admin" ? "push_notifications_admin" : "push_notifications_farmer";
+      const altKey = role === "admin" ? "admin_push" : "farmer_push";
+      const val = s?.[key] ?? s?.[altKey] ?? s?.push;
+      return val !== false;
     } catch {
       return true;
     }
-  }, []);
+  }, [role]);
 
   const fetchNotifications = useCallback(async () => {
     const userId = getExternalUserId();
@@ -67,10 +97,11 @@ export function useNotifications() {
 
       const data = await getUserNotifications(userId);
       const raw = Array.isArray(data) ? data : data?.notifications || data?.data || [];
-      const list: Notification[] = raw.map((n: any) => ({
+      const filtered = raw.filter((n: any) => matchesRole(n, role));
+      const list: Notification[] = filtered.map((n: any) => ({
         id: String(n.id ?? n.notif_id ?? crypto.randomUUID()),
-        title: n.title ?? "Notification",
-        description: n.description ?? n.message ?? null,
+        title: stripRolePrefix(n.title) || "Notification",
+        description: stripRolePrefix(n.description ?? n.message ?? null),
         type: n.type ?? "info",
         is_read: n.is_read ?? n.read ?? false,
         created_at: n.created_at ?? n.date ?? new Date().toISOString(),
@@ -82,7 +113,7 @@ export function useNotifications() {
     } finally {
       setLoading(false);
     }
-  }, [checkPushSetting]);
+  }, [checkPushSetting, role]);
 
   useEffect(() => {
     fetchNotifications();
