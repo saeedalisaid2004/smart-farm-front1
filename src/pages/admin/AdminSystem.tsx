@@ -7,9 +7,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   getSystemStatus, getSystemSettings, getModelsTable,
   toggleService as apiToggleService, toggleSystemSetting as apiToggleSystemSetting,
-  createLocalNotification, getExternalUserId,
 } from "@/services/smartFarmApi";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 // Map module key -> matcher used against model name returned by /admin/system/ai-models
 const SERVICE_MODEL_MATCHERS: Array<{ module: string; match: (name: string) => boolean }> = [
@@ -35,7 +34,7 @@ const buildModelStatusMap = (modelsList: any[]): Record<string, boolean> => {
 
 const AdminSystem = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  
   const [loading, setLoading] = useState(true);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
@@ -93,22 +92,7 @@ const AdminSystem = () => {
     } catch {}
     // Re-fetch from API so UI reflects whatever the backend actually persisted
     await loadAll();
-    // Notify the current admin (admin-only confirmation) — bilingual + clear status
-    const adminId = getExternalUserId() || user?.id;
-    if (adminId) {
-      const nowOnline = !wasOnline;
-      const statusEn = nowOnline ? "enabled ✅" : "disabled ⛔";
-      const statusAr = nowOnline ? "تم التفعيل ✅" : "تم الإيقاف ⛔";
-      const stateEn = nowOnline ? "online" : "offline";
-      const stateAr = nowOnline ? "يعمل الآن" : "متوقفة الآن";
-      await createLocalNotification({
-        user_id: adminId,
-        type: "admin_service_toggled",
-        title: `[admin] ${svc.name} — ${statusEn} / ${statusAr}`,
-        description: `${svc.name} is ${stateEn}. | الخدمة ${stateAr}.`,
-      });
-      window.dispatchEvent(new Event("notifications-updated"));
-    }
+    window.dispatchEvent(new Event("notifications-updated"));
   };
 
   const handleToggleSetting = async (settingKey: string) => {
@@ -121,17 +105,7 @@ const AdminSystem = () => {
       const key = s.key || s.setting_name || s.name;
       return key === settingKey ? { ...s, enabled: newEnabled } : s;
     }));
-    const adminId = getExternalUserId() || user?.id;
-    if (adminId) {
-      const label = current?.name || settingKey;
-      await createLocalNotification({
-        user_id: adminId,
-        type: "admin_setting_toggled",
-        title: `[admin] Setting ${newEnabled ? "enabled" : "disabled"} — ${label}`,
-        description: `${label} is now ${newEnabled ? "ON" : "OFF"}.`,
-      });
-      window.dispatchEvent(new Event("notifications-updated"));
-    }
+    window.dispatchEvent(new Event("notifications-updated"));
   };
 
   const defaultSettings = [
