@@ -53,31 +53,56 @@ const translateAdminText = (text: string | null | undefined, lang: "en" | "ar"):
   if (!text) return text ?? "";
   let out = String(text).trim();
 
-  // ===== Specific API patterns (Arabic → English) =====
+  // ===== Specific API patterns =====
   if (lang === "en") {
+    // Title: "تنبيه الخدمات 🚜" → "Services Alert 🚜"
+    out = out.replace(/تنبيه\s*الخدمات/g, "Services Alert");
+
     // Title: "تحديث نظام: <ModelName>" → "System update: <ModelName>"
     out = out.replace(/^تحديث\s*نظام\s*:?\s*/i, "System update: ");
 
-    // Message: "نحيطكم علماً بأن خدمة <X> متوقفة حالياً للصيانة" → "Service <X> is currently down for maintenance"
+    // "تم تشغيل ✅ خدمة (X) بنجاح." → "Service (X) has been enabled ✅ successfully."
+    out = out.replace(
+      /تم\s*تشغيل\s*✅?\s*خدمة\s*(\([^)]+\)|\S+)\s*بنجاح\.?/g,
+      "Service $1 has been enabled ✅ successfully."
+    );
+
+    // "تم إيقاف ❌ خدمة (X) بنجاح." → "Service (X) has been disabled ❌ successfully."
+    out = out.replace(
+      /تم\s*إيقاف\s*❌?\s*خدمة\s*(\([^)]+\)|\S+)\s*بنجاح\.?/g,
+      "Service $1 has been disabled ❌ successfully."
+    );
+
+    // Maintenance / back-online patterns
     out = out.replace(
       /نحيطكم\s*علماً\s*بأن\s*خدمة\s*(.+?)\s*متوقفة\s*حالياً\s*للصيانة/i,
       "Service $1 is currently down for maintenance"
     );
-
-    // Message: "نحيطكم علماً بأن خدمة <X> عادت للعمل الآن" → "Service <X> is back online"
     out = out.replace(
       /نحيطكم\s*علماً\s*بأن\s*خدمة\s*(.+?)\s*عادت\s*للعمل\s*الآن/i,
       "Service $1 is back online"
     );
 
-    // Generic standalone phrases
+    // Generic standalone phrases (fallback)
     out = out.replace(/متوقفة\s*حالياً\s*للصيانة/g, "currently down for maintenance");
     out = out.replace(/عادت\s*للعمل\s*الآن/g, "back online");
     out = out.replace(/نحيطكم\s*علماً\s*بأن\s*/g, "Please be informed that ");
+    out = out.replace(/بنجاح\.?/g, "successfully.");
+    out = out.replace(/تم\s*تشغيل/g, "enabled");
+    out = out.replace(/تم\s*إيقاف/g, "disabled");
     out = out.replace(/خدمة/g, "service");
   } else {
-    // English → Arabic reverse mapping (in case API ever returns English)
+    // English → Arabic reverse mapping
+    out = out.replace(/Services\s*Alert/g, "تنبيه الخدمات");
     out = out.replace(/^System\s*update\s*:?\s*/i, "تحديث نظام: ");
+    out = out.replace(
+      /Service\s+(\([^)]+\)|\S+)\s+has\s+been\s+enabled\s*✅?\s*successfully\.?/i,
+      "تم تشغيل ✅ خدمة $1 بنجاح."
+    );
+    out = out.replace(
+      /Service\s+(\([^)]+\)|\S+)\s+has\s+been\s+disabled\s*❌?\s*successfully\.?/i,
+      "تم إيقاف ❌ خدمة $1 بنجاح."
+    );
     out = out.replace(
       /Service\s+(.+?)\s+is\s+currently\s+down\s+for\s+maintenance/i,
       "نحيطكم علماً بأن خدمة $1 متوقفة حالياً للصيانة"
