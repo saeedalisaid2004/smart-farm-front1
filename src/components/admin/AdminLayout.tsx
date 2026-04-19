@@ -42,7 +42,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children, title }: AdminLayoutProps) => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications("admin");
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
