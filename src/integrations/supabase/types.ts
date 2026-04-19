@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      chatbot_session_titles: {
+        Row: {
+          created_at: string
+          external_user_id: string
+          id: string
+          session_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          external_user_id: string
+          id?: string
+          session_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          external_user_id?: string
+          id?: string
+          session_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           analysis_alerts: boolean

@@ -5,7 +5,18 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { askFarmBot, getChatHistory, getUserSessions, deleteChatSession, renameChatSession, getExternalUserId } from "@/services/smartFarmApi";
+import {
+  askFarmBot,
+  getChatHistory,
+  getUserSessions,
+  deleteChatSession,
+  renameChatSession,
+  getExternalUserId,
+  getStoredChatSessionTitles,
+  saveStoredChatSessionTitle,
+  deleteStoredChatSessionTitle,
+  type StoredChatSessionTitle,
+} from "@/services/smartFarmApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -41,6 +52,14 @@ const cleanBotResponse = (raw: string): string => {
   return text.trim();
 };
 
+const applyStoredTitles = (apiSessions: Session[], storedTitles: StoredChatSessionTitle[]): Session[] => {
+  const titleMap = new Map(storedTitles.map((item) => [item.session_id, item.title]));
+  return apiSessions.map((session) => ({
+    ...session,
+    title: titleMap.get(session.session_id) || session.title,
+  }));
+};
+
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -66,21 +85,24 @@ const SmartFarmChatbot = () => {
     ));
   }, [language, t]);
 
-  // Load sessions on mount
   const loadSessions = useCallback(async () => {
     const userId = getExternalUserId();
     if (!userId) return;
     setSessionsLoading(true);
     try {
-      const data = await getUserSessions(userId);
-      if (Array.isArray(data)) setSessions(data);
+      const [sessionData, storedTitles] = await Promise.all([
+        getUserSessions(userId),
+        getStoredChatSessionTitles(userId),
+      ]);
+      if (Array.isArray(sessionData)) {
+        setSessions(applyStoredTitles(sessionData, storedTitles));
+      }
     } catch {}
     setSessionsLoading(false);
   }, []);
 
   useEffect(() => { loadSessions(); }, [loadSessions]);
 
-  // Load chat history for a session
   const loadSessionHistory = useCallback(async (sessionId: string) => {
     const userId = getExternalUserId();
     if (!userId) return;
@@ -109,18 +131,27 @@ const SmartFarmChatbot = () => {
   };
 
   const handleDeleteSession = async (sessionId: string) => {
+    const userId = getExternalUserId();
     try {
       await deleteChatSession(sessionId);
+      if (userId) {
+        await deleteStoredChatSessionTitle(userId, sessionId);
+      }
       setSessions(prev => prev.filter(s => s.session_id !== sessionId));
       if (activeSessionId === sessionId) handleNewChat();
     } catch {}
   };
 
   const handleRenameSession = async (sessionId: string) => {
-    if (!editTitle.trim()) { setEditingId(null); return; }
+    const nextTitle = editTitle.trim();
+    const userId = getExternalUserId();
+    if (!nextTitle) { setEditingId(null); return; }
     try {
-      await renameChatSession(sessionId, editTitle.trim());
-      setSessions(prev => prev.map(s => s.session_id === sessionId ? { ...s, title: editTitle.trim() } : s));
+      await renameChatSession(sessionId, nextTitle);
+      if (userId) {
+        await saveStoredChatSessionTitle(userId, sessionId, nextTitle);
+      }
+      setSessions(prev => prev.map(s => s.session_id === sessionId ? { ...s, title: nextTitle } : s));
     } catch {}
     setEditingId(null);
   };
