@@ -77,8 +77,21 @@ const AnimalWeight = () => {
 
         <AnimatePresence mode="wait">
           {result && (() => {
-            if (result.detail || result.status === "Rejected" || result.status === "Not Supported")
-              return <ErrorResult key="err" title={result.status === "Not Supported" ? "Not Supported" : "Analysis Error"} message={result.message || result.detail || "Request rejected"} />;
+            const isErrorStatus = typeof result.status === "string" &&
+              !/^(success|ok|done|completed)$/i.test(result.status) &&
+              /invalid|reject|not\s*support|error|fail|no\s*animal/i.test(result.status);
+            if (result.detail || isErrorStatus || result.status === "Rejected" || result.status === "Not Supported" || result.status === "Invalid Input") {
+              const isInvalid = result.status === "Invalid Input" || /invalid|no\s*animal/i.test(result.status || "");
+              const title = result.status === "Not Supported"
+                ? (isRTL ? "غير مدعوم" : "Not Supported")
+                : isInvalid
+                  ? (isRTL ? "إدخال غير صالح" : "Invalid Input")
+                  : (isRTL ? "خطأ في التحليل" : "Analysis Error");
+              const fallbackMsg = isInvalid
+                ? (isRTL ? "عذراً، لم يتم اكتشاف أي حيوان في الصورة. يرجى رفع صورة واضحة لحيوان." : "Sorry, no animal was detected. Please upload a clear photo of an animal.")
+                : (isRTL ? "تم رفض الطلب" : "Request rejected");
+              return <ErrorResult key="err" title={title} message={result.message || result.detail || fallbackMsg} />;
+            }
 
             const animalNameRaw = isRTL
               ? result.animal_name_ar || result.animal_name || result.animal_type || result.animal || result.class_name || result.label || result.animal_name_en
@@ -112,7 +125,10 @@ const AnimalWeight = () => {
                 )}
                 {!weightValue && !animalName && (
                   <StaggerItem>
-                    <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">{JSON.stringify(result, null, 2)}</pre>
+                    <ErrorResult
+                      title={isRTL ? "لا توجد نتائج" : "No Results"}
+                      message={isRTL ? "لم نتمكن من تقدير الوزن. حاول بصورة أوضح." : "We couldn't estimate the weight. Try a clearer photo."}
+                    />
                   </StaggerItem>
                 )}
               </AnalysisResultCard>
