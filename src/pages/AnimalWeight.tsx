@@ -125,7 +125,10 @@ const AnimalWeight = () => {
                 )}
                 {!weightValue && !animalName && (
                   <StaggerItem>
-                    <pre className="text-xs text-muted-foreground bg-secondary rounded-xl p-4 overflow-auto max-h-60">{JSON.stringify(result, null, 2)}</pre>
+                    <ErrorResult
+                      title={isRTL ? "لا توجد نتائج" : "No Results"}
+                      message={isRTL ? "لم نتمكن من تقدير الوزن. حاول بصورة أوضح." : "We couldn't estimate the weight. Try a clearer photo."}
+                    />
                   </StaggerItem>
                 )}
               </AnalysisResultCard>
