@@ -526,6 +526,7 @@ const AdminUsers = () => {
                 )}
               </div>
             </div>
+          </div>
         </DialogContent>
       </Dialog>
 
