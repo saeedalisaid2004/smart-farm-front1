@@ -11,10 +11,26 @@ class ApiTimeoutError extends Error {
   }
 }
 
+const TOKEN_KEY = "smartfarm_access_token";
+
+export const setAccessToken = (token: string | null) => {
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  else localStorage.removeItem(TOKEN_KEY);
+};
+
+export const getAccessToken = (): string | null => {
+  try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
+};
+
 const fetchWithTimeout = (url: string, options?: RequestInit): Promise<Response> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  return fetch(url, { ...options, signal: controller.signal })
+  const token = getAccessToken();
+  const headers = new Headers(options?.headers || {});
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  return fetch(url, { ...options, headers, signal: controller.signal })
     .catch((err) => {
       if (err.name === "AbortError") throw new ApiTimeoutError();
       throw err;
@@ -146,12 +162,16 @@ export const apiLogin = async (email: string, password: string) => {
   if (data.user?.id) {
     setExternalUserId(data.user.id);
   }
+  if (data.access_token) {
+    setAccessToken(data.access_token);
+  }
   return data;
 };
 
 export const apiLogout = async (userId: number) => {
   const res = await fetchWithTimeout(`${API_BASE}/logout/${userId}`, { method: "POST" });
   setExternalUserId(null);
+  setAccessToken(null);
   return res.json();
 };
 
