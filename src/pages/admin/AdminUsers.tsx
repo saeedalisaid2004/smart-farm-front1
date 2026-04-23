@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone, ShieldOff } from "lucide-react";
 import { getSavedAvatarUrl } from "@/services/avatarService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   getUserManagementData, searchUsers as apiSearchUsers,
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
+  demoteToFarmer as apiDemoteToFarmer,
   updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
 
@@ -125,6 +126,24 @@ const AdminUsers = () => {
       toast({ title: `${user.name} activated` });
       
       loadData();
+    } catch {
+      toast({ title: "Failed", variant: "destructive" });
+    }
+  };
+
+  const handleDemoteUser = async (user: any) => {
+    if (!user.email) {
+      toast({ title: "Email required", variant: "destructive" });
+      return;
+    }
+    try {
+      const result = await apiDemoteToFarmer(user.email);
+      if (result.success || result.status === "success" || result.message) {
+        toast({ title: `${user.name || user.full_name || user.email} ${t("adminUsers.demotedSuccess")}` });
+        loadData();
+      } else {
+        toast({ title: result.message || "Failed", variant: "destructive" });
+      }
     } catch {
       toast({ title: "Failed", variant: "destructive" });
     }
@@ -316,6 +335,15 @@ const AdminUsers = () => {
                               >
                                 <UserCheck className="w-4 h-4" />
                                 {t("adminUsers.activate")}
+                              </button>
+                            )}
+                            {(user.role === "Admin" || user.role === "admin") && (
+                              <button
+                                onClick={() => handleDemoteUser(user)}
+                                className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
+                              >
+                                <ShieldOff className="w-4 h-4 text-muted-foreground" />
+                                {t("adminUsers.demote")}
                               </button>
                             )}
                             <button

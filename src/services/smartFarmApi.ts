@@ -373,6 +373,12 @@ export const promoteToAdmin = async (email: string) => {
   return res.json();
 };
 
+export const demoteToFarmer = async (email: string) => {
+  const url = `${API_BASE}/admin/users/demote-to-farmer?email=${encodeURIComponent(email)}`;
+  const res = await fetchWithTimeout(url, { method: "POST" });
+  return res.json();
+};
+
 export const getSystemStatus = async () => {
   const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/status`);
   return res.json();
