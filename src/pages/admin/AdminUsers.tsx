@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone, ShieldOff } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone, ShieldOff, Activity } from "lucide-react";
 import { getSavedAvatarUrl } from "@/services/avatarService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
   demoteToFarmer as apiDemoteToFarmer,
+  getUserActivityDetails as apiGetUserActivity,
   updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
 
@@ -41,6 +42,9 @@ const AdminUsers = () => {
   const [viewUser, setViewUser] = useState<any>(null);
   const [notifSettings, setNotifSettings] = useState<{ push: boolean; email: boolean } | null>(null);
   const [loadingNotif, setLoadingNotif] = useState(false);
+  const [activity, setActivity] = useState<any>(null);
+  const [loadingActivity, setLoadingActivity] = useState(false);
+  const [activityPeriod, setActivityPeriod] = useState<"daily" | "weekly" | "monthly" | "all">("all");
 
   const loadData = () => {
     setLoadingData(true);
@@ -149,9 +153,22 @@ const AdminUsers = () => {
     }
   };
 
+  const loadActivity = async (uid: number | string, period: "daily" | "weekly" | "monthly" | "all") => {
+    setLoadingActivity(true);
+    try {
+      const data = await apiGetUserActivity(uid, period);
+      setActivity(data);
+    } catch {
+      setActivity(null);
+    }
+    setLoadingActivity(false);
+  };
+
   const handleViewUser = async (user: any) => {
     setViewUser(user);
     setNotifSettings(null);
+    setActivity(null);
+    setActivityPeriod("all");
     const uid = user.id || user.user_id;
     if (uid) {
       setLoadingNotif(true);
@@ -160,6 +177,15 @@ const AdminUsers = () => {
         if (data.current_settings) setNotifSettings(data.current_settings);
       } catch {}
       setLoadingNotif(false);
+      loadActivity(uid, "all");
+    }
+  };
+
+  const handleChangePeriod = (period: "daily" | "weekly" | "monthly" | "all") => {
+    setActivityPeriod(period);
+    if (viewUser) {
+      const uid = viewUser.id || viewUser.user_id;
+      if (uid) loadActivity(uid, period);
     }
   };
 
@@ -484,6 +510,77 @@ const AdminUsers = () => {
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">N/A</p>
+                )}
+              </div>
+
+              {/* User Activity */}
+              <div className="p-3.5 rounded-xl bg-secondary/50 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Activity className="w-4 h-4 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground font-medium">{t("adminUsers.activity")}</p>
+                </div>
+                <div className="grid grid-cols-4 gap-1 p-1 bg-background/50 rounded-lg">
+                  {(["daily", "weekly", "monthly", "all"] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => handleChangePeriod(p)}
+                      className={`text-xs py-1.5 rounded-md transition-colors ${
+                        activityPeriod === p
+                          ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {t(`adminUsers.${p === "all" ? "allTime" : p}`)}
+                    </button>
+                  ))}
+                </div>
+                {loadingActivity ? (
+                  <div className="flex justify-center py-3">
+                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : activity ? (
+                  <div className="space-y-2 max-h-56 overflow-y-auto">
+                    {(() => {
+                      const counts =
+                        activity.activity_counts ||
+                        activity.counts ||
+                        activity.summary ||
+                        activity.activities ||
+                        activity.data ||
+                        activity;
+                      const entries = counts && typeof counts === "object" && !Array.isArray(counts)
+                        ? Object.entries(counts).filter(([k, v]) =>
+                            typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
+                          )
+                        : [];
+                      const total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
+                      if (entries.length === 0 && !total) {
+                        return <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>;
+                      }
+                      return (
+                        <>
+                          {entries.map(([key, value]) => (
+                            <div key={key} className="flex items-center justify-between text-sm">
+                              <span className="text-foreground capitalize" dir="auto">
+                                {key.replace(/_/g, " ")}
+                              </span>
+                              <Badge variant="outline" className="rounded-md text-xs">
+                                {value as number}
+                              </Badge>
+                            </div>
+                          ))}
+                          {total ? (
+                            <div className="flex items-center justify-between text-sm pt-2 mt-1 border-t border-border/50">
+                              <span className="font-medium text-foreground">Total</span>
+                              <Badge className="rounded-md text-xs">{total}</Badge>
+                            </div>
+                          ) : null}
+                        </>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>
                 )}
               </div>
             </div>

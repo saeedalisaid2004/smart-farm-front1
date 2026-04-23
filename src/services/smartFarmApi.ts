@@ -379,6 +379,12 @@ export const demoteToFarmer = async (email: string) => {
   return res.json();
 };
 
+export const getUserActivityDetails = async (userId: number | string, period: "daily" | "weekly" | "monthly" | "all" = "all") => {
+  const url = `${API_BASE}/admin/users/user-activity-details/${userId}?period=${period}`;
+  const res = await fetchWithTimeout(url);
+  return res.json();
+};
+
 export const getSystemStatus = async () => {
   const res = await fetchWithTimeout(`${API_BASE}/admin/system/admin/system/status`);
   return res.json();
