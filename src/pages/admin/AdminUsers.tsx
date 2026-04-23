@@ -153,9 +153,22 @@ const AdminUsers = () => {
     }
   };
 
+  const loadActivity = async (uid: number | string, period: "daily" | "weekly" | "monthly" | "all") => {
+    setLoadingActivity(true);
+    try {
+      const data = await apiGetUserActivity(uid, period);
+      setActivity(data);
+    } catch {
+      setActivity(null);
+    }
+    setLoadingActivity(false);
+  };
+
   const handleViewUser = async (user: any) => {
     setViewUser(user);
     setNotifSettings(null);
+    setActivity(null);
+    setActivityPeriod("all");
     const uid = user.id || user.user_id;
     if (uid) {
       setLoadingNotif(true);
@@ -164,6 +177,15 @@ const AdminUsers = () => {
         if (data.current_settings) setNotifSettings(data.current_settings);
       } catch {}
       setLoadingNotif(false);
+      loadActivity(uid, "all");
+    }
+  };
+
+  const handleChangePeriod = (period: "daily" | "weekly" | "monthly" | "all") => {
+    setActivityPeriod(period);
+    if (viewUser) {
+      const uid = viewUser.id || viewUser.user_id;
+      if (uid) loadActivity(uid, period);
     }
   };
 
