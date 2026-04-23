@@ -644,8 +644,139 @@ const AdminUsers = () => {
                     </div>
                   );
                 })()}
-              </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* User Activities Dialog (separate) */}
+      <Dialog open={!!activitiesUser} onOpenChange={(open) => !open && setActivitiesUser(null)}>
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-2xl">
+          <div className="h-20 bg-gradient-to-r from-primary via-primary/80 to-primary/60 relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
+          </div>
+          <div className="-mt-10 px-6 pb-6">
+            <div className="w-16 h-16 rounded-2xl bg-card border-4 border-background flex items-center justify-center mb-3 shadow-xl">
+              <Activity className="w-7 h-7 text-primary" />
+            </div>
+            <DialogHeader className="text-left mb-4">
+              <DialogTitle className="text-lg">{t("adminUsers.activity")}</DialogTitle>
+              <p className="text-sm text-muted-foreground">{activitiesUser?.name || activitiesUser?.full_name || "User"}</p>
+            </DialogHeader>
+
+            <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/50 rounded-lg mb-4">
+              {(["daily", "weekly", "monthly", "all"] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handleChangePeriod(p)}
+                  className={`text-xs py-1.5 rounded-md transition-colors ${
+                    activityPeriod === p
+                      ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                      : "text-muted-foreground hover:bg-secondary"
+                  }`}
+                >
+                  {t(`adminUsers.${p === "all" ? "allTime" : p}`)}
+                </button>
+              ))}
+            </div>
+
+            {loadingActivity ? (
+              <div className="flex justify-center py-6">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : activity ? (
+              <div className="space-y-2 mb-3">
+                {(() => {
+                  const counts =
+                    activity.activity_counts ||
+                    activity.counts ||
+                    activity.summary ||
+                    activity.activities ||
+                    activity.data ||
+                    activity;
+                  const entries = counts && typeof counts === "object" && !Array.isArray(counts)
+                    ? Object.entries(counts).filter(([k, v]) =>
+                        typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
+                      )
+                    : [];
+                  const total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
+                  if (entries.length === 0 && !total) {
+                    return <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>;
+                  }
+                  return (
+                    <div className="p-3.5 rounded-xl bg-secondary/50 space-y-2">
+                      {entries.map(([key, value]) => (
+                        <div key={key} className="flex items-center justify-between text-sm">
+                          <span className="text-foreground capitalize" dir="auto">
+                            {key.replace(/_/g, " ")}
+                          </span>
+                          <Badge variant="outline" className="rounded-md text-xs">
+                            {value as number}
+                          </Badge>
+                        </div>
+                      ))}
+                      {total ? (
+                        <div className="flex items-center justify-between text-sm pt-2 mt-1 border-t border-border/50">
+                          <span className="font-medium text-foreground">Total</span>
+                          <Badge className="rounded-md text-xs">{total}</Badge>
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>
+            )}
+
+            {/* Activity History List (with images when available) */}
+            {(() => {
+              const list: any[] =
+                (Array.isArray(activity?.activities) && activity.activities) ||
+                (Array.isArray(activity?.recent_activities) && activity.recent_activities) ||
+                (Array.isArray(activity?.history) && activity.history) ||
+                (Array.isArray(activity?.items) && activity.items) ||
+                [];
+              if (!list.length) return null;
+              return (
+                <div className="pt-3 border-t border-border/50 space-y-2">
+                  <p className="text-xs font-medium text-foreground/80">History</p>
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {list.map((it: any, i: number) => (
+                      <div key={i} className="flex gap-3 p-2.5 rounded-lg bg-secondary/40 border border-border/40">
+                        {it.has_image && it.image_url ? (
+                          <img
+                            src={it.image_url}
+                            alt={it.type || "activity"}
+                            loading="lazy"
+                            className="w-14 h-14 rounded-lg object-cover shrink-0 border border-border/40"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <Activity className="w-5 h-5 text-primary/70" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-xs font-medium text-foreground truncate" dir="auto">{it.type}</p>
+                            {it.date && (
+                              <span className="text-[10px] text-muted-foreground shrink-0">{it.date}</span>
+                            )}
+                          </div>
+                          {it.result && (
+                            <p className="text-xs text-foreground/80 mt-0.5 line-clamp-2" dir="auto">{it.result}</p>
+                          )}
+                          {it.details && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2" dir="auto">{it.details}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </DialogContent>
       </Dialog>
