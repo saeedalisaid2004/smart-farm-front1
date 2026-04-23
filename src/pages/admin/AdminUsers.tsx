@@ -582,6 +582,55 @@ const AdminUsers = () => {
                 ) : (
                   <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>
                 )}
+
+                {/* Activity History List (with images when available) */}
+                {(() => {
+                  const list: any[] =
+                    (Array.isArray(activity?.activities) && activity.activities) ||
+                    (Array.isArray(activity?.recent_activities) && activity.recent_activities) ||
+                    (Array.isArray(activity?.history) && activity.history) ||
+                    (Array.isArray(activity?.items) && activity.items) ||
+                    [];
+                  if (!list.length) return null;
+                  return (
+                    <div className="pt-3 mt-2 border-t border-border/50 space-y-2">
+                      <p className="text-xs font-medium text-foreground/80">History</p>
+                      <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        {list.map((it: any, i: number) => (
+                          <div key={i} className="flex gap-3 p-2.5 rounded-lg bg-background/60 border border-border/40">
+                            {it.has_image && it.image_url ? (
+                              <img
+                                src={it.image_url}
+                                alt={it.type || "activity"}
+                                loading="lazy"
+                                className="w-14 h-14 rounded-lg object-cover shrink-0 border border-border/40"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                              />
+                            ) : (
+                              <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                <Activity className="w-5 h-5 text-primary/70" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-xs font-medium text-foreground truncate" dir="auto">{it.type}</p>
+                                {it.date && (
+                                  <span className="text-[10px] text-muted-foreground shrink-0">{it.date}</span>
+                                )}
+                              </div>
+                              {it.result && (
+                                <p className="text-xs text-foreground/80 mt-0.5 line-clamp-2" dir="auto">{it.result}</p>
+                              )}
+                              {it.details && (
+                                <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2" dir="auto">{it.details}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
