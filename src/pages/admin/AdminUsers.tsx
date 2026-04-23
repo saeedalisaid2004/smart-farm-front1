@@ -131,6 +131,24 @@ const AdminUsers = () => {
     }
   };
 
+  const handleDemoteUser = async (user: any) => {
+    if (!user.email) {
+      toast({ title: "Email required", variant: "destructive" });
+      return;
+    }
+    try {
+      const result = await apiDemoteToFarmer(user.email);
+      if (result.success || result.status === "success" || result.message) {
+        toast({ title: `${user.name || user.full_name || user.email} ${t("adminUsers.demotedSuccess")}` });
+        loadData();
+      } else {
+        toast({ title: result.message || "Failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Failed", variant: "destructive" });
+    }
+  };
+
   const handleViewUser = async (user: any) => {
     setViewUser(user);
     setNotifSettings(null);
@@ -317,6 +335,15 @@ const AdminUsers = () => {
                               >
                                 <UserCheck className="w-4 h-4" />
                                 {t("adminUsers.activate")}
+                              </button>
+                            )}
+                            {(user.role === "Admin" || user.role === "admin") && (
+                              <button
+                                onClick={() => handleDemoteUser(user)}
+                                className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
+                              >
+                                <ShieldOff className="w-4 h-4 text-muted-foreground" />
+                                {t("adminUsers.demote")}
                               </button>
                             )}
                             <button
