@@ -42,6 +42,9 @@ const AdminUsers = () => {
   const [viewUser, setViewUser] = useState<any>(null);
   const [notifSettings, setNotifSettings] = useState<{ push: boolean; email: boolean } | null>(null);
   const [loadingNotif, setLoadingNotif] = useState(false);
+  const [activity, setActivity] = useState<any>(null);
+  const [loadingActivity, setLoadingActivity] = useState(false);
+  const [activityPeriod, setActivityPeriod] = useState<"daily" | "weekly" | "monthly" | "all">("all");
 
   const loadData = () => {
     setLoadingData(true);
