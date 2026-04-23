@@ -352,6 +352,13 @@ const AdminUsers = () => {
                               <Eye className="w-4 h-4 text-muted-foreground" />
                               {t("adminUsers.viewProfile")}
                             </button>
+                            <button
+                              onClick={() => handleViewActivities(user)}
+                              className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
+                            >
+                              <Activity className="w-4 h-4 text-muted-foreground" />
+                              {t("adminUsers.activity")}
+                            </button>
                             {(user.status === "Active" || user.status === "active" || user.is_active) ? (
                               <button
                                 onClick={() => handleDeactivateUser(user)}
