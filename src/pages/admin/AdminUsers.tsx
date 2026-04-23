@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone } from "lucide-react";
+import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone, ShieldOff } from "lucide-react";
 import { getSavedAvatarUrl } from "@/services/avatarService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   getUserManagementData, searchUsers as apiSearchUsers,
   deleteUser as apiDeleteUser, deactivateUser as apiDeactivateUser,
   activateUser as apiActivateUser, promoteToAdmin as apiPromoteToAdmin,
+  demoteToFarmer as apiDemoteToFarmer,
   updateAdminNotificationSettings, updateFarmerNotificationSettings,
 } from "@/services/smartFarmApi";
 
