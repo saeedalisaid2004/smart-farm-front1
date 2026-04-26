@@ -81,12 +81,9 @@ const SmartFarmChatbot = () => {
     if (!userId) return;
     setSessionsLoading(true);
     try {
-      const [sessionData, storedTitles] = await Promise.all([
-        getUserSessions(userId),
-        getStoredChatSessionTitles(userId),
-      ]);
+      const sessionData = await getUserSessions(userId);
       if (Array.isArray(sessionData)) {
-        setSessions(applyStoredTitles(sessionData, storedTitles));
+        setSessions(sessionData);
       }
     } catch {}
     setSessionsLoading(false);
