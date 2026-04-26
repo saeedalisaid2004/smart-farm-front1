@@ -12,10 +12,6 @@ import {
   deleteChatSession,
   renameChatSession,
   getExternalUserId,
-  getStoredChatSessionTitles,
-  saveStoredChatSessionTitle,
-  deleteStoredChatSessionTitle,
-  type StoredChatSessionTitle,
 } from "@/services/smartFarmApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
