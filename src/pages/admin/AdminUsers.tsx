@@ -220,10 +220,12 @@ const AdminUsers = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t("adminUsers.title")}</h1>
             <p className="text-muted-foreground mt-1">{t("adminUsers.subtitle")}</p>
           </div>
-          <Button onClick={() => setShowAddAdmin(true)} className="gap-2 rounded-xl shadow-md shadow-primary/20">
-            <UserPlus className="w-4 h-4" />
-            {t("adminUsers.addAdmin")}
-          </Button>
+          {isSuperAdmin && (
+            <Button onClick={() => setShowAddAdmin(true)} className="gap-2 rounded-xl shadow-md shadow-primary/20">
+              <UserPlus className="w-4 h-4" />
+              {t("adminUsers.addAdmin")}
+            </Button>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
