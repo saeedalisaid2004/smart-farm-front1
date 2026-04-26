@@ -157,7 +157,8 @@ const AdminUsers = () => {
   const loadActivity = async (uid: number | string, period: "daily" | "weekly" | "monthly" | "all") => {
     setLoadingActivity(true);
     try {
-      const data = await apiGetUserActivity(uid, period);
+      // Always fetch all; we filter client-side because backend ignores `period`.
+      const data = await apiGetUserActivity(uid, "all");
       setActivity(data);
     } catch {
       setActivity(null);
