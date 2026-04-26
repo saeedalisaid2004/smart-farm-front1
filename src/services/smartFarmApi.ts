@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+// External API only — no Supabase
 
 const API_BASE = "https://mahmoud123mahmoud-smartfarm-api.hf.space";
 
