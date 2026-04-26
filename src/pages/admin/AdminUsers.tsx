@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
   getUserManagementData, searchUsers as apiSearchUsers,
@@ -32,6 +33,8 @@ const cardVariants = {
 
 const AdminUsers = () => {
   const { t } = useLanguage();
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -217,10 +220,12 @@ const AdminUsers = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t("adminUsers.title")}</h1>
             <p className="text-muted-foreground mt-1">{t("adminUsers.subtitle")}</p>
           </div>
-          <Button onClick={() => setShowAddAdmin(true)} className="gap-2 rounded-xl shadow-md shadow-primary/20">
-            <UserPlus className="w-4 h-4" />
-            {t("adminUsers.addAdmin")}
-          </Button>
+          {isSuperAdmin && (
+            <Button onClick={() => setShowAddAdmin(true)} className="gap-2 rounded-xl shadow-md shadow-primary/20">
+              <UserPlus className="w-4 h-4" />
+              {t("adminUsers.addAdmin")}
+            </Button>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -374,7 +379,7 @@ const AdminUsers = () => {
                                 {t("adminUsers.activate")}
                               </button>
                             )}
-                            {(user.role === "Admin" || user.role === "admin") && (
+                            {isSuperAdmin && (user.role === "Admin" || user.role === "admin") && (
                               <button
                                 onClick={() => handleDemoteUser(user)}
                                 className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
@@ -383,13 +388,15 @@ const AdminUsers = () => {
                                 {t("adminUsers.demote")}
                               </button>
                             )}
-                            <button
-                              onClick={() => handleDeleteUser(user)}
-                              className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              {t("adminUsers.deleteUser")}
-                            </button>
+                            {(isSuperAdmin || !(user.role === "Admin" || user.role === "admin" || user.role === "super_admin")) && (
+                              <button
+                                onClick={() => handleDeleteUser(user)}
+                                className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                {t("adminUsers.deleteUser")}
+                              </button>
+                            )}
                           </PopoverContent>
                         </Popover>
                       </td>
