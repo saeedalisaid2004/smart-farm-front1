@@ -3,7 +3,6 @@ import { Mail, Send, Loader2, MessageSquare, Clock, CheckCircle2, Plus, Trash2 }
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { sendMessage, getMyMessages, getExternalUserId, deleteUserMessage } from "@/services/smartFarmApi";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -78,18 +77,8 @@ const Messages = () => {
       await sendMessage(userId, subject, content);
       toast({ title: language === "ar" ? "تم إرسال الرسالة بنجاح ✉️" : "Message sent successfully ✉️" });
 
-      const userName = JSON.parse(localStorage.getItem("smart_farm_user") || "{}").name || "مزارع";
-      supabase.functions.invoke("manage-notifications", {
-        body: {
-          action: "create",
-          user_id: "2",
-          title: language === "ar" ? "[admin] رسالة جديدة 📩" : "[admin] New Message 📩",
-          description: language === "ar"
-            ? `رسالة جديدة من ${userName}: "${subject}"`
-            : `New message from ${userName}: "${subject}"`,
-          type: "admin_new_message",
-        },
-      }).catch(() => {});
+
+
 
       setSubject("");
       setContent("");
