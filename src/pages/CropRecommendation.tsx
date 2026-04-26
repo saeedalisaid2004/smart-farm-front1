@@ -117,7 +117,46 @@ const CropRecommendation = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0, duration: 0.4 }}>
                 <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.cityName")}</Label>
-                <Input placeholder={t("crop.cityPlaceholder")} value={cityName} onChange={(e) => setCityName(e.target.value)} className="rounded-xl h-12 bg-secondary/50 border-border focus:border-primary px-4 transition-all focus:shadow-sm focus:shadow-primary/10" />
+                <Select value={cityName} onValueChange={setCityName}>
+                  <SelectTrigger className="rounded-xl h-12 bg-secondary/50 border-border px-4">
+                    <SelectValue placeholder={t("crop.cityPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {[
+                      { en: "Cairo", ar: "القاهرة" },
+                      { en: "Giza", ar: "الجيزة" },
+                      { en: "Alexandria", ar: "الإسكندرية" },
+                      { en: "Qalyubia", ar: "القليوبية" },
+                      { en: "Sharqia", ar: "الشرقية" },
+                      { en: "Dakahlia", ar: "الدقهلية" },
+                      { en: "Gharbia", ar: "الغربية" },
+                      { en: "Monufia", ar: "المنوفية" },
+                      { en: "Kafr El Sheikh", ar: "كفر الشيخ" },
+                      { en: "Beheira", ar: "البحيرة" },
+                      { en: "Damietta", ar: "دمياط" },
+                      { en: "Port Said", ar: "بورسعيد" },
+                      { en: "Ismailia", ar: "الإسماعيلية" },
+                      { en: "Suez", ar: "السويس" },
+                      { en: "North Sinai", ar: "شمال سيناء" },
+                      { en: "South Sinai", ar: "جنوب سيناء" },
+                      { en: "Beni Suef", ar: "بني سويف" },
+                      { en: "Faiyum", ar: "الفيوم" },
+                      { en: "Minya", ar: "المنيا" },
+                      { en: "Asyut", ar: "أسيوط" },
+                      { en: "Sohag", ar: "سوهاج" },
+                      { en: "Qena", ar: "قنا" },
+                      { en: "Luxor", ar: "الأقصر" },
+                      { en: "Aswan", ar: "أسوان" },
+                      { en: "Red Sea", ar: "البحر الأحمر" },
+                      { en: "New Valley", ar: "الوادي الجديد" },
+                      { en: "Matrouh", ar: "مطروح" },
+                    ].map((c) => (
+                      <SelectItem key={c.en} value={c.en}>
+                        {language === "ar" ? c.ar : c.en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, duration: 0.4 }}>
                 <Label className="text-foreground mb-2 block text-sm font-medium">{t("crop.soilType")}</Label>
