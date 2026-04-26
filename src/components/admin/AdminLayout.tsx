@@ -50,9 +50,30 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const unreadMsgCount = useUnreadMessages("admin");
 
+  const parseEgyptDate = (dateStr: string): Date => {
+    // API returns Egypt time (GMT+2). Normalize to ISO with +02:00 offset.
+    if (!dateStr) return new Date();
+    if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(dateStr)) return new Date(dateStr);
+    // Handle "YYYY-MM-DD hh:mm AM/PM"
+    const ampm = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (ampm) {
+      let h = parseInt(ampm[4], 10);
+      const mer = ampm[6].toUpperCase();
+      if (mer === "PM" && h < 12) h += 12;
+      if (mer === "AM" && h === 12) h = 0;
+      return new Date(`${ampm[1]}-${ampm[2]}-${ampm[3]}T${String(h).padStart(2, "0")}:${ampm[5]}:00+02:00`);
+    }
+    // Handle "YYYY-MM-DD HH:mm[:ss]"
+    const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+    if (iso) {
+      return new Date(`${iso[1]}-${iso[2]}-${iso[3]}T${iso[4]}:${iso[5]}:${iso[6] ?? "00"}+02:00`);
+    }
+    return new Date(dateStr);
+  };
+
   const formatTime = (dateStr: string) => {
     try {
-      return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: isRTL ? ar : enUS });
+      return formatDistanceToNow(parseEgyptDate(dateStr), { addSuffix: true, locale: isRTL ? ar : enUS });
     } catch { return dateStr; }
   };
 
