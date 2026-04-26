@@ -33,6 +33,8 @@ const cardVariants = {
 
 const AdminUsers = () => {
   const { t } = useLanguage();
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
