@@ -171,7 +171,6 @@ const SmartFarmChatbot = () => {
         const autoTitle = generateTitleFromMessage(userMsg);
         try {
           await renameChatSession(newSessionId, autoTitle);
-          await saveStoredChatSessionTitle(userId, newSessionId, autoTitle);
         } catch {}
         loadSessions();
       }
