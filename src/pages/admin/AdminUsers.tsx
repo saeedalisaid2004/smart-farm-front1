@@ -566,19 +566,58 @@ const AdminUsers = () => {
             ) : activity ? (
               <div className="space-y-2 mb-3">
                 {(() => {
-                  const counts =
-                    activity.activity_counts ||
-                    activity.counts ||
-                    activity.summary ||
-                    activity.activities ||
-                    activity.data ||
-                    activity;
-                  const entries = counts && typeof counts === "object" && !Array.isArray(counts)
-                    ? Object.entries(counts).filter(([k, v]) =>
-                        typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
-                      )
-                    : [];
-                  const total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
+                  // Build filtered list first (used by both counts + history sections)
+                  const rawList: any[] =
+                    (Array.isArray(activity?.activities) && activity.activities) ||
+                    (Array.isArray(activity?.recent_activities) && activity.recent_activities) ||
+                    (Array.isArray(activity?.history) && activity.history) ||
+                    (Array.isArray(activity?.items) && activity.items) ||
+                    [];
+                  const now = new Date();
+                  const cutoff =
+                    activityPeriod === "daily"
+                      ? new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+                      : activityPeriod === "weekly"
+                      ? now.getTime() - 7 * 24 * 60 * 60 * 1000
+                      : activityPeriod === "monthly"
+                      ? now.getTime() - 30 * 24 * 60 * 60 * 1000
+                      : 0;
+                  const filteredList =
+                    activityPeriod === "all"
+                      ? rawList
+                      : rawList.filter((it: any) => {
+                          const d = it?.date || it?.created_at || it?.timestamp;
+                          if (!d) return false;
+                          const t = new Date(d).getTime();
+                          return !isNaN(t) && t >= cutoff;
+                        });
+
+                  // Recompute counts from filtered list when filtering, else use server counts
+                  let entries: [string, number][] = [];
+                  let total = 0;
+                  if (activityPeriod === "all") {
+                    const counts =
+                      activity.activity_counts ||
+                      activity.counts ||
+                      activity.summary ||
+                      activity.data ||
+                      activity;
+                    entries = counts && typeof counts === "object" && !Array.isArray(counts)
+                      ? (Object.entries(counts).filter(([k, v]) =>
+                          typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
+                        ) as [string, number][])
+                      : [];
+                    total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + v, 0);
+                  } else {
+                    const map: Record<string, number> = {};
+                    for (const it of filteredList) {
+                      const key = String(it?.type || "other").toLowerCase().replace(/\s+/g, "_");
+                      map[key] = (map[key] || 0) + 1;
+                    }
+                    entries = Object.entries(map);
+                    total = filteredList.length;
+                  }
+
                   if (entries.length === 0 && !total) {
                     return <p className="text-xs text-muted-foreground text-center py-2">{t("adminUsers.noActivity")}</p>;
                   }
