@@ -272,13 +272,24 @@ export const getUserSessions = async (userId: number) => {
   return res.json();
 };
 
-export const getStoredChatSessionTitles = async (userId: number): Promise<StoredChatSessionTitle[]> => {
-  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
-    body: { action: "get_many", user_id: String(userId) },
-  });
+const titlesStorageKey = (userId: number) => `chat_session_titles_${userId}`;
 
-  if (error) throw error;
-  return Array.isArray(data?.titles) ? data.titles : [];
+const readStoredTitles = (userId: number): Record<string, string> => {
+  try {
+    const raw = localStorage.getItem(titlesStorageKey(userId));
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeStoredTitles = (userId: number, map: Record<string, string>) => {
+  try { localStorage.setItem(titlesStorageKey(userId), JSON.stringify(map)); } catch {}
+};
+
+export const getStoredChatSessionTitles = async (userId: number): Promise<StoredChatSessionTitle[]> => {
+  const map = readStoredTitles(userId);
+  return Object.entries(map).map(([session_id, title]) => ({ session_id, title }));
 };
 
 export const getChatHistory = async (userId: number, sessionId?: string) => {
@@ -295,12 +306,10 @@ export const deleteChatSession = async (sessionId: string) => {
 };
 
 export const deleteStoredChatSessionTitle = async (userId: number, sessionId: string) => {
-  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
-    body: { action: "delete", user_id: String(userId), session_id: sessionId },
-  });
-
-  if (error) throw error;
-  return data;
+  const map = readStoredTitles(userId);
+  delete map[sessionId];
+  writeStoredTitles(userId, map);
+  return { success: true };
 };
 
 export const renameChatSession = async (sessionId: string, newTitle: string) => {
@@ -315,12 +324,10 @@ export const renameChatSession = async (sessionId: string, newTitle: string) => 
 };
 
 export const saveStoredChatSessionTitle = async (userId: number, sessionId: string, title: string) => {
-  const { data, error } = await supabase.functions.invoke("chatbot-session-titles", {
-    body: { action: "upsert", user_id: String(userId), session_id: sessionId, title },
-  });
-
-  if (error) throw error;
-  return data;
+  const map = readStoredTitles(userId);
+  map[sessionId] = title;
+  writeStoredTitles(userId, map);
+  return { success: true };
 };
 
 // ============ Reports ============
