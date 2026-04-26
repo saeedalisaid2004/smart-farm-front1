@@ -190,10 +190,7 @@ const AdminUsers = () => {
 
   const handleChangePeriod = (period: "daily" | "weekly" | "monthly" | "all") => {
     setActivityPeriod(period);
-    if (activitiesUser) {
-      const uid = activitiesUser.id || activitiesUser.user_id;
-      if (uid) loadActivity(uid, period);
-    }
+    // Client-side filter only — data already loaded.
   };
 
   const handleToggleNotif = async (key: "push" | "email", value: boolean) => {
