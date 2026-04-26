@@ -48,13 +48,8 @@ const cleanBotResponse = (raw: string): string => {
   return text.trim();
 };
 
-const applyStoredTitles = (apiSessions: Session[], storedTitles: StoredChatSessionTitle[]): Session[] => {
-  const titleMap = new Map(storedTitles.map((item) => [item.session_id, item.title]));
-  return apiSessions.map((session) => ({
-    ...session,
-    title: titleMap.get(session.session_id) || session.title,
-  }));
-};
+
+
 
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
