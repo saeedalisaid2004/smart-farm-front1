@@ -447,7 +447,7 @@ const AdminUsers = () => {
                     return r !== "admin" && r !== "super_admin";
                   }).length === 0 && (
                     <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                      {t("adminUsers.noUsersFound") || "No farmers available"}
+                      No farmers available
                     </div>
                   )}
                 </SelectContent>
