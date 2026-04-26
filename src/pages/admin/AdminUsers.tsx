@@ -379,7 +379,7 @@ const AdminUsers = () => {
                                 {t("adminUsers.activate")}
                               </button>
                             )}
-                            {(user.role === "Admin" || user.role === "admin") && (
+                            {isSuperAdmin && (user.role === "Admin" || user.role === "admin") && (
                               <button
                                 onClick={() => handleDemoteUser(user)}
                                 className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-foreground rounded-lg hover:bg-secondary transition-colors"
@@ -388,13 +388,15 @@ const AdminUsers = () => {
                                 {t("adminUsers.demote")}
                               </button>
                             )}
-                            <button
-                              onClick={() => handleDeleteUser(user)}
-                              className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              {t("adminUsers.deleteUser")}
-                            </button>
+                            {(isSuperAdmin || !(user.role === "Admin" || user.role === "admin" || user.role === "super_admin")) && (
+                              <button
+                                onClick={() => handleDeleteUser(user)}
+                                className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                {t("adminUsers.deleteUser")}
+                              </button>
+                            )}
                           </PopoverContent>
                         </Popover>
                       </td>
