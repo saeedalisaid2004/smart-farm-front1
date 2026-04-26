@@ -152,7 +152,7 @@ export type Database = {
       promote_to_admin: { Args: { _email: string }; Returns: Json }
     }
     Enums: {
-      app_role: "admin" | "farmer"
+      app_role: "admin" | "farmer" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -280,7 +280,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "farmer"],
+      app_role: ["admin", "farmer", "super_admin"],
     },
   },
 } as const
