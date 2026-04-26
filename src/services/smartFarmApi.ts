@@ -251,11 +251,6 @@ export const analyzeFruit = async (userId: number, image: File, lang: string = "
 
 // ============ Chatbot ============
 
-export interface StoredChatSessionTitle {
-  session_id: string;
-  title: string;
-}
-
 export const askFarmBot = async (userId: number, question: string, language = "ar", sessionId?: string) => {
   const params: Record<string, any> = { user_id: userId, question, language };
   if (sessionId) params.session_id = sessionId;
@@ -272,26 +267,6 @@ export const getUserSessions = async (userId: number) => {
   return res.json();
 };
 
-const titlesStorageKey = (userId: number) => `chat_session_titles_${userId}`;
-
-const readStoredTitles = (userId: number): Record<string, string> => {
-  try {
-    const raw = localStorage.getItem(titlesStorageKey(userId));
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-};
-
-const writeStoredTitles = (userId: number, map: Record<string, string>) => {
-  try { localStorage.setItem(titlesStorageKey(userId), JSON.stringify(map)); } catch {}
-};
-
-export const getStoredChatSessionTitles = async (userId: number): Promise<StoredChatSessionTitle[]> => {
-  const map = readStoredTitles(userId);
-  return Object.entries(map).map(([session_id, title]) => ({ session_id, title }));
-};
-
 export const getChatHistory = async (userId: number, sessionId?: string) => {
   const query = sessionId ? `?session_id=${sessionId}` : "";
   const res = await fetchWithTimeout(`${API_BASE}/chatbot/chat-history/${userId}${query}`);
@@ -305,13 +280,6 @@ export const deleteChatSession = async (sessionId: string) => {
   return res.json();
 };
 
-export const deleteStoredChatSessionTitle = async (userId: number, sessionId: string) => {
-  const map = readStoredTitles(userId);
-  delete map[sessionId];
-  writeStoredTitles(userId, map);
-  return { success: true };
-};
-
 export const renameChatSession = async (sessionId: string, newTitle: string) => {
   const params = new URLSearchParams();
   params.append("new_title", newTitle);
@@ -321,13 +289,6 @@ export const renameChatSession = async (sessionId: string, newTitle: string) => 
     body: params.toString(),
   });
   return res.json();
-};
-
-export const saveStoredChatSessionTitle = async (userId: number, sessionId: string, title: string) => {
-  const map = readStoredTitles(userId);
-  map[sessionId] = title;
-  writeStoredTitles(userId, map);
-  return { success: true };
 };
 
 // ============ Reports ============

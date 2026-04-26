@@ -12,10 +12,6 @@ import {
   deleteChatSession,
   renameChatSession,
   getExternalUserId,
-  getStoredChatSessionTitles,
-  saveStoredChatSessionTitle,
-  deleteStoredChatSessionTitle,
-  type StoredChatSessionTitle,
 } from "@/services/smartFarmApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -52,13 +48,8 @@ const cleanBotResponse = (raw: string): string => {
   return text.trim();
 };
 
-const applyStoredTitles = (apiSessions: Session[], storedTitles: StoredChatSessionTitle[]): Session[] => {
-  const titleMap = new Map(storedTitles.map((item) => [item.session_id, item.title]));
-  return apiSessions.map((session) => ({
-    ...session,
-    title: titleMap.get(session.session_id) || session.title,
-  }));
-};
+
+
 
 const SmartFarmChatbot = () => {
   const { t, language } = useLanguage();
@@ -90,12 +81,9 @@ const SmartFarmChatbot = () => {
     if (!userId) return;
     setSessionsLoading(true);
     try {
-      const [sessionData, storedTitles] = await Promise.all([
-        getUserSessions(userId),
-        getStoredChatSessionTitles(userId),
-      ]);
+      const sessionData = await getUserSessions(userId);
       if (Array.isArray(sessionData)) {
-        setSessions(applyStoredTitles(sessionData, storedTitles));
+        setSessions(sessionData);
       }
     } catch {}
     setSessionsLoading(false);
@@ -131,12 +119,8 @@ const SmartFarmChatbot = () => {
   };
 
   const handleDeleteSession = async (sessionId: string) => {
-    const userId = getExternalUserId();
     try {
       await deleteChatSession(sessionId);
-      if (userId) {
-        await deleteStoredChatSessionTitle(userId, sessionId);
-      }
       setSessions(prev => prev.filter(s => s.session_id !== sessionId));
       if (activeSessionId === sessionId) handleNewChat();
     } catch {}
@@ -144,13 +128,9 @@ const SmartFarmChatbot = () => {
 
   const handleRenameSession = async (sessionId: string) => {
     const nextTitle = editTitle.trim();
-    const userId = getExternalUserId();
     if (!nextTitle) { setEditingId(null); return; }
     try {
       await renameChatSession(sessionId, nextTitle);
-      if (userId) {
-        await saveStoredChatSessionTitle(userId, sessionId, nextTitle);
-      }
       setSessions(prev => prev.map(s => s.session_id === sessionId ? { ...s, title: nextTitle } : s));
     } catch {}
     setEditingId(null);
@@ -191,7 +171,6 @@ const SmartFarmChatbot = () => {
         const autoTitle = generateTitleFromMessage(userMsg);
         try {
           await renameChatSession(newSessionId, autoTitle);
-          await saveStoredChatSessionTitle(userId, newSessionId, autoTitle);
         } catch {}
         loadSessions();
       }
