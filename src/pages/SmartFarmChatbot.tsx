@@ -119,12 +119,8 @@ const SmartFarmChatbot = () => {
   };
 
   const handleDeleteSession = async (sessionId: string) => {
-    const userId = getExternalUserId();
     try {
       await deleteChatSession(sessionId);
-      if (userId) {
-        await deleteStoredChatSessionTitle(userId, sessionId);
-      }
       setSessions(prev => prev.filter(s => s.session_id !== sessionId));
       if (activeSessionId === sessionId) handleNewChat();
     } catch {}
@@ -132,13 +128,9 @@ const SmartFarmChatbot = () => {
 
   const handleRenameSession = async (sessionId: string) => {
     const nextTitle = editTitle.trim();
-    const userId = getExternalUserId();
     if (!nextTitle) { setEditingId(null); return; }
     try {
       await renameChatSession(sessionId, nextTitle);
-      if (userId) {
-        await saveStoredChatSessionTitle(userId, sessionId, nextTitle);
-      }
       setSessions(prev => prev.map(s => s.session_id === sessionId ? { ...s, title: nextTitle } : s));
     } catch {}
     setEditingId(null);
