@@ -2,8 +2,6 @@ import { useState, useEffect, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, ChevronLeft, Leaf, BarChart3, MessageCircle, Bell, Bug, Weight, Sprout, FlaskConical, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { getExternalUserId } from "@/services/smartFarmApi";
 
 interface Step {
   title: string;
