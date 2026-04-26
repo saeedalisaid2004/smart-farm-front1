@@ -16,7 +16,8 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== "admin") {
+  const role = (user.role || "").toLowerCase();
+  if (role !== "admin" && role !== "super_admin") {
     return <Navigate to="/dashboard" replace />;
   }
 

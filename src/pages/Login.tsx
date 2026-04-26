@@ -47,7 +47,8 @@ const Login = () => {
           avatar_url: avatarUrl || undefined,
           created_at: data.user.created_at || new Date().toISOString(),
         });
-        if (data.user.role === "admin") {
+        const role = (data.user.role || "").toLowerCase();
+        if (role === "admin" || role === "super_admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/dashboard");
