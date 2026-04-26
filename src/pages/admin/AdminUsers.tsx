@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Users, UserCheck, UserX, Shield, Search, MoreVertical, Mail, Eye, UserMinus, Trash2, UserPlus, Loader2, Calendar, Bell, BellOff, Phone, ShieldOff, Activity } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSavedAvatarUrl } from "@/services/avatarService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -423,14 +424,34 @@ const AdminUsers = () => {
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">{t("adminUsers.emailAddress")}</label>
-              <Input
-                type="email"
-                placeholder={t("adminUsers.emailPlaceholder")}
-                value={adminEmail}
-                onChange={(e) => setAdminEmail(e.target.value)}
-                className="h-12 bg-secondary/50 border-border rounded-xl"
-                onKeyDown={(e) => e.key === "Enter" && handleAddAdmin()}
-              />
+              <Select value={adminEmail} onValueChange={setAdminEmail}>
+                <SelectTrigger className="h-12 bg-secondary/50 border-border rounded-xl">
+                  <SelectValue placeholder={t("adminUsers.emailPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl max-h-72">
+                  {users
+                    .filter((u) => {
+                      const r = (u.role || "").toLowerCase();
+                      return r !== "admin" && r !== "super_admin";
+                    })
+                    .map((u) => (
+                      <SelectItem key={u.id} value={u.email} className="rounded-lg">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{u.name || u.full_name || u.email}</span>
+                          <span className="text-xs text-muted-foreground">{u.email}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  {users.filter((u) => {
+                    const r = (u.role || "").toLowerCase();
+                    return r !== "admin" && r !== "super_admin";
+                  }).length === 0 && (
+                    <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                      No farmers available
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex gap-3 pt-2">
               <Button variant="outline" className="flex-1 rounded-xl" onClick={() => { setShowAddAdmin(false); setAdminEmail(""); }}>
