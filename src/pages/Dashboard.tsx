@@ -141,6 +141,8 @@ const Dashboard = () => {
                       <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
                         <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
+                        {weather.time && <span dir="ltr" className="font-semibold text-foreground/80">{weather.time}</span>}
+                        {weather.date && <span dir="ltr" className="text-[11px]">{weather.date}</span>}
                       </div>
                     </div>
                     {weather.advice && (
@@ -150,12 +152,6 @@ const Dashboard = () => {
                     )}
                     {weather.desc && (
                       <p className="text-xs text-muted-foreground">{weather.desc}</p>
-                    )}
-                    {(weather.date || weather.time) && (
-                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground">
-                        {weather.date && <span dir="ltr">{weather.date}</span>}
-                        {weather.time && <span dir="ltr" className="font-medium">{weather.time}</span>}
-                      </div>
                     )}
                   </div>
                 ) : (
