@@ -613,33 +613,15 @@ const AdminUsers = () => {
             ) : activity ? (
               <div className="space-y-2 mb-3">
                 {(() => {
-                  // Build filtered list first (used by both counts + history sections)
-                  const rawList: any[] =
+                  // Backend returns the list already filtered for the selected period.
+                  const filteredList: any[] =
                     (Array.isArray(activity?.activities) && activity.activities) ||
                     (Array.isArray(activity?.recent_activities) && activity.recent_activities) ||
                     (Array.isArray(activity?.history) && activity.history) ||
                     (Array.isArray(activity?.items) && activity.items) ||
                     [];
-                  const now = new Date();
-                  const cutoff =
-                    activityPeriod === "daily"
-                      ? new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-                      : activityPeriod === "weekly"
-                      ? now.getTime() - 7 * 24 * 60 * 60 * 1000
-                      : activityPeriod === "monthly"
-                      ? now.getTime() - 30 * 24 * 60 * 60 * 1000
-                      : 0;
-                  const filteredList =
-                    activityPeriod === "all"
-                      ? rawList
-                      : rawList.filter((it: any) => {
-                          const d = it?.date || it?.created_at || it?.timestamp;
-                          const t = parseActivityDate(d);
-                          return !isNaN(t) && t >= cutoff;
-                        });
 
-                  // Always recompute counts from the (filtered) list so all tabs
-                  // — Daily / Weekly / Monthly / All Time — show consistent items.
+                  // Compute counts from the returned list so labels match across all tabs.
                   let entries: [string, number][] = [];
                   let total = 0;
                   const map: Record<string, number> = {};
@@ -650,21 +632,19 @@ const AdminUsers = () => {
                   entries = Object.entries(map);
                   total = filteredList.length;
 
-                  // Fallback to server counts only if list is completely empty
-                  // (e.g., backend returned summary without items) and we're on All Time.
-                  if (entries.length === 0 && activityPeriod === "all") {
+                  // Fallback to server counts only if list is empty but a summary exists.
+                  if (entries.length === 0) {
                     const counts =
-                      activity.activity_counts ||
-                      activity.counts ||
-                      activity.summary ||
-                      activity.data ||
-                      activity;
-                    entries = counts && typeof counts === "object" && !Array.isArray(counts)
-                      ? (Object.entries(counts).filter(([k, v]) =>
-                          typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
-                        ) as [string, number][])
-                      : [];
-                    total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
+                      activity?.activity_counts ||
+                      activity?.counts ||
+                      activity?.summary ||
+                      activity?.data;
+                    if (counts && typeof counts === "object" && !Array.isArray(counts)) {
+                      entries = Object.entries(counts).filter(([k, v]) =>
+                        typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
+                      ) as [string, number][];
+                      total = activity?.total_activities ?? activity?.total_operations ?? activity?.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
+                    }
                   }
 
                   if (entries.length === 0 && !total) {
