@@ -214,7 +214,7 @@ const CropRecommendation = () => {
                       const rec = result.recommendation;
                       const categories = [
                         { key: "vegetables", fallbackTitle: t("crop.vegetables"), color: "from-emerald-500 to-green-600", icon: Carrot },
-                        { key: "fruits", fallbackTitle: t("crop.fruits"), color: "from-pink-500 to-rose-600", icon: Apple },
+                        { key: "fruits", fallbackTitle: t("crop.fruits"), color: "from-red-500 to-orange-500", icon: Apple },
                         { key: "field_crops", fallbackTitle: t("crop.fieldCrops"), color: "from-amber-500 to-orange-600", icon: Wheat },
                       ];
                       const hasNewFormat = categories.some((c) => rec[c.key]);
