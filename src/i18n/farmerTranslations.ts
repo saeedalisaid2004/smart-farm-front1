@@ -58,6 +58,9 @@ export const farmerTranslations = {
     "crop.fertilizer": "Fertilizer Advice",
     "crop.diseaseAlert": "Disease Alert",
     "crop.generalWarning": "General Status",
+    "crop.vegetables": "Vegetables",
+    "crop.fruits": "Fruits",
+    "crop.fieldCrops": "Field Crops",
     "crop.error": "Error",
     // Soil Analysis
     "soil.title": "Soil Type Analysis",
