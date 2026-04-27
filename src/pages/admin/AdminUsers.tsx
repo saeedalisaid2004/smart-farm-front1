@@ -636,10 +636,21 @@ const AdminUsers = () => {
                           return !isNaN(t) && t >= cutoff;
                         });
 
-                  // Recompute counts from filtered list when filtering, else use server counts
+                  // Always recompute counts from the (filtered) list so all tabs
+                  // — Daily / Weekly / Monthly / All Time — show consistent items.
                   let entries: [string, number][] = [];
                   let total = 0;
-                  if (activityPeriod === "all") {
+                  const map: Record<string, number> = {};
+                  for (const it of filteredList) {
+                    const key = String(it?.type || "other").trim() || "other";
+                    map[key] = (map[key] || 0) + 1;
+                  }
+                  entries = Object.entries(map);
+                  total = filteredList.length;
+
+                  // Fallback to server counts only if list is completely empty
+                  // (e.g., backend returned summary without items) and we're on All Time.
+                  if (entries.length === 0 && activityPeriod === "all") {
                     const counts =
                       activity.activity_counts ||
                       activity.counts ||
@@ -651,15 +662,7 @@ const AdminUsers = () => {
                           typeof v === "number" && !["user_id", "id", "period", "total"].includes(k)
                         ) as [string, number][])
                       : [];
-                    total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + v, 0);
-                  } else {
-                    const map: Record<string, number> = {};
-                    for (const it of filteredList) {
-                      const key = String(it?.type || "other").toLowerCase().replace(/\s+/g, "_");
-                      map[key] = (map[key] || 0) + 1;
-                    }
-                    entries = Object.entries(map);
-                    total = filteredList.length;
+                    total = activity.total_activities ?? activity.total ?? entries.reduce((s, [, v]) => s + (v as number), 0);
                   }
 
                   if (entries.length === 0 && !total) {
