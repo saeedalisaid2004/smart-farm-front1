@@ -210,32 +210,82 @@ const CropRecommendation = () => {
                         </div>
                       </StaggerItem>
                     )}
-                    <StaggerItem>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {[
-                          { key: "primary", label: t("crop.recommendedCrop"), color: "from-amber-500 to-orange-600" },
-                          { key: "secondary", label: t("crop.secondaryCrop"), color: "from-emerald-500 to-green-600" },
-                          { key: "tertiary", label: t("crop.tertiaryCrop"), color: "from-blue-500 to-cyan-600" },
-                        ].map(({ key, label, color }) => {
-                          const cropRaw = result.recommendation[key];
-                          if (!cropRaw) return null;
-                          const crop = cleanByLang(cropRaw, language);
-                          return (
-                            <motion.div
-                              key={key}
-                              whileHover={{ y: -4, scale: 1.02 }}
-                              className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-center cursor-default"
-                            >
-                              <div className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg mb-2`}>
-                                <Sprout className="w-5 h-5 text-white" />
-                              </div>
-                              <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
-                              <p className="text-base font-bold text-foreground" dir="auto">{crop}</p>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                    </StaggerItem>
+                    {(() => {
+                      const rec = result.recommendation;
+                      const categories = [
+                        { key: "vegetables", fallbackTitle: t("crop.vegetables"), color: "from-emerald-500 to-green-600", icon: Carrot },
+                        { key: "fruits", fallbackTitle: t("crop.fruits"), color: "from-pink-500 to-rose-600", icon: Apple },
+                        { key: "field_crops", fallbackTitle: t("crop.fieldCrops"), color: "from-amber-500 to-orange-600", icon: Wheat },
+                      ];
+                      const hasNewFormat = categories.some((c) => rec[c.key]);
+
+                      if (hasNewFormat) {
+                        return (
+                          <div className="space-y-4">
+                            {categories.map(({ key, fallbackTitle, color, icon: Ic }) => {
+                              const cat = rec[key];
+                              if (!cat) return null;
+                              const items: string[] = Array.isArray(cat.items) ? cat.items : Array.isArray(cat) ? cat : [];
+                              if (!items.length) return null;
+                              const titleRaw = cat.title || fallbackTitle;
+                              const title = cleanByLang(titleRaw, language) || fallbackTitle;
+                              return (
+                                <StaggerItem key={key}>
+                                  <div className="bg-secondary/40 border border-border rounded-2xl p-4">
+                                    <div className="flex items-center gap-2.5 mb-3">
+                                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md`}>
+                                        <Ic className="w-4.5 h-4.5 text-white" />
+                                      </div>
+                                      <p className="text-sm font-semibold text-foreground" dir="auto">{title}</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                      {items.map((it, idx) => {
+                                        const display = cleanByLang(it, language) || it;
+                                        return (
+                                          <motion.div
+                                            key={idx}
+                                            whileHover={{ y: -2, scale: 1.02 }}
+                                            className="bg-primary/5 border border-primary/20 rounded-xl px-3 py-2.5 text-center"
+                                          >
+                                            <p className="text-sm font-bold text-foreground" dir="auto">{display}</p>
+                                          </motion.div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </StaggerItem>
+                              );
+                            })}
+                          </div>
+                        );
+                      }
+
+                      // Legacy fallback (primary/secondary/tertiary)
+                      return (
+                        <StaggerItem>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {[
+                              { key: "primary", label: t("crop.recommendedCrop"), color: "from-amber-500 to-orange-600" },
+                              { key: "secondary", label: t("crop.secondaryCrop"), color: "from-emerald-500 to-green-600" },
+                              { key: "tertiary", label: t("crop.tertiaryCrop"), color: "from-blue-500 to-cyan-600" },
+                            ].map(({ key, label, color }) => {
+                              const cropRaw = rec[key];
+                              if (!cropRaw) return null;
+                              const crop = cleanByLang(cropRaw, language);
+                              return (
+                                <motion.div key={key} whileHover={{ y: -4, scale: 1.02 }} className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-center cursor-default">
+                                  <div className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg mb-2`}>
+                                    <Sprout className="w-5 h-5 text-white" />
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                                  <p className="text-base font-bold text-foreground" dir="auto">{crop}</p>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        </StaggerItem>
+                      );
+                    })()}
                     {result.recommendation.description && (() => {
                       const desc = result.recommendation.description;
                       const cleanDesc = cleanByLang(desc, language);
