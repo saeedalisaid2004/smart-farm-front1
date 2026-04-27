@@ -178,8 +178,8 @@ const AdminUsers = () => {
   const loadActivity = async (uid: number | string, period: "daily" | "weekly" | "monthly" | "all") => {
     setLoadingActivity(true);
     try {
-      // Always fetch all; we filter client-side because backend ignores `period`.
-      const data = await apiGetUserActivity(uid, "all");
+      // Backend supports `period` and returns the correctly filtered set.
+      const data = await apiGetUserActivity(uid, period);
       setActivity(data);
     } catch {
       setActivity(null);
@@ -211,7 +211,9 @@ const AdminUsers = () => {
 
   const handleChangePeriod = (period: "daily" | "weekly" | "monthly" | "all") => {
     setActivityPeriod(period);
-    // Client-side filter only — data already loaded.
+    // Re-fetch from backend with the chosen period.
+    const uid = activitiesUser?.id || activitiesUser?.user_id;
+    if (uid) loadActivity(uid, period);
   };
 
   const handleToggleNotif = async (key: "push" | "email", value: boolean) => {
