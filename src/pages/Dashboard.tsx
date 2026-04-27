@@ -141,11 +141,6 @@ const Dashboard = () => {
                       <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-sky-500" />{weather.humidity}</span>
                         <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-500" />{weather.wind}</span>
-                        {(weather.time || weather.date) && (
-                          <span dir="ltr" className="text-[10px] opacity-80">
-                            {[weather.time, weather.date].filter(Boolean).join(" • ")}
-                          </span>
-                        )}
                       </div>
                     </div>
                     {weather.advice && (
@@ -155,6 +150,16 @@ const Dashboard = () => {
                     )}
                     {weather.desc && (
                       <p className="text-xs text-muted-foreground">{weather.desc}</p>
+                    )}
+                    {(weather.time || weather.date) && (
+                      <span
+                        dir="ltr"
+                        className="absolute bottom-2 ltr:right-3 rtl:left-3 text-[10px] text-muted-foreground/80 leading-tight text-right pointer-events-none"
+                      >
+                        {weather.time}
+                        {weather.time && weather.date && <br />}
+                        {weather.date}
+                      </span>
                     )}
                   </div>
                 ) : (
