@@ -678,29 +678,13 @@ const AdminUsers = () => {
 
             {/* Activity History List (with images when available) */}
             {(() => {
-              const rawList: any[] =
+              // Backend already returns the period-filtered list.
+              const list: any[] =
                 (Array.isArray(activity?.activities) && activity.activities) ||
                 (Array.isArray(activity?.recent_activities) && activity.recent_activities) ||
                 (Array.isArray(activity?.history) && activity.history) ||
                 (Array.isArray(activity?.items) && activity.items) ||
                 [];
-              const now = new Date();
-              const cutoff =
-                activityPeriod === "daily"
-                  ? new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-                  : activityPeriod === "weekly"
-                  ? now.getTime() - 7 * 24 * 60 * 60 * 1000
-                  : activityPeriod === "monthly"
-                  ? now.getTime() - 30 * 24 * 60 * 60 * 1000
-                  : 0;
-              const list =
-                activityPeriod === "all"
-                  ? rawList
-                  : rawList.filter((it: any) => {
-                      const d = it?.date || it?.created_at || it?.timestamp;
-                      const t = parseActivityDate(d);
-                      return !isNaN(t) && t >= cutoff;
-                    });
               if (!list.length) return null;
               return (
                 <div className="pt-3 border-t border-border/50 space-y-2">
