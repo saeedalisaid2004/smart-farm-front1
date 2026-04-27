@@ -713,8 +713,7 @@ const AdminUsers = () => {
                   ? rawList
                   : rawList.filter((it: any) => {
                       const d = it?.date || it?.created_at || it?.timestamp;
-                      if (!d) return false;
-                      const t = new Date(d).getTime();
+                      const t = parseActivityDate(d);
                       return !isNaN(t) && t >= cutoff;
                     });
               if (!list.length) return null;
