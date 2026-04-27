@@ -16,13 +16,26 @@ import { containsArabic, containsLatin, stripArabic, stripEnglish } from "@/lib/
 
 const hasMeaningfulText = (s: string) => /[A-Za-z\u0600-\u06FF]/.test(s);
 
-// Arabic → English dictionary for daily guide & crop values
+// Arabic → English dictionary for crop names, weather, advice values
 const arToEn: Record<string, string> = {
-  // Crops
-  "الطماطم": "Tomato", "الفلفل": "Pepper", "الذرة": "Corn", "القمح": "Wheat",
-  "الأرز": "Rice", "الشعير": "Barley", "الخيار": "Cucumber", "البطاطس": "Potato",
-  "البصل": "Onion", "الثوم": "Garlic", "الفول": "Beans", "العدس": "Lentils",
-  "القطن": "Cotton", "السمسم": "Sesame", "البطيخ": "Watermelon", "الباذنجان": "Eggplant",
+  // Vegetables
+  "الطماطم": "Tomato", "الخيار": "Cucumber", "الفلفل": "Pepper", "البطاطس": "Potato",
+  "البصل": "Onion", "الثوم": "Garlic", "الباذنجان": "Eggplant", "الكوسة": "Zucchini",
+  "الجزر": "Carrot", "الخس": "Lettuce", "الملفوف": "Cabbage", "القرنبيط": "Cauliflower",
+  "البامية": "Okra", "الفاصوليا": "Green Beans", "الفجل": "Radish", "السبانخ": "Spinach",
+  // Fruits
+  "الجوافة": "Guava", "الزيتون": "Olive", "المانجو": "Mango", "البرتقال": "Orange",
+  "الليمون": "Lemon", "العنب": "Grapes", "التين": "Fig", "الرمان": "Pomegranate",
+  "البطيخ": "Watermelon", "الشمام": "Cantaloupe", "الفراولة": "Strawberry", "التفاح": "Apple",
+  "الموز": "Banana", "المشمش": "Apricot", "الخوخ": "Peach", "البلح": "Dates",
+  // Field crops
+  "عباد الشمس": "Sunflower", "السمسم": "Sesame", "القمح": "Wheat", "الذرة": "Corn",
+  "الأرز": "Rice", "الشعير": "Barley", "القطن": "Cotton", "الفول": "Beans",
+  "العدس": "Lentils", "البرسيم": "Clover", "قصب السكر": "Sugarcane", "بنجر السكر": "Sugar Beet",
+  // Categories
+  "الخضروات": "Vegetables", "الفواكه": "Fruits", "المحاصيل الحقلية": "Field Crops",
+  // Common phrases
+  "تجهيز الأرض": "Land Preparation",
   // Weather
   "سماء صافية": "Clear sky", "غائم جزئياً": "Partly cloudy", "غائم": "Cloudy",
   "ممطر": "Rainy", "عاصف": "Stormy", "ضباب": "Foggy", "حار": "Hot", "بارد": "Cold",
