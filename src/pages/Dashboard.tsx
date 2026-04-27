@@ -40,7 +40,7 @@ const Dashboard = () => {
     };
     window.addEventListener("stats-updated", refresh);
     return () => window.removeEventListener("stats-updated", refresh);
-  }, []);
+  }, [language]);
 
   const features = [
     { icon: Leaf, title: t("dashboard.plantDisease"), desc: t("dashboard.plantDiseaseDesc"), path: "/dashboard/plant-disease", gradient: "from-emerald-500 to-green-600" },
