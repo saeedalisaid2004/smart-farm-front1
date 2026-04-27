@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { Sprout, Loader2, AlertCircle, Droplets, Leaf, Bug, CloudSun, MapPin } from "lucide-react";
+import { Sprout, Loader2, AlertCircle, Droplets, Leaf, Bug, CloudSun, MapPin, Apple, Wheat, Carrot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
