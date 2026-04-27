@@ -11,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const userName = user?.name || "John Farmer";
 
   const [stats, setStats] = useState<AnalysisStats>(getAnalysisStats());
@@ -40,7 +40,7 @@ const Dashboard = () => {
     };
     window.addEventListener("stats-updated", refresh);
     return () => window.removeEventListener("stats-updated", refresh);
-  }, []);
+  }, [language]);
 
   const features = [
     { icon: Leaf, title: t("dashboard.plantDisease"), desc: t("dashboard.plantDiseaseDesc"), path: "/dashboard/plant-disease", gradient: "from-emerald-500 to-green-600" },

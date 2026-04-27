@@ -298,8 +298,9 @@ export const getUserReportSummary = async (userId: number) => {
   return res.json();
 };
 
-export const getFarmerStats = async (userId: number) => {
-  const res = await fetchWithTimeout(`${API_BASE}/farmer/dashboard-all/${userId}`);
+export const getFarmerStats = async (userId: number, lang?: string) => {
+  const language = lang || (typeof localStorage !== "undefined" ? (localStorage.getItem("language_farmer") || "ar") : "ar");
+  const res = await fetchWithTimeout(`${API_BASE}/farmer/dashboard-all/${userId}?lang=${encodeURIComponent(language)}`);
   return res.json();
 };
 
