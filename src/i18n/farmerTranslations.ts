@@ -182,6 +182,9 @@ export const farmerTranslations = {
     "crop.fertilizer": "نصيحة السماد",
     "crop.diseaseAlert": "تنبيه الأمراض",
     "crop.generalWarning": "الحالة العامة",
+    "crop.vegetables": "الخضروات",
+    "crop.fruits": "الفواكه",
+    "crop.fieldCrops": "المحاصيل الحقلية",
     "crop.error": "خطأ",
     // Soil Analysis
     "soil.title": "تحليل نوع التربة",
