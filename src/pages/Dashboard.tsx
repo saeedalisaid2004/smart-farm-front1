@@ -154,7 +154,7 @@ const Dashboard = () => {
                     {(weather.time || weather.date) && (
                       <span
                         dir="ltr"
-                        className="absolute bottom-2 ltr:right-3 rtl:left-3 text-[10px] text-muted-foreground/80 leading-tight text-right pointer-events-none"
+                        className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/80 leading-tight text-right pointer-events-none"
                       >
                         {weather.time}
                         {weather.time && weather.date && <br />}
