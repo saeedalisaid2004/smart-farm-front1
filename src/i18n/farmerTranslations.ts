@@ -58,6 +58,9 @@ export const farmerTranslations = {
     "crop.fertilizer": "Fertilizer Advice",
     "crop.diseaseAlert": "Disease Alert",
     "crop.generalWarning": "General Status",
+    "crop.vegetables": "Vegetables",
+    "crop.fruits": "Fruits",
+    "crop.fieldCrops": "Field Crops",
     "crop.error": "Error",
     // Soil Analysis
     "soil.title": "Soil Type Analysis",
@@ -179,6 +182,9 @@ export const farmerTranslations = {
     "crop.fertilizer": "نصيحة السماد",
     "crop.diseaseAlert": "تنبيه الأمراض",
     "crop.generalWarning": "الحالة العامة",
+    "crop.vegetables": "الخضروات",
+    "crop.fruits": "الفواكه",
+    "crop.fieldCrops": "المحاصيل الحقلية",
     "crop.error": "خطأ",
     // Soil Analysis
     "soil.title": "تحليل نوع التربة",
