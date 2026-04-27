@@ -149,7 +149,7 @@ const Dashboard = () => {
                       </p>
                     )}
                     {weather.desc && (
-                      <p className="text-xs text-muted-foreground ltr:pr-20 rtl:pl-20">{weather.desc}</p>
+                      <p className="text-xs text-muted-foreground pr-20">{weather.desc}</p>
                     )}
                     {(weather.time || weather.date) && (
                       <span
