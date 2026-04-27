@@ -24,6 +24,23 @@ import {
 
 import { Switch } from "@/components/ui/switch";
 
+// Parse date strings from API. Supports formats like:
+//  - "Apr 19, 2026 - 04:35 AM"
+//  - "2026-04-19 11:48 PM"
+//  - "2026-04-19 | 11:48 PM"
+//  - ISO strings
+const parseActivityDate = (raw: any): number => {
+  if (!raw) return NaN;
+  const s = String(raw).trim();
+  // Replace " - " separator with space so Date can parse
+  let normalized = s.replace(/\s*\|\s*/g, " ").replace(/\s+-\s+/g, " ");
+  let t = new Date(normalized).getTime();
+  if (!isNaN(t)) return t;
+  // Try ISO-like fallback
+  t = new Date(s).getTime();
+  return t;
+};
+
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
