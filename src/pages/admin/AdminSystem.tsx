@@ -231,7 +231,7 @@ const AdminSystem = () => {
                   {svc.online ? <CheckCircle className="w-5 h-5 text-green-500" /> : <AlertCircle className="w-5 h-5 text-destructive" />}
                   <div>
                     <p className="text-sm font-medium text-foreground">{svc.name}</p>
-                    <p className="text-xs text-muted-foreground">{t("adminSys.uptime")}: {svc.uptime || "99%"}</p>
+                    {svc.uptime ? <p className="text-xs text-muted-foreground">{t("adminSys.uptime")}: {svc.uptime}</p> : null}
                   </div>
                 </div>
                 {svc.online ? (
