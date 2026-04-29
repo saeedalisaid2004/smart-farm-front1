@@ -69,12 +69,12 @@ const AdminSystem = () => {
     } else {
       const modelStatusMap = buildModelStatusMap(modelsList);
       setServices([
-        { name: t("dashboard.plantDisease"), module: "plant_disease", uptime: "99.9%", online: modelStatusMap["plant_disease"] ?? true },
-        { name: t("dashboard.animalWeight"), module: "animal_weight", uptime: "99.7%", online: modelStatusMap["animal_weight"] ?? true },
-        { name: t("dashboard.cropRecommendation"), module: "crop_rec", uptime: "99.8%", online: modelStatusMap["crop_rec"] ?? true },
-        { name: t("dashboard.soilAnalysis"), module: "soil_analysis", uptime: "99.6%", online: modelStatusMap["soil_analysis"] ?? true },
-        { name: t("dashboard.fruitQuality"), module: "fruit_quality", uptime: "99.5%", online: modelStatusMap["fruit_quality"] ?? true },
-        { name: t("dashboard.chatbot"), module: "chatbot", uptime: "99.9%", online: modelStatusMap["chatbot"] ?? true },
+        { name: t("dashboard.plantDisease"), module: "plant_disease", online: modelStatusMap["plant_disease"] ?? true },
+        { name: t("dashboard.animalWeight"), module: "animal_weight", online: modelStatusMap["animal_weight"] ?? true },
+        { name: t("dashboard.cropRecommendation"), module: "crop_rec", online: modelStatusMap["crop_rec"] ?? true },
+        { name: t("dashboard.soilAnalysis"), module: "soil_analysis", online: modelStatusMap["soil_analysis"] ?? true },
+        { name: t("dashboard.fruitQuality"), module: "fruit_quality", online: modelStatusMap["fruit_quality"] ?? true },
+        { name: t("dashboard.chatbot"), module: "chatbot", online: modelStatusMap["chatbot"] ?? true },
       ]);
     }
   }, [t]);
@@ -231,7 +231,7 @@ const AdminSystem = () => {
                   {svc.online ? <CheckCircle className="w-5 h-5 text-green-500" /> : <AlertCircle className="w-5 h-5 text-destructive" />}
                   <div>
                     <p className="text-sm font-medium text-foreground">{svc.name}</p>
-                    <p className="text-xs text-muted-foreground">{t("adminSys.uptime")}: {svc.uptime || "99%"}</p>
+                    {svc.uptime ? <p className="text-xs text-muted-foreground">{t("adminSys.uptime")}: {svc.uptime}</p> : null}
                   </div>
                 </div>
                 {svc.online ? (
