@@ -14,7 +14,7 @@ export default defineConfig({
       overlay: false,
     },
   },
-  plugins: [react(), isDev && componentTagger()].filter(Boolean),
+  plugins: [react(), ...(isDev ? [componentTagger()] : [])],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
