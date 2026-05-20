@@ -34,10 +34,10 @@ const Index = () => {
   ];
 
   const stats = [
-    { value: "10K+", label: "Active Farms" },
-    { value: "50+", label: "AI Models" },
-    { value: "99%", label: "Accuracy" },
-    { value: "24/7", label: "Support" },
+    { value: "6", label: "AI Services" },
+    { value: "~92%", label: "Avg. Accuracy" },
+    { value: "2", label: "Languages" },
+    { value: "24/7", label: "Availability" },
   ];
 
   const services = [
@@ -431,7 +431,7 @@ const Index = () => {
               >
                 Start your journey with us today
               </motion.h2>
-              <p className="text-primary-foreground/80 text-sm sm:text-lg mb-6 sm:mb-8 max-w-xl mx-auto">Join thousands of users who manage their businesses efficiently</p>
+              <p className="text-primary-foreground/80 text-sm sm:text-lg mb-6 sm:mb-8 max-w-xl mx-auto">Join farmers and agronomists using AI to make smarter decisions every day</p>
               
               <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
                 {["Free to try", "No credit card", "Instant results"].map((item, i) => (
